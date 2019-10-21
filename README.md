@@ -39,7 +39,7 @@ Install custom udev rules by copying the 99-gpio.rules file into the rules.d
 directory. The 99-gpio.rules file was copied from NVIDIA's official repository.  
   
 ```
-sudo cp 99-gpio.rules /etc/udev/rules.d/
+sudo cp JetsonGPIO/99-gpio.rules /etc/udev/rules.d/
 ```
   
 For the new rule to take place, you either need to reboot or reload the udev
