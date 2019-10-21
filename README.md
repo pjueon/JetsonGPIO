@@ -8,7 +8,9 @@ It has been written in C++ based on NVIDIA's Jetson-GPIO Python Library.
 It has almost same API with the NVIDIA's python library.   
 But it DOESN'T support all functionalites of the NVIDIA's original one.   
 
-It's not fully tested yet.  
+**It's not fully tested yet.**  
+  
+  
 ==========================================================================  
 
 
