@@ -4,11 +4,12 @@ A C++ library that enables the use of Jetson's GPIOs
   
 This is a very simple C++ Jetson GPIO Library written by Jueon Park(pjueon).   
 It has been written in C++ based on NVIDIA's Jetson-GPIO Python Library.  
-(https://github.com/NVIDIA/jetson-gpio)  
-It has almost same API with the NVIDIA's python library.   
-But it DOESN'T support all functionalites of the NVIDIA's original one.   
-
-**It's not fully tested yet.**  
+(https://github.com/NVIDIA/jetson-gpio)
+  
+JetsonGPIO library provides almost same public APIs provided by the NVIDIA's official python library.
+  
+**But it DOESN'T support all functionalites of the NVIDIA's original one.   
+And it's not fully tested yet.**  
   
 # Installation
 Clone this repository, build it, and install it.
