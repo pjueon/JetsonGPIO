@@ -1,7 +1,7 @@
 /*
-Copyright (c) 2012-2017 Ben Croston <ben@croston.org>.
-Copyright (c) 2019, NVIDIA CORPORATION. 
-Copyright (c) 2019 Jueon Park <bluegbg@gmail.com>.
+Copyright (c) 2012-2017 Ben Croston ben@croston.org.
+Copyright (c) 2019, NVIDIA CORPORATION.
+Copyright (c) 2019 Jueon Park(pjueon) bluegbg@gmail.com.
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -15,19 +15,11 @@ all copies or substantial portions of the Software.
 
 THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL
 THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
-
-==========================================================================
-This is a simple C++ Jetson GPIO Library written by Jueon Park(pjueon). 
-It has been written in C++ based on NVIDIA Jetson-GPIO Python Library, 
-but it DOESN'T support all functionalites of the NVIDIA's original one. 
-
-And it's never been tested yet.
-==========================================================================
 */
 
 #pragma once
