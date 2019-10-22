@@ -100,7 +100,7 @@ const _GPIO_PIN_INFO _JETSON_INFO = _gpio_data.pin_info;
 const auto _channel_data_by_mode = _gpio_data.channel_data;
 
 // Originally added function
-const char* _get_JETSON_INFO(){
+const string _get_JETSON_INFO(){
     stringstream ss;
     ss << "[JETSON_INFO]\n";
     ss << "P1_REVISION: " << _JETSON_INFO.P1_REVISION << endl;
@@ -109,7 +109,7 @@ const char* _get_JETSON_INFO(){
     ss << "TYPE: " << _JETSON_INFO.TYPE << endl;
     ss << "MANUFACTURER: " << _JETSON_INFO.MANUFACTURER << endl;
     ss << "PROCESSOR: " << _JETSON_INFO.PROCESSOR << endl;
-    return ss.str().c_str();
+    return ss.str();
 }
 
 const char* _get_model(){
