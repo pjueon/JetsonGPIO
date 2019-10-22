@@ -31,6 +31,8 @@ using namespace std;
 int main(){
 	cout << "model: "<< GPIO::model << endl;
 	cout << "lib version: " << GPIO::VERSION << endl;
+	cout << "JETSON_INFO: " << GPIO::JETSON_INFO << endl;
+
 
 	int output_pin = 18;
 	GPIO::setmode(GPIO::BCM);
