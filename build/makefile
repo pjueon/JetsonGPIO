@@ -26,11 +26,13 @@ RANLIB = ranlib
 LIB_NAME = JetsonGPIO
 LIB_FULL_NAME = lib$(LIB_NAME).a
 
+
 SRC_DIR = ../src
 INCLUDE_DIR = ../include
 
-LIB_SRCS = JetsonGPIO.cpp
-LIB_OBJS = $(LIB_SRCS:%.cpp=%.o)
+LIB_SRCS = JetsonGPIO.cpp PythonFunctions.cpp gpio_pin_data.cpp
+LIB_HEADERS = $(INCLUDE_DIR)/$(LIB_NAME).h $(INCLUDE_DIR)/private/PythonFunctions.h $(INCLUDE_DIR)/private/gpio_pin_data.h
+LIB_OBJS = $(LIB_NAME).o PythonFunctions.o gpio_pin_data.o
 
 TEST_SRC = test.cpp
 
@@ -48,8 +50,15 @@ $(LIB_FULL_NAME) : $(LIB_OBJS)
 	$(AR) rcv $@ $(LIB_OBJS)
 	$(RANLIB) $@
 
-$(LIB_OBJS) : $(SRC_DIR)/$(LIB_SRCS) $(INCLUDE_DIR)/$(LIB_NAME).h
-	g++ $(INCLUDE_FLAG) -c -o $@ $(SRC_DIR)/$(LIB_SRCS)
+
+$(LIB_NAME).o : $(SRC_DIR)/$(LIB_NAME).cpp $(LIB_HEADERS)
+	g++ $(INCLUDE_FLAG) -c -o $@ $(SRC_DIR)/$(LIB_NAME).cpp
+
+PythonFunctions.o :  $(SRC_DIR)/PythonFunctions.cpp $(INCLUDE_DIR)/private/PythonFunctions.h
+	g++ $(INCLUDE_FLAG) -c -o $@ $(SRC_DIR)/PythonFunctions.cpp
+
+gpio_pin_data.o : $(SRC_DIR)/gpio_pin_data.cpp $(LIB_HEADERS)
+	g++ $(INCLUDE_FLAG) -c -o $@ $(SRC_DIR)/gpio_pin_data.cpp
 
 
 install : $(LIB_FULL_NAME)

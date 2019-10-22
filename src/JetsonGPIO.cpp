@@ -23,8 +23,8 @@ DEALINGS IN THE SOFTWARE.
 */
 
 
-// #include <unistd.h>
-// #include <dirent.h>
+#include <unistd.h>
+#include <dirent.h>
 #include <iostream>
 #include <string>
 #include <stdexcept>
@@ -59,6 +59,11 @@ constexpr Directions HARD_PWM = Directions::HARD_PWM;
 
 // Jetson Models
 enum class Model{ JETSON_XAVIER, JETSON_TX2, JETSON_TX1, JETSON_NANO };
+
+extern const Model JETSON_XAVIER = Model::JETSON_XAVIER;
+extern const Model JETSON_TX2 = Model::JETSON_TX2;
+extern const Model JETSON_TX1 = Model::JETSON_TX1;
+extern const Model JETSON_NANO = Model::JETSON_NANO;
 
 // Numbering Modes
 enum class GPIO::NumberingModes{ BOARD, BCM, TEGRA_SOC, CVM, None };

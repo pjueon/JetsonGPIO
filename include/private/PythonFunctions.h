@@ -33,10 +33,9 @@ bool startswith(const std::string& s, const std::string& prefix);
 
 std::vector<std::string> split(const std::string& s, const char d);
 
-bool std::os_access(const string& path, int mode); // os.access
+bool os_access(const std::string& path, int mode); // os.access
 
-
-std::vector<string> os_listdir(const std::string& path);  // os.listdir
+std::vector<std::string> os_listdir(const std::string& path);  // os.listdir
 
 bool os_path_exists(const std::string& path);  // os.path.exists
 

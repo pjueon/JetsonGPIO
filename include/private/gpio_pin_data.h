@@ -35,6 +35,11 @@ DEALINGS IN THE SOFTWARE.
 
 enum class Model;
 
+extern const Model JETSON_XAVIER;
+extern const Model JETSON_TX2;
+extern const Model JETSON_TX1;
+extern const Model JETSON_NANO;
+
 struct _GPIO_PIN_DEF{
     const int LinuxPin;           // Linux GPIO pin number
     const std::string SysfsDir;        // GPIO chip sysfs directory
@@ -55,32 +60,10 @@ struct _GPIO_PIN_INFO{
     const std::string PROCESSOR;
 };
 
-extern const std::vector<_GPIO_PIN_DEF> JETSON_XAVIER_PIN_DEFS;
-extern const std::vector<std::string> compats_xavier;
-
-extern const std::vector<_GPIO_PIN_DEF> JETSON_TX2_PIN_DEFS;
-extern const std::vector<std::string> compats_tx2;
-
-extern const std::vector<_GPIO_PIN_DEF> JETSON_TX1_PIN_DEFS;
-extern const std::vector<std::string> compats_tx1;
-
-extern const std::vector<_GPIO_PIN_DEF> JETSON_NANO_PIN_DEFS;
-extern const std::vector<std::string> compats_nano;
-
-extern const std::map<Model, std::vector<_GPIO_PIN_DEF>> PIN_DEFS_MAP;
-extern const std::map<Model, _GPIO_PIN_INFO> JETSON_INFO_MAP;
-
-
-struct GPIO_data{
-    Model model;
-    _GPIO_PIN_INFO pin_info;
-    map<NumberingModes, map<string, ChannelInfo>> channel_data;
-};
-
 
 struct ChannelInfo{
-    ChannelInfo(const string& channel, const string& gpio_chip_dir, 
-		int chip_gpio, int gpio, const string& pwm_chip_dir, 
+    ChannelInfo(const std::string& channel, const std::string& gpio_chip_dir, 
+		int chip_gpio, int gpio, const std::string& pwm_chip_dir, 
 		int pwm_id)
 	    : channel(channel),
 	      gpio_chip_dir(gpio_chip_dir),
@@ -91,12 +74,18 @@ struct ChannelInfo{
 	    {}
     ChannelInfo(const ChannelInfo&) = default;
 
-    const string channel;
-    const string gpio_chip_dir;
+    const std::string channel;
+    const std::string gpio_chip_dir;
     const int chip_gpio;
     const int gpio;
-    const string pwm_chip_dir;
+    const std::string pwm_chip_dir;
     const int pwm_id;
+};
+
+struct GPIO_data{
+    Model model;
+    _GPIO_PIN_INFO pin_info;
+    std::map<GPIO::NumberingModes, std::map<std::string, ChannelInfo>> channel_data;
 };
 
 

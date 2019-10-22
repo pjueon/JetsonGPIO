@@ -49,7 +49,7 @@ using namespace std;
    The values are use to generate dictionaries that map the corresponding pin
    mode numbers to the Linux GPIO pin number and GPIO chip directory */
 
-extern const vector<_GPIO_PIN_DEF> JETSON_XAVIER_PIN_DEFS = {
+const vector<_GPIO_PIN_DEF> JETSON_XAVIER_PIN_DEFS{
     { 134, "/sys/devices/2200000.gpio", "7", "4", "MCLK05", "SOC_GPIO42", "None", -1 },
     { 140, "/sys/devices/2200000.gpio", "11", "17", "UART1_RTS", "UART1_RTS", "None", -1 },
     { 63, "/sys/devices/2200000.gpio", "12", "18", "I2S2_CLK", "DAP2_SCLK", "None", -1 },
@@ -77,14 +77,14 @@ extern const vector<_GPIO_PIN_DEF> JETSON_XAVIER_PIN_DEFS = {
     { 64, "/sys/devices/2200000.gpio", "40", "21", "I2S2_DOUT", "DAP2_DOUT", "None", -1 }
 };
 
-extern const vector<string> compats_xavier = {    
+const vector<string> compats_xavier{    
     "nvidia,p2972-0000",
     "nvidia,p2972-0006",
     "nvidia,jetson-xavier"
     };
 
 
-extern const vector<_GPIO_PIN_DEF> JETSON_TX2_PIN_DEFS = {
+const vector<_GPIO_PIN_DEF> JETSON_TX2_PIN_DEFS{
     { 76, "/sys/devices/2200000.gpio", "7", "4", "AUDIO_MCLK", "AUD_MCLK", "None", -1 },
     // Output-only (due to base board)
     { 146, "/sys/devices/2200000.gpio", "11", "17", "UART0_RTS", "UART1_RTS", "None", -1 },
@@ -114,7 +114,7 @@ extern const vector<_GPIO_PIN_DEF> JETSON_TX2_PIN_DEFS = {
     { 73, "/sys/devices/2200000.gpio", "40", "21", "I2S0_SDOUT", "DAP1_DOUT", "None", -1}
 };
 
-extern const vector<string> compats_tx2 = {    
+const vector<string> compats_tx2{    
     "nvidia,p2771-0000",
     "nvidia,p2771-0888",
     "nvidia,p3489-0000",
@@ -124,7 +124,7 @@ extern const vector<string> compats_tx2 = {
     };
 
 
-extern const vector<_GPIO_PIN_DEF> JETSON_TX1_PIN_DEFS = {
+const vector<_GPIO_PIN_DEF> JETSON_TX1_PIN_DEFS{
     { 216, "/sys/devices/6000d000.gpio", "7", "4", "AUDIO_MCLK", "AUD_MCLK", "None", -1 },
     // Output-only (due to base board)
     { 162, "/sys/devices/6000d000.gpio", "11", "17", "UART0_RTS", "UART1_RTS", "None", -1 },
@@ -152,13 +152,13 @@ extern const vector<_GPIO_PIN_DEF> JETSON_TX1_PIN_DEFS = {
     { 10, "/sys/devices/6000d000.gpio", "40", "21", "I2S0_SDOUT", "DAP1_DOUT", "None", -1 }
 }; 
 
-extern const vector<string> compats_tx1 = {    
+const vector<string> compats_tx1{    
     "nvidia,p2371-2180",
     "nvidia,jetson-cv"
     };
 
 
-extern const vector<_GPIO_PIN_DEF> JETSON_NANO_PIN_DEFS = {
+const vector<_GPIO_PIN_DEF> JETSON_NANO_PIN_DEFS{
     { 216, "/sys/devices/6000d000.gpio", "7", "4", "GPIO9", "AUD_MCLK", "None", -1 },
     { 50, "/sys/devices/6000d000.gpio", "11", "17", "UART1_RTS", "UART2_RTS", "None", -1 },
     { 79, "/sys/devices/6000d000.gpio", "12", "18", "I2S0_SCLK", "DAP4_SCLK", "None", -1 },
@@ -185,63 +185,45 @@ extern const vector<_GPIO_PIN_DEF> JETSON_NANO_PIN_DEFS = {
     { 78, "/sys/devices/6000d000.gpio", "40", "21", "I2S0_DOUT", "DAP4_DOUT", "None", -1 }
 };
 
-extern const vector<string> compats_nano = {    
+const vector<string> compats_nano{    
     "nvidia,p3450-0000",
     "nvidia,p3450-0002",
     "nvidia,jetson-nano"
     };
 
 
-extern const map<Model, vector<_GPIO_PIN_DEF>> PIN_DEFS_MAP = {
-    { Model::JETSON_XAVIER, JETSON_XAVIER_PIN_DEFS },
-    { Model::JETSON_TX2, JETSON_TX2_PIN_DEFS },
-    { Model::JETSON_TX1, JETSON_TX1_PIN_DEFS },
-    { Model::JETSON_NANO, JETSON_NANO_PIN_DEFS },
+const map<Model, vector<_GPIO_PIN_DEF>> PIN_DEFS_MAP{
+    { JETSON_XAVIER, JETSON_XAVIER_PIN_DEFS },
+    { JETSON_TX2, JETSON_TX2_PIN_DEFS },
+    { JETSON_TX1, JETSON_TX1_PIN_DEFS },
+    { JETSON_NANO, JETSON_NANO_PIN_DEFS },
 };
 
-extern const map<Model, _GPIO_PIN_INFO> JETSON_INFO_MAP = {
-    { Model::JETSON_XAVIER, {1, "16384M", "Unknown", "Jetson Xavier", "NVIDIA", "ARM Carmel"} },
-    { Model::JETSON_TX2, {1, "8192M", "Unknown", "Jetson TX2", "NVIDIA", "ARM A57 + Denver"} },
-    { Model::JETSON_TX1, {1, "4096M", "Unknown", "Jetson TX1", "NVIDIA", "ARM A57"} },
-    { Model::JETSON_NANO, {1, "4096M", "Unknown", "Jetson nano", "NVIDIA", "ARM A57"} }
+const map<Model, _GPIO_PIN_INFO> JETSON_INFO_MAP{
+    { JETSON_XAVIER, {1, "16384M", "Unknown", "Jetson Xavier", "NVIDIA", "ARM Carmel"} },
+    { JETSON_TX2, {1, "8192M", "Unknown", "Jetson TX2", "NVIDIA", "ARM A57 + Denver"} },
+    { JETSON_TX1, {1, "4096M", "Unknown", "Jetson TX1", "NVIDIA", "ARM A57"} },
+    { JETSON_NANO, {1, "4096M", "Unknown", "Jetson nano", "NVIDIA", "ARM A57"} }
 };
 
-
-
-// struct ChannelInfo{
-//     ChannelInfo(const string& channel, const string& gpio_chip_dir, 
-// 		int chip_gpio, int gpio, const string& pwm_chip_dir, 
-// 		int pwm_id)
-// 	    : channel(channel),
-// 	      gpio_chip_dir(gpio_chip_dir),
-// 	      chip_gpio(chip_gpio), 
-// 	      gpio(gpio), 
-// 	      pwm_chip_dir(pwm_chip_dir),
-// 	      pwm_id(pwm_id) 
-// 	    {}
-//     ChannelInfo(const ChannelInfo&) = default;
-
-//     const string channel;
-//     const string gpio_chip_dir;
-//     const int chip_gpio;
-//     const int gpio;
-//     const string pwm_chip_dir;
-//     const int pwm_id;
-// };
-
-
-// struct GPIO_data{
-//     Model model;
-//     _GPIO_PIN_INFO pin_info;
-//     map<NumberingModes, map<string, ChannelInfo>> channel_data;
-// };
 
 bool ids_warned = false;
 
+int debuging = 35;
+vector<string> debug_vector{"A", "B", "C"};
 
 GPIO_data get_data(){
-//    cerr << "[DEBUG] get_data begin" << endl;
+    cerr << "[DEBUG] get_data begin" << endl;
     try{
+	cerr << "[DEBUG] compats_tx1.size(): " << compats_tx1.size() << endl;
+	cerr << "[DEBUG] compats_tx2.size(): " << compats_tx2.size() << endl;
+	cerr << "[DEBUG] compats_xavier.size(): " << compats_xavier.size() << endl;
+	cerr << "[DEBUG] compats_nano.size(): " << compats_nano.size() << endl;
+	cerr << "[DEBUG] JETSON_XAVIER_PIN_DEFS.size(): " << JETSON_XAVIER_PIN_DEFS.size() << endl;
+	cerr << "[DEBUG] " << debuging << endl;
+
+	cerr << "[DEBUG] debug vector.size()" << debug_vector.size() << endl;
+
         const string compatible_path = "/proc/device-tree/compatible";
         const string ids_path = "/proc/device-tree/chosen/plugin-manager/ids";
 
@@ -259,10 +241,13 @@ GPIO_data get_data(){
         } // scope ends
 
         auto matches = [&compatibles](const vector<string>& vals) {
-            // cerr << "[DEBUG] matches begin" << endl;
-        for(const auto& v : vals)
+            cerr << "[DEBUG] matches begin" << endl;
+	    cerr << "[DEBUG] vals.size(): " << vals.size() << endl;
+        for(const auto& v : vals){
+		cerr << "[DEBUG] try to find " << v << endl; 
                 if(compatibles.find(v) != compatibles.end()) return true;     
-
+	}
+            cerr << "[DEBUG] None of candidates matched!" << endl;
             return false;
         };
 
@@ -300,21 +285,22 @@ GPIO_data get_data(){
         };
 
         Model model;
+	
 
         if (matches(compats_tx1)){
-            model = Model::JETSON_TX1;
+            model = JETSON_TX1;
             warn_if_not_carrier_board("2597");
         }
         else if (matches(compats_tx2)){
-            model = Model::JETSON_TX2;
+            model = JETSON_TX2;
             warn_if_not_carrier_board("2597");
         }
         else if (matches(compats_xavier)){
-            model = Model::JETSON_XAVIER;
+            model = JETSON_XAVIER;
             warn_if_not_carrier_board("2822");
         }
         else if (matches(compats_nano)){
-            model = Model::JETSON_NANO;
+            model = JETSON_NANO;
             string module_id = find_pmgr_board("3448");
 
             if (module_id == "None")
