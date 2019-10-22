@@ -80,8 +80,8 @@ extern const NumberingModes GPIO::CVM = NumberingModes::CVM;
 constexpr auto _SYSFS_ROOT = "/sys/class/gpio";
 
 bool CheckPermission(){
-    string path1 = _SYSFS_ROOT + "/export";
-    string path2 = _SYSFS_ROOT + "/unexport";
+    string path1 = string(_SYSFS_ROOT) + "/export";
+    string path2 = string(_SYSFS_ROOT) + "/unexport";
     if(!os_access(path1, W_OK) || !os_access(path2, W_OK) ){
         cerr << "[ERROR] The current user does not have permissions set to "
                 "access the library functionalites. Please configure "
@@ -177,7 +177,7 @@ Directions _sysfs_channel_configuration(const ChannelInfo& ch_info){
             return HARD_PWM;
     }
 
-    string gpio_dir = _SYSFS_ROOT + "/gpio" + to_string(ch_info.gpio);
+    string gpio_dir = string(_SYSFS_ROOT) + "/gpio" + to_string(ch_info.gpio);
     if (!os_path_exists(gpio_dir))
         return UNKNOWN;  // Originally returns None in NVIDIA's GPIO Python Library
 
@@ -212,14 +212,14 @@ Directions _app_channel_configuration(const ChannelInfo& ch_info){
 
 
 void _export_gpio(const int gpio){
-    if(os_path_exists(_SYSFS_ROOT + "/gpio" + to_string(gpio) ))
+    if(os_path_exists(string(_SYSFS_ROOT) + "/gpio" + to_string(gpio) ))
         return;
     { // scope for f_export
-        ofstream f_export(_SYSFS_ROOT + "/export");
+        ofstream f_export(string(_SYSFS_ROOT) + "/export");
         f_export << gpio;
     } // scope ends
 
-    string value_path = _SYSFS_ROOT + "/gpio" + to_string(gpio) + "/value";
+    string value_path = string(_SYSFS_ROOT) + "/gpio" + to_string(gpio) + "/value";
     
     int time_count = 0;
     while (!os_access(value_path, R_OK | W_OK)){
@@ -230,16 +230,16 @@ void _export_gpio(const int gpio){
 
 
 void _unexport_gpio(const int gpio){
-    if (!os_path_exists(_SYSFS_ROOT + "/gpio" + to_string(gpio)))
+    if (!os_path_exists(string(_SYSFS_ROOT) + "/gpio" + to_string(gpio)))
         return;
 
-    ofstream f_unexport(_SYSFS_ROOT + "/unexport");
+    ofstream f_unexport(string(_SYSFS_ROOT) + "/unexport");
     f_unexport << gpio;
 }
 
 
 void _output_one(const string gpio, const int value){
-    ofstream value_file(_SYSFS_ROOT + "/gpio" + gpio + "/value");
+    ofstream value_file(string(_SYSFS_ROOT) + "/gpio" + gpio + "/value");
     value_file << int(bool(value));
 }
 
@@ -251,7 +251,7 @@ void _output_one(const int gpio, const int value){
 void _setup_single_out(const ChannelInfo& ch_info, int initial = -1){
     _export_gpio(ch_info.gpio);
 
-    string gpio_dir_path = _SYSFS_ROOT + "/gpio" + to_string(ch_info.gpio) + "/direction";
+    string gpio_dir_path = string(_SYSFS_ROOT) + "/gpio" + to_string(ch_info.gpio) + "/direction";
     { // scope for direction_file
         ofstream direction_file(gpio_dir_path);
         direction_file << "out";
@@ -267,7 +267,7 @@ void _setup_single_out(const ChannelInfo& ch_info, int initial = -1){
 void _setup_single_in(const ChannelInfo& ch_info){
     _export_gpio(ch_info.gpio);
 
-    string gpio_dir_path = _SYSFS_ROOT + "/gpio" + to_string(ch_info.gpio) + "/direction";
+    string gpio_dir_path = string(_SYSFS_ROOT) + "/gpio" + to_string(ch_info.gpio) + "/direction";
     { // scope for direction_file
         ofstream direction_file(gpio_dir_path);
         direction_file << "in";
@@ -507,7 +507,7 @@ int GPIO::input(const string& channel){
             throw runtime_error("You must setup() the GPIO channel first");
 
         { // scope for value
-            ifstream value(_SYSFS_ROOT + "/gpio" + to_string(ch_info.gpio) + "/value");
+            ifstream value(string(_SYSFS_ROOT) + "/gpio" + to_string(ch_info.gpio) + "/value");
             int value_read;
             value >> value_read;
             return value_read;
