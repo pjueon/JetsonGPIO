@@ -230,15 +230,8 @@ PIN_DATA::PIN_DATA()
 
 GPIO_data get_data(){
     
-    cerr << "[DEBUG] get_data begin" << endl;
     try{
         PIN_DATA& _DATA = PIN_DATA::get_instance();
-
-        cerr << "[DEBUG] compats_tx1.size(): " << _DATA.compats_tx1.size() << endl;
-        cerr << "[DEBUG] compats_tx2.size(): " << _DATA.compats_tx2.size() << endl;
-        cerr << "[DEBUG] compats_xavier.size(): " << _DATA.compats_xavier.size() << endl;
-        cerr << "[DEBUG] compats_nano.size(): " << _DATA.compats_nano.size() << endl;
-
 
         const string compatible_path = "/proc/device-tree/compatible";
         const string ids_path = "/proc/device-tree/chosen/plugin-manager/ids";
@@ -257,47 +250,42 @@ GPIO_data get_data(){
         } // scope ends
 
         auto matches = [&compatibles](const vector<string>& vals) {
-            cerr << "[DEBUG] matches begin" << endl;
-	    cerr << "[DEBUG] vals.size(): " << vals.size() << endl;
-        for(const auto& v : vals){
-		cerr << "[DEBUG] try to find " << v << endl; 
-                if(compatibles.find(v) != compatibles.end()) return true;     
-	}
-            cerr << "[DEBUG] None of candidates matched!" << endl;
-            return false;
+            for(const auto& v : vals){
+                    if(compatibles.find(v) != compatibles.end()) return true;     
+            }
+        return false;
         };
 
         auto find_pmgr_board = [&](const string& prefix){
-
-        if (!os_path_exists(ids_path)){ 
-                if (ids_warned == false){
-                    ids_warned = true;
-                    string msg = "WARNING: Plugin manager information missing from device tree.\n"
-                                "WARNING: Cannot determine whether the expected Jetson board is present." ;
-                    cerr << msg;
+            if (!os_path_exists(ids_path)){ 
+                    if (ids_warned == false){
+                        ids_warned = true;
+                        string msg = "WARNING: Plugin manager information missing from device tree.\n"
+                                    "WARNING: Cannot determine whether the expected Jetson board is present." ;
+                        cerr << msg;
+                    }
+                    return "None";
                 }
-                return "None";
-            }
 
-            vector<string> files = os_listdir(ids_path);
-            for (const string& file : files){
+                vector<string> files = os_listdir(ids_path);
+                for (const string& file : files){
 
-                if (startswith(file, prefix))
-                    return file.c_str();
-            }
+                    if (startswith(file, prefix))
+                        return file.c_str();
+                }
 
-        return "None";
-        };
-        
-        auto warn_if_not_carrier_board = [&](string carrier_board){
+            return "None";
+            };
+            
+            auto warn_if_not_carrier_board = [&](string carrier_board){
 
-        string found = find_pmgr_board(carrier_board + "-");
-            if (found == "None"){
-                string msg = "WARNING: Carrier board is not from a Jetson Developer Kit.\n"
-                            "WARNNIG: Jetson.GPIO library has not been verified with this carrier board,\n"
-                            "WARNING: and in fact is unlikely to work correctly.";
-                cerr << msg << endl;
-            }
+            string found = find_pmgr_board(carrier_board + "-");
+                if (found == "None"){
+                    string msg = "WARNING: Carrier board is not from a Jetson Developer Kit.\n"
+                                "WARNNIG: Jetson.GPIO library has not been verified with this carrier board,\n"
+                                "WARNING: and in fact is unlikely to work correctly.";
+                    cerr << msg << endl;
+                }
         };
 
         Model model;
@@ -440,5 +428,3 @@ GPIO_data get_data(){
       	throw false;	
     }
 }
-
-// ========================================= End of "gpio_pin_data.py" =========================================
