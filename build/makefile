@@ -26,7 +26,6 @@ RANLIB = ranlib
 LIB_NAME = JetsonGPIO
 LIB_FULL_NAME = lib$(LIB_NAME).a
 
-
 SRC_DIR = ../src
 INCLUDE_DIR = ../include
 
@@ -43,13 +42,9 @@ ifeq ($(PREFIX),)
 	PREFIX := /usr/local
 endif
 
-
-all : $(LIB_FULL_NAME)
-	
-$(LIB_FULL_NAME) : $(LIB_OBJS)
-	$(AR) rcv $@ $(LIB_OBJS)
-	$(RANLIB) $@
-
+all : $(LIB_OBJS)
+	$(AR) rcv $(LIB_FULL_NAME) $(LIB_OBJS)
+	$(RANLIB) $(LIB_FULL_NAME)
 
 $(LIB_NAME).o : $(SRC_DIR)/$(LIB_NAME).cpp $(LIB_HEADERS)
 	g++ $(INCLUDE_FLAG) -c -o $@ $(SRC_DIR)/$(LIB_NAME).cpp
@@ -72,8 +67,7 @@ uninstall :
 Test : $(SRC_DIR)/$(TEST_SRC)
 	g++ -o $@ $(SRC_DIR)/$(TEST_SRC) $(LIBS_FLAG)
 
-
 clean :
-	rm -rf *.o
-	rm -rf *.a
+	rm -rf  *.o
+	rm -rf  *.a
 
