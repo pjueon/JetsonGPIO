@@ -10,7 +10,7 @@ The library provides almost same APIs as the the NVIDIA's Jetson GPIO Python lib
 **But it DOESN'T support all functionalites of the NVIDIA's original one.**  
   
     
-**Tested on Jetson Nano and Jetson TX2**
+**(Tested on Jetson Nano and Jetson TX2)**
  
 # Installation
 Clone this repository, build it, and install it.
