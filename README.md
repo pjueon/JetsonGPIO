@@ -1,10 +1,9 @@
 # JetsonGPIO(C++)
 A C++ library that enables the use of Jetson's GPIOs  
 (Jetson TX1, TX2, AGX Xavier, and Nano)
-  
-This is a very simple C++ Jetson GPIO Library written by Jueon Park(pjueon).   
-It's an unofficial port of the NVIDIA's official Jetson GPIO Python library to C++.
-(https://github.com/NVIDIA/jetson-gpio)
+    
+It's an unofficial port of the NVIDIA's official Jetson GPIO Python library to C++.    
+**NVIDIA's official Jetson GPIO Python library**: https://github.com/NVIDIA/jetson-gpio
   
 The library provides almost same APIs as the the NVIDIA's Jetson GPIO Python library.
   
