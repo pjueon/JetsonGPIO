@@ -431,7 +431,7 @@ void GPIO::setup(const string& channel, Directions direction, int initial){
             
         }
 
-        if(direction != OUT || direction != IN)
+        if(direction != OUT && direction != IN)
             throw runtime_error("GPIO direction must be GPIO::IN or GPIO::OUT");
 
         if(direction == OUT){
