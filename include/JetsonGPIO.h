@@ -40,10 +40,10 @@ namespace GPIO{
     enum class NumberingModes{ BOARD, BCM, TEGRA_SOC, CVM, None };
     
     // GPIO::BOARD, GPIO::BCM, GPIO::TEGRA_SOC, GPIO::CVM
-    constexpr NumberingModes GPIO::BOARD = NumberingModes::BOARD;
-    constexpr NumberingModes GPIO::BCM = NumberingModes::BCM;
-    constexpr NumberingModes GPIO::TEGRA_SOC = NumberingModes::TEGRA_SOC;
-    constexpr NumberingModes GPIO::CVM = NumberingModes::CVM;
+    constexpr NumberingModes BOARD = NumberingModes::BOARD;
+    constexpr NumberingModes BCM = NumberingModes::BCM;
+    constexpr NumberingModes TEGRA_SOC = NumberingModes::TEGRA_SOC;
+    constexpr NumberingModes CVM = NumberingModes::CVM;
 
    // Pull up/down options are removed because they are unused in NVIDIA's original python libarary.
    // check: https://github.com/NVIDIA/jetson-gpio/issues/5
@@ -56,8 +56,8 @@ namespace GPIO{
     enum class Directions{ UNKNOWN, OUT, IN, HARD_PWM };
 
     // GPIO::IN, GPIO::OUT
-    constexpr Directions IN;
-    constexpr Directions OUT;
+    constexpr Directions IN = Directions::IN;
+    constexpr Directions OUT = Directions::OUT;
     
     // Function used to enable/disable warnings during setup and cleanup.
     void setwarnings(bool state);
