@@ -50,6 +50,8 @@ using namespace std;
    mode numbers to the Linux GPIO pin number and GPIO chip directory */
 bool ids_warned = false;
 
+// Global variables are wrapped in singleton pattern in order to avoid 
+// initialization order of global variables in different compilation units problem
 class PIN_DATA{
 private:
     PIN_DATA();

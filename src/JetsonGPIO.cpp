@@ -46,14 +46,9 @@ DEALINGS IN THE SOFTWARE.
 using namespace GPIO;
 using namespace std;
 
-// GPIO directions. UNKNOWN constant is for gpios that are not yet setup
-enum class GPIO::Directions{ UNKNOWN, OUT, IN, HARD_PWM };
 
-// The user only can use IN, OUT
-extern const Directions GPIO::IN = Directions::IN;
-extern const Directions GPIO::OUT = Directions::OUT;
-
-// The use CAN'T use UNKNOW, HARD_PWM
+// The user CAN'T use GPIO::UNKNOW, GPIO::HARD_PWM 
+// These are only for implementation
 constexpr Directions UNKNOWN = Directions::UNKNOWN;
 constexpr Directions HARD_PWM = Directions::HARD_PWM;
 
@@ -64,15 +59,6 @@ extern const Model JETSON_XAVIER = Model::JETSON_XAVIER;
 extern const Model JETSON_TX2 = Model::JETSON_TX2;
 extern const Model JETSON_TX1 = Model::JETSON_TX1;
 extern const Model JETSON_NANO = Model::JETSON_NANO;
-
-// Numbering Modes
-enum class GPIO::NumberingModes{ BOARD, BCM, TEGRA_SOC, CVM, None };
-
-// The use CAN'T use NumberingModes::None
-extern const NumberingModes GPIO::BOARD = NumberingModes::BOARD;
-extern const NumberingModes GPIO::BCM = NumberingModes::BCM;
-extern const NumberingModes GPIO::TEGRA_SOC = NumberingModes::TEGRA_SOC;
-extern const NumberingModes GPIO::CVM = NumberingModes::CVM;
 
 
 // ========================================= Begin of "gpio.py" =========================================
@@ -134,9 +120,9 @@ map<string, Directions>_channel_configuration;
 void _validate_mode_set(){
     if(_gpio_mode == NumberingModes::None)
         throw runtime_error("Please set pin numbering mode using "
-                           "GPIO.setmode(GPIO::BOARD), GPIO.setmode(GPIO::BCM), "
-                           "GPIO.setmode(GPIO::TEGRA_SOC) or "
-                           "GPIO.setmode(GPIO::CVM)");
+                           "GPIO::setmode(GPIO::BOARD), GPIO::setmode(GPIO::BCM), "
+                           "GPIO::setmode(GPIO::TEGRA_SOC) or "
+                           "GPIO::setmode(GPIO::CVM)");
 }
 
 
@@ -312,8 +298,7 @@ void _export_pwm(const ChannelInfo& ch_info){
     
     { // scope for f
         string path = _pwm_export_path(ch_info);
-	ofstream f(path);
-	//ofstream f(_pwm_export_path(ch_info));
+	    ofstream f(path);
 	
 	if(!f.is_open()) throw runtime_error("Can't open " + path);
 
@@ -321,8 +306,6 @@ void _export_pwm(const ChannelInfo& ch_info){
     } // scope ends
 
     string enable_path = _pwm_enable_path(ch_info);
-    
-   // cerr << "[DEBUG] _export_pwm, enable_path: " << enable_path << endl;
 	
     int time_count = 0;
     while (!os_access(enable_path, R_OK | W_OK)){
@@ -405,7 +388,13 @@ void GPIO::setwarnings(bool state){
 // Possible mode values are BOARD, BCM, TEGRA_SOC and CVM
 void GPIO::setmode(NumberingModes mode){
     try{
-        // check if a different mode has been set
+        // check if mode is valid
+        if(mode == NumberingModes::None)
+            throw runtime_error("Pin numbering mode must be "
+                                "GPIO::BOARD, GPIO::BCM, "
+                                "GPIO::TEGRA_SOC or "
+                                "GPIO::CVM");
+        // check if a different mode has been set                        
         if(_gpio_mode != NumberingModes::None && mode != _gpio_mode)
             throw runtime_error("A different mode has already been set!");
         
@@ -414,7 +403,7 @@ void GPIO::setmode(NumberingModes mode){
     }
     catch(exception& e){
         cerr << "[Exception] " << e.what() << " (catched from: setmode())" << endl;
-        throw false;
+        terminate();
     }
 }
 
@@ -436,11 +425,14 @@ void GPIO::setup(const string& channel, Directions direction, int initial){
             Directions sysfs_cfg = _sysfs_channel_configuration(ch_info);
             Directions app_cfg = _app_channel_configuration(ch_info);
 
-        if (app_cfg == UNKNOWN && sysfs_cfg != UNKNOWN){
-            cerr << "[WARNING] This channel is already in use, continuing anyway. Use GPIO::setwarnings(false) to disable warnings.\n";
-        }
+            if (app_cfg == UNKNOWN && sysfs_cfg != UNKNOWN){
+                cerr << "[WARNING] This channel is already in use, continuing anyway. Use GPIO::setwarnings(false) to disable warnings.\n";
+            }
             
         }
+
+        if(direction != OUT || direction != IN)
+            throw runtime_error("GPIO direction must be GPIO::IN or GPIO::OUT");
 
         if(direction == OUT){
             _setup_single_out(ch_info, initial);
@@ -452,7 +444,7 @@ void GPIO::setup(const string& channel, Directions direction, int initial){
     }
     catch(exception& e){
         cerr << "[Exception] " << e.what() << " (catched from: setup())" << endl;
-        throw false;
+        terminate();
     }
 }
 
@@ -486,7 +478,7 @@ void GPIO::cleanup(const string& channel){
     }
     catch (exception& e){
         cerr << "[Exception] " << e.what() << " (catched from: cleanup())" << endl;
-        throw false;
+        terminate();
     }
 }
 
@@ -515,7 +507,7 @@ int GPIO::input(const string& channel){
     }
     catch (exception& e){
         cerr << "[Exception] " << e.what() << " (catched from: input())" << endl;
-        throw false;
+        terminate();
     }
 }
 
@@ -536,7 +528,7 @@ void GPIO::output(const string& channel, int value){
     }
     catch (exception& e){
         cerr << "[Exception] " << e.what() << " (catched from: output())" << endl;
-        throw false;
+        terminate();
     }
 }
 
@@ -553,7 +545,7 @@ Directions GPIO::gpio_function(const string& channel){
     }
     catch (exception& e){
         cerr << "[Exception] " << e.what() << " (catched from: gpio_function())" << endl;
-        throw false;
+        terminate();
     }
 }
 
@@ -577,7 +569,6 @@ struct GPIO::PWM::Impl {
 };
 
 void GPIO::PWM::Impl::_reconfigure(int frequency_hz, double duty_cycle_percent, bool start){
-    cerr << "[DEBUG] PWM.pImpl->_reconfigure begin" << endl;
 
     if (duty_cycle_percent < 0.0 || duty_cycle_percent > 100.0)
             throw runtime_error("invalid duty_cycle_percent");
@@ -601,7 +592,6 @@ void GPIO::PWM::Impl::_reconfigure(int frequency_hz, double duty_cycle_percent, 
         _started = true;
     }
 
-    cerr << "[DEBUG] PWM.pImpl->_reconfigure end" << endl;
 }
 
 
@@ -610,7 +600,6 @@ GPIO::PWM::PWM(int channel, int frequency_hz)
             false, 0, 0, 0.0, 0}))  //temporary values
 {
     try{
-	cerr << "[DEBUG] PWM cunstroctor begin" << endl;
 
         Directions app_cfg = _app_channel_configuration(pImpl->_ch_info);
         if(app_cfg == HARD_PWM)
@@ -640,10 +629,10 @@ GPIO::PWM::PWM(int channel, int frequency_hz)
     }
     catch (exception& e){
         cerr << "[Exception] " << e.what() << " (catched from: PWM::PWM())" << endl;
-        throw false;
+        _cleanup_all();
+        terminate();
     }
 
-    cerr << "[DEBUG] PWM constructor end!" << endl;
 }
 
 GPIO::PWM::~PWM(){
@@ -658,7 +647,7 @@ GPIO::PWM::~PWM(){
         _unexport_pwm(pImpl->_ch_info);
         _channel_configuration.erase(pImpl->_ch_info.channel);
         }
-    catch(bool b){
+    catch(...){
         cerr << "[Exception] ~PWM Exception! shut down the program." << endl;
         _cleanup_all();
         terminate();
@@ -666,15 +655,14 @@ GPIO::PWM::~PWM(){
 }
 
 void GPIO::PWM::start(double  duty_cycle_percent){
-    cerr << "[DEBUG] PWM::start begin!" << endl;
     try{
         pImpl->_reconfigure(pImpl->_frequency_hz, duty_cycle_percent, true);
     }
     catch(exception& e){
         cerr << "[Exception] " << e.what() << " (catched from: PWM::start())" << endl;
-        throw false;
+        _cleanup_all();
+        terminate();
     }
-    cerr << "[DEBUG] PWM::start end!" << endl;
 }
 
 void GPIO::PWM::ChangeFrequency(int frequency_hz){
@@ -683,7 +671,7 @@ void GPIO::PWM::ChangeFrequency(int frequency_hz){
     }
     catch(exception& e){
         cerr << "[Exception] " << e.what() << " (catched from: PWM::ChangeFrequency())" << endl;
-        throw false;
+        terminate();
     }
 }
 
@@ -693,7 +681,7 @@ void GPIO::PWM::ChangeDutyCycle(double duty_cycle_percent){
     }
     catch(exception& e){
         cerr << "[Exception] " << e.what() << " (catched from: PWM::ChangeDutyCycle())" << endl;
-        throw false;
+        terminate();
     }
 }
 
@@ -706,7 +694,7 @@ void GPIO::PWM::stop(){
     }
     catch(exception& e){
         cerr << "[Exception] " << e.what() << " (catched from: PWM::stop())" << endl;
-        throw false;
+        throw runtime_error("Exeception from GPIO::PWM::stop");
     }
 }
 
@@ -732,7 +720,6 @@ public:
             // When the user forgot to call cleanup() at the end of the program,
             // _cleaner object will call it.
             _cleanup_all(); 
-           // cout << "[DEBUG] ~_cleaner() worked" << endl;
         }
         catch(exception& e){
             cerr << "Exception: " << e.what() << endl;
