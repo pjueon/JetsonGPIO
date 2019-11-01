@@ -93,7 +93,7 @@ private:
     }
 
 public:
-    GlobalVariableWrapper(const OccupancyGrid&) = delete;
+    GlobalVariableWrapper(const GlobalVariableWrapper&) = delete;
     GlobalVariableWrapper& operator=(const GlobalVariableWrapper&) = delete;
 
     ~GlobalVariableWrapper() = default;
