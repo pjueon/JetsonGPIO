@@ -110,7 +110,7 @@ public:
     GPIO_data _gpio_data;
     const Model _model;
     const _GPIO_PIN_INFO _JETSON_INFO;
-    const auto _channel_data_by_mode;
+    const map<GPIO::NumberingModes, map<string, ChannelInfo>> _channel_data_by_mode;
 
     // A map used as lookup tables for pin to linux gpio mapping
     map<string, ChannelInfo> _channel_data;
