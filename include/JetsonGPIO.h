@@ -53,6 +53,8 @@ namespace GPIO{
 
     // GPIO directions. 
     // UNKNOWN constant is for gpios that are not yet setup
+    // If the user uses UNKNOWN or HARD_PWM as a parameter to GPIO::setmode function,
+    // An exception will occur
     enum class Directions{ UNKNOWN, OUT, IN, HARD_PWM };
 
     // GPIO::IN, GPIO::OUT
@@ -98,6 +100,8 @@ namespace GPIO{
     Directions gpio_function(int channel);
 
    //----------------------------------
+   
+
     class PWM{
     public:
       PWM(int channel, int frequency_hz);
