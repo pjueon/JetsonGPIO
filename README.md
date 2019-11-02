@@ -112,7 +112,7 @@ The GPIO channel must be set up before use as input or output. To configure
 the channel as input, call:
 ```
 // (where channel is based on the pin numbering mode discussed above)
-GPIO::setup(channel, GPIO::IN);
+GPIO::setup(channel, GPIO::IN); // channel must be int or std::string
 ```
 
 To set up a channel as output, call:
@@ -141,10 +141,10 @@ This will return either GPIO::LOW(== 0) or GPIO::HIGH(== 1).
 To set the value of a pin configured as output, use:
 
 ```
-GPIO::output(channel, state);
+GPIO::output(channel, state); 
 ```
 
-where state can be GPIO::LOW or GPIO::HIGH.
+where state can be GPIO::LOW(== 0) or GPIO::HIGH(== 1).
   
 
 #### 7. Clean up
