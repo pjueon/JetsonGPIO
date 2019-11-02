@@ -81,11 +81,11 @@ To specify which mode you are using (mandatory), use the following function
 call:
 ```
 GPIO::setmode(GPIO::BOARD);
-# or
+// or
 GPIO::setmode(GPIO::BCM);
-# or
+// or
 GPIO::setmode(GPIO::CVM);
-# or
+// or
 GPIO::setmode(GPIO::TEGRA_SOC);
 ```
 
