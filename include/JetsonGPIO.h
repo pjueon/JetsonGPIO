@@ -31,7 +31,7 @@ DEALINGS IN THE SOFTWARE.
 
 
 namespace GPIO{
-    constexpr auto VERSION = "0.1.0";
+    constexpr auto VERSION = "0.1.1";
     extern const std::string JETSON_INFO;
     extern const std::string model;
 
