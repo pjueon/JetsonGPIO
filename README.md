@@ -8,6 +8,7 @@ It's an unofficial port of the NVIDIA's official Jetson GPIO Python library to C
 The library provides almost same APIs as the the NVIDIA's Jetson GPIO Python library.
   
 **But it DOESN'T support all functionalites of the NVIDIA's original one.**  
+(The gpio_event module hasn't implemented yet, for example.)
   
     
 **(Tested on Jetson Nano and Jetson TX2)**
