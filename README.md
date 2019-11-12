@@ -198,7 +198,7 @@ The function returns either GPIO::IN(GPIO::Directions::IN) or GPIO::OUT(GPIO::Di
 
 #### 10. PWM  
 
-See `samples/simple_pwm.py` for details on how to use PWM channels.
+See `samples/simple_pwm.cpp` for details on how to use PWM channels.
 
 The JetsonGPIO library supports PWM only on pins with attached hardware PWM
 controllers. Unlike the RPi.GPIO library, the JetsonGPIO library does not
