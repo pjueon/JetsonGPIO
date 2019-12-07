@@ -23,7 +23,6 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include <iostream>
-#include <string>
 #include "JetsonGPIO.h"
 
 using namespace std;
@@ -38,16 +37,16 @@ int main(){
 	GPIO::setmode(GPIO::BCM);
 	GPIO::setup(output_pin, GPIO::OUT, GPIO::HIGH);
 	
-	string dummy;
 
-	cout << "BCM "<<output_pin << "pin, set to OUTPUT, HIGH" << endl;
-        cout << "wait for stdin: ";
-	cin >> dummy;
+
+	cout << "BCM "<< output_pin << "pin, set to OUTPUT, HIGH" << endl;
+    cout << "Press Enter to Continue";
+	cin.ignore();
 
 	GPIO::output(output_pin, GPIO::LOW);
 	cout << output_pin <<"pin, set to LOW now" << endl;
-	cout << "wait for stdin: ";
-	cin >> dummy;
+	cout << "Press Enter to Continue";
+	cin.ignore();
 
 	GPIO::cleanup();	
 
