@@ -40,8 +40,8 @@ DEALINGS IN THE SOFTWARE.
 #include <thread>
 
 #include "JetsonGPIO.h"
-#include "private/gpio_pin_data.h"
-#include "private/PythonFunctions.h"
+#include "gpio_pin_data.h"
+#include "PythonFunctions.h"
 
 using namespace GPIO;
 using namespace std;

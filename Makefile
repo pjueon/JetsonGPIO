@@ -26,13 +26,17 @@ RANLIB = ranlib
 LIB_NAME = JetsonGPIO
 LIB_FULL_NAME = lib$(LIB_NAME).a
 
-SRC_DIR = ../src
-INCLUDE_DIR = ../include
+SRC_DIR = src
+INCLUDE_DIR = include
+BUILD_DIR = build
+TARGET_DIR = lib
+BIN_DIR = bin
+TEST_DIR = test
 
-LIB_SRCS = JetsonGPIO.cpp PythonFunctions.cpp gpio_pin_data.cpp
-LIB_HEADERS = $(INCLUDE_DIR)/$(LIB_NAME).h $(INCLUDE_DIR)/private/PythonFunctions.h $(INCLUDE_DIR)/private/gpio_pin_data.h
+LIB_SRCS = $(SRC_DIR)/JetsonGPIO.cpp $(SRC_DIR)/PythonFunctions.cpp $(SRC_DIR)/gpio_pin_data.cpp
+LIB_HEADERS = $(INCLUDE_DIR)/$(LIB_NAME).h $(INCLUDE_DIR)/PythonFunctions.h $(INCLUDE_DIR)/gpio_pin_data.h
 LIB_OBJS = $(LIB_NAME).o PythonFunctions.o gpio_pin_data.o
-
+BUILT_OBJS = $(BUILD_DIR)/$(LIB_NAME).o $(BUILD_DIR)/PythonFunctions.o $(BUILD_DIR)/gpio_pin_data.o
 TEST_SRC = test.cpp
 
 INCLUDE_FLAG = -I$(INCLUDE_DIR)
@@ -43,31 +47,31 @@ ifeq ($(PREFIX),)
 endif
 
 all : $(LIB_OBJS)
-	$(AR) rcv $(LIB_FULL_NAME) $(LIB_OBJS)
-	$(RANLIB) $(LIB_FULL_NAME)
+	$(AR) rcv $(TARGET_DIR)/$(LIB_FULL_NAME) $(BUILT_OBJS)
+	$(RANLIB) $(TARGET_DIR)/$(LIB_FULL_NAME)
+
 
 $(LIB_NAME).o : $(SRC_DIR)/$(LIB_NAME).cpp $(LIB_HEADERS)
-	g++ $(INCLUDE_FLAG) -c -o $@ $(SRC_DIR)/$(LIB_NAME).cpp
+	g++ $(INCLUDE_FLAG) -c -o $(BUILD_DIR)/$@ $(SRC_DIR)/$(LIB_NAME).cpp
 
-PythonFunctions.o :  $(SRC_DIR)/PythonFunctions.cpp $(INCLUDE_DIR)/private/PythonFunctions.h
-	g++ $(INCLUDE_FLAG) -c -o $@ $(SRC_DIR)/PythonFunctions.cpp
+PythonFunctions.o :  $(SRC_DIR)/PythonFunctions.cpp $(INCLUDE_DIR)/PythonFunctions.h
+	g++ $(INCLUDE_FLAG) -c -o $(BUILD_DIR)/$@ $(SRC_DIR)/PythonFunctions.cpp
 
 gpio_pin_data.o : $(SRC_DIR)/gpio_pin_data.cpp $(LIB_HEADERS)
-	g++ $(INCLUDE_FLAG) -c -o $@ $(SRC_DIR)/gpio_pin_data.cpp
+	g++ $(INCLUDE_FLAG) -c -o $(BUILD_DIR)/$@ $(SRC_DIR)/gpio_pin_data.cpp
 
-
-install : $(LIB_FULL_NAME)
-	install -m 644 $(LIB_FULL_NAME) $(PREFIX)/lib/
+install :
+	install -m 644 $(TARGET_DIR)/$(LIB_FULL_NAME) $(PREFIX)/lib/
 	install -m 644 $(INCLUDE_DIR)/$(LIB_NAME).h $(PREFIX)/include/
 
 uninstall : 
 	rm -rf $(PREFIX)/lib/$(LIB_FULL_NAME)
 	rm -rf $(PREFIX)/include/$(LIB_NAME).h
 
-Test : $(SRC_DIR)/$(TEST_SRC)
-	g++ -o $@ $(SRC_DIR)/$(TEST_SRC) $(LIBS_FLAG)
+#test : $(TEST_DIR)/$(TEST_SRC) 
+#	g++ -I$(PREFIX)/include/ -c -o $(BIN_DIR)/$@ $(TEST_DIR)/$(TEST_SRC) $(LIBS_FLAG)
 
 clean :
-	rm -rf  *.o
-	rm -rf  *.a
-
+	rm -rf  $(BUILD_DIR)/*.o
+	rm -rf  $(TARGET_DIR)/*.a
+	rm -rf	$(BIN_DIR)/*
