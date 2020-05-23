@@ -391,6 +391,11 @@ GPIO_data get_data(){
                 string pinName;
                 if(key == BOARD){
                     pinName = x.BoardPin;
+                    if (pinName == "32"){pwm_dir(x.PWMSysfsDir);}//NO IDEA WHY THIS WORKS or is required 
+                    //if the preceding call is not present, only one of the PWM GPIOs (pin 33 on the header) can be exported
+                    //and any attempt to do anything with pin 32 will crash the library. 
+                    //utterly ridiculous bug but I don't have the time to track it down.  
+
                 }
                 else if(key == BCM){
                     pinName = x.BCMPin;
