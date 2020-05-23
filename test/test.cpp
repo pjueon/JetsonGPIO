@@ -76,10 +76,10 @@ int main(int argc, char** argv) {
     GPIO::setmode(GPIO::BOARD);
     GPIO::setup(JETSON_DRIVE_PIN, GPIO::OUT, GPIO::HIGH);
     drive_pwm = std::make_shared<GPIO::PWM>(JETSON_DRIVE_PIN, 50);
-    //steer_pwm = std::make_shared<GPIO::PWM>(JETSON_STEER_PIN, 1000);
+    steer_pwm = std::make_shared<GPIO::PWM>(JETSON_STEER_PIN, 1000);
    
     drive_pwm->start(.5);
-    //steer_pwm->start(.5);
+    steer_pwm->start(.5);
     
     std::cout << "Starting demo now! Press CTRL+C to exit" << std::endl;
     int curr_value = GPIO::HIGH;
@@ -103,7 +103,7 @@ int main(int argc, char** argv) {
     }
     
     drive_pwm->stop();
-    //steer_pwm->stop();
+    steer_pwm->stop();
     
     GPIO::cleanup();
 
