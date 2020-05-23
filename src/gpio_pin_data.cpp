@@ -391,6 +391,7 @@ GPIO_data get_data(){
                 string pinName;
                 if(key == BOARD){
                     pinName = x.BoardPin;
+		    if (pinName == "32"){pwm_dir(x.PWMSysfsDir);}
                 }
                 else if(key == BCM){
                     pinName = x.BCMPin;
