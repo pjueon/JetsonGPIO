@@ -45,18 +45,20 @@ using namespace std;
 
 // ========================================= Begin of "gpio_pin_data.py" =========================================
 
-/* These vectors contain all the relevant GPIO data for each Jetson 
+/* These vectors contain all the relevant GPIO data for each Jetson
    The values are use to generate dictionaries that map the corresponding pin
    mode numbers to the Linux GPIO pin number and GPIO chip directory */
 bool ids_warned = false;
 
-// Global variables are wrapped in singleton pattern in order to avoid 
+// Global variables are wrapped in singleton pattern in order to avoid
 // initialization order of global variables in different compilation units problem
 class PIN_DATA{
 private:
     PIN_DATA();
 
 public:
+    const vector<_GPIO_PIN_DEF> JETSON_NX_PIN_DEFS;
+    const vector<string> compats_nx;
     const vector<_GPIO_PIN_DEF> JETSON_XAVIER_PIN_DEFS;
     const vector<string> compats_xavier;
     const vector<_GPIO_PIN_DEF> JETSON_TX2_PIN_DEFS;
@@ -71,7 +73,7 @@ public:
     PIN_DATA(const PIN_DATA&) = delete;
     PIN_DATA& operator=(const PIN_DATA&) = delete;
     ~PIN_DATA() = default;
-    
+
     static PIN_DATA& get_instance(){
         static PIN_DATA singleton;
         return singleton;
@@ -81,7 +83,37 @@ public:
 
 
 PIN_DATA::PIN_DATA()
-    : JETSON_XAVIER_PIN_DEFS{
+    : JETSON_NX_PIN_DEFS{
+            {148, "/sys/devices/2200000.gpio", "7", "4", "GPIO09", "AUD_MCLK", "None", -1},
+            {140, "/sys/devices/2200000.gpio", "11", "17", "UART1_RTS", "UART1_RTS", "None", -1},
+            {157, "/sys/devices/2200000.gpio", "12", "18", "I2S0_SCLK", "DAP5_SCLK", "None", -1},
+            {192, "/sys/devices/2200000.gpio", "13", "27", "SPI1_SCK", "SPI3_SCK", "None", -1},
+            {20, "/sys/devices/c2f0000.gpio", "15", "22", "GPIO12", "TOUCH_CLK", "None", -1},
+            {196, "/sys/devices/2200000.gpio", "16", "23", "SPI1_CS1", "SPI3_CS1_N", "None", -1},
+            {195, "/sys/devices/2200000.gpio", "18", "24", "SPI1_CS0", "SPI3_CS0_N", "None", -1},
+            {205, "/sys/devices/2200000.gpio", "19", "10", "SPI0_MOSI", "SPI1_MOSI", "None", -1},
+            {204, "/sys/devices/2200000.gpio", "21", "9", "SPI0_MISO", "SPI1_MISO", "None", -1},
+            {193, "/sys/devices/2200000.gpio", "22", "25", "SPI1_MISO", "SPI3_MISO", "None", -1},
+            {203, "/sys/devices/2200000.gpio", "23", "11", "SPI0_SCK", "SPI1_SCK", "None", -1},
+            {206, "/sys/devices/2200000.gpio", "24", "8", "SPI0_CS0", "SPI1_CS0_N", "None", -1},
+            {207, "/sys/devices/2200000.gpio", "26", "7", "SPI0_CS1", "SPI1_CS1_N", "None", -1},
+            {133, "/sys/devices/2200000.gpio", "29", "5", "GPIO01", "SOC_GPIO41", "None", -1},
+            {134, "/sys/devices/2200000.gpio", "31", "6", "GPIO11", "SOC_GPIO42", "None", -1},
+            {136, "/sys/devices/2200000.gpio", "32", "12", "GPIO07", "SOC_GPIO44", "/sys/devices/32f0000.pwm", 0},
+            {105, "/sys/devices/2200000.gpio", "33", "13", "GPIO13", "SOC_GPIO54", "/sys/devices/3280000.pwm", 0},
+            {160, "/sys/devices/2200000.gpio", "35", "19", "I2S0_FS", "DAP5_FS", "None", -1},
+            {141, "/sys/devices/2200000.gpio", "36", "16", "UART1_CTS", "UART1_CTS", "None", -1},
+            {194, "/sys/devices/2200000.gpio", "37", "26", "SPI1_MOSI", "SPI3_MOSI", "None", -1},
+            {159, "/sys/devices/2200000.gpio", "38", "20", "I2S0_DIN", "DAP5_DIN", "None", -1},
+            {158, "/sys/devices/2200000.gpio", "40", "21", "I2S0_DOUT", "DAP5_DOUT", "None", -1}
+      },
+      compats_nx{
+            "nvidia,p3509-0000+p3668-0000",
+            "nvidia,p3509-0000+p3668-0001",
+            "nvidia,p3449-0000+p3668-0000",
+            "nvidia,p3449-0000+p3668-0001"
+      },
+      JETSON_XAVIER_PIN_DEFS{
             { 134, "/sys/devices/2200000.gpio", "7", "4", "MCLK05", "SOC_GPIO42", "None", -1 },
             { 140, "/sys/devices/2200000.gpio", "11", "17", "UART1_RTS", "UART1_RTS", "None", -1 },
             { 63, "/sys/devices/2200000.gpio", "12", "18", "I2S2_CLK", "DAP2_SCLK", "None", -1 },
@@ -107,8 +139,8 @@ PIN_DATA::PIN_DATA()
             { 1, "/sys/devices/c2f0000.gpio", "37", "26", "CAN1_DIN", "CAN1_DIN", "None", -1 },
             { 65, "/sys/devices/2200000.gpio", "38", "20", "I2S2_DIN", "DAP2_DIN", "None", -1 },
             { 64, "/sys/devices/2200000.gpio", "40", "21", "I2S2_DOUT", "DAP2_DOUT", "None", -1 }
-        }, 
-        compats_xavier{    
+        },
+        compats_xavier{
             "nvidia,p2972-0000",
             "nvidia,p2972-0006",
             "nvidia,jetson-xavier"
@@ -142,7 +174,7 @@ PIN_DATA::PIN_DATA()
             { 74, "/sys/devices/2200000.gpio", "38", "20", "I2S0_SDIN", "DAP1_DIN", "None", -1 },
             { 73, "/sys/devices/2200000.gpio", "40", "21", "I2S0_SDOUT", "DAP1_DOUT", "None", -1}
         },
-        compats_tx2{    
+        compats_tx2{
             "nvidia,p2771-0000",
             "nvidia,p2771-0888",
             "nvidia,p3489-0000",
@@ -177,7 +209,7 @@ PIN_DATA::PIN_DATA()
             { 9, "/sys/devices/6000d000.gpio", "38", "20", "I2S0_SDIN", "DAP1_DIN", "None", -1 },
             { 10, "/sys/devices/6000d000.gpio", "40", "21", "I2S0_SDOUT", "DAP1_DOUT", "None", -1 }
         },
-        compats_tx1{    
+        compats_tx1{
             "nvidia,p2371-2180",
             "nvidia,jetson-cv"
         },
@@ -207,31 +239,30 @@ PIN_DATA::PIN_DATA()
             { 77, "/sys/devices/6000d000.gpio", "38", "20", "I2S0_DIN", "DAP4_DIN", "None", -1 },
             { 78, "/sys/devices/6000d000.gpio", "40", "21", "I2S0_DOUT", "DAP4_DOUT", "None", -1 }
         },
-        compats_nano{    
+        compats_nano{
             "nvidia,p3450-0000",
             "nvidia,p3450-0002",
             "nvidia,jetson-nano"
         },
         PIN_DEFS_MAP{
+            { JETSON_NX, JETSON_NX_PIN_DEFS },
             { JETSON_XAVIER, JETSON_XAVIER_PIN_DEFS },
             { JETSON_TX2, JETSON_TX2_PIN_DEFS },
             { JETSON_TX1, JETSON_TX1_PIN_DEFS },
-            { JETSON_NANO, JETSON_NANO_PIN_DEFS },
+            { JETSON_NANO, JETSON_NANO_PIN_DEFS }
         },
-            JETSON_INFO_MAP{
+        JETSON_INFO_MAP{
+            { JETSON_NX, {1, "16384M", "Unknown", "Jetson NX", "NVIDIA", "ARM Carmel"} },
             { JETSON_XAVIER, {1, "16384M", "Unknown", "Jetson Xavier", "NVIDIA", "ARM Carmel"} },
             { JETSON_TX2, {1, "8192M", "Unknown", "Jetson TX2", "NVIDIA", "ARM A57 + Denver"} },
             { JETSON_TX1, {1, "4096M", "Unknown", "Jetson TX1", "NVIDIA", "ARM A57"} },
             { JETSON_NANO, {1, "4096M", "Unknown", "Jetson nano", "NVIDIA", "ARM A57"} }
-        }
-
-    {
-};
+        }{};
 
 
 
 GPIO_data get_data(){
-    
+
     try{
         PIN_DATA& _DATA = PIN_DATA::get_instance();
 
@@ -239,11 +270,11 @@ GPIO_data get_data(){
         const string ids_path = "/proc/device-tree/chosen/plugin-manager/ids";
 
         set<string> compatibles;
-        
+
         { // scope for f:
             ifstream f(compatible_path);
             stringstream buffer;
-            
+
             buffer << f.rdbuf();
             string tmp_str = buffer.str();
             vector<string> _vec_compatibles(split(tmp_str, '\x00'));
@@ -253,13 +284,13 @@ GPIO_data get_data(){
 
         auto matches = [&compatibles](const vector<string>& vals) {
             for(const auto& v : vals){
-                    if(compatibles.find(v) != compatibles.end()) return true;     
+                    if(compatibles.find(v) != compatibles.end()) return true;
             }
         return false;
         };
 
         auto find_pmgr_board = [&](const string& prefix){
-            if (!os_path_exists(ids_path)){ 
+            if (!os_path_exists(ids_path)){
                     if (ids_warned == false){
                         ids_warned = true;
                         string msg = "WARNING: Plugin manager information missing from device tree.\n"
@@ -278,7 +309,7 @@ GPIO_data get_data(){
 
             return "None";
             };
-            
+
             auto warn_if_not_carrier_board = [&](string carrier_board){
 
             string found = find_pmgr_board(carrier_board + "-");
@@ -291,8 +322,12 @@ GPIO_data get_data(){
         };
 
         Model model;
-	
-        if (matches(_DATA.compats_tx1)){
+
+        if (matches(_DATA.compats_nx)){
+            model = JETSON_NX;
+            warn_if_not_carrier_board("3509", "3449");
+        }
+        else if (matches(_DATA.compats_tx1)){
             model = JETSON_TX1;
             warn_if_not_carrier_board("2597");
         }
@@ -314,7 +349,7 @@ GPIO_data get_data(){
             // Revision is an ordered string, not a decimal integer
             if (revision < "200")
                 throw runtime_error("Jetson Nano module revision must be A02 or later");
-            
+
             warn_if_not_carrier_board("3449");
         }
         else{
@@ -339,7 +374,7 @@ GPIO_data get_data(){
             for (const auto& fn : files){
                 if (!startswith(fn, "gpiochip"))
                     continue;
-                
+
                 string gpiochip_fn = gpio_chip_gpio_dir + "/" + fn + "/base";
                 { // scope for f
                     ifstream f(gpiochip_fn);
@@ -347,7 +382,7 @@ GPIO_data get_data(){
                     buffer << f.rdbuf();
                     gpio_chip_base[gpio_chip_dir] = stoi(strip(buffer.str()));
                     break;
-                } // scope ends 
+                } // scope ends
             }
         }
 
@@ -375,7 +410,7 @@ GPIO_data get_data(){
             for (const auto& fn : files){
                 if (!startswith(fn, "pwmchip"))
                     continue;
-                
+
                 string chip_pwm_pwmchip_dir = chip_pwm_dir + "/" + fn;
                 pwm_dirs[chip_dir] = chip_pwm_pwmchip_dir;
                 return chip_pwm_pwmchip_dir.c_str();
@@ -386,7 +421,7 @@ GPIO_data get_data(){
 
         auto model_data = [&global_gpio_id, &pwm_dir](NumberingModes key, const vector<_GPIO_PIN_DEF>& pin_defs){
             map<string, ChannelInfo> ret;
-            
+
             for (const auto& x : pin_defs){
                 string pinName;
                 if(key == BOARD){
@@ -401,32 +436,32 @@ GPIO_data get_data(){
                 else{ // TEGRA_SOC
                     pinName = x.TEGRAPin;
                 }
-                
-                ret.insert({ pinName, 
+
+                ret.insert({ pinName,
                             ChannelInfo{ pinName,
                                         x.SysfsDir,
                                         x.LinuxPin,
                                         global_gpio_id(x.SysfsDir, x.LinuxPin),
                                         pwm_dir(x.PWMSysfsDir),
-                                        x.PWMID }                                        
+                                        x.PWMID }
                             }
                         );
             }
             return ret;
         };
 
-        map<NumberingModes, map<string, ChannelInfo>> channel_data = 
+        map<NumberingModes, map<string, ChannelInfo>> channel_data =
         {
-            { BOARD, model_data(BOARD, pin_defs) }, 
-            { BCM, model_data(BCM, pin_defs) }, 
-            { CVM, model_data(CVM, pin_defs) }, 
-            { TEGRA_SOC, model_data(TEGRA_SOC, pin_defs) } 
+            { BOARD, model_data(BOARD, pin_defs) },
+            { BCM, model_data(BCM, pin_defs) },
+            { CVM, model_data(CVM, pin_defs) },
+            { TEGRA_SOC, model_data(TEGRA_SOC, pin_defs) }
         };
 
 	return {model, jetson_info, channel_data};
     }
     catch(exception& e){
         cerr << "[Exception] " << e.what() << " (catched from: get_data())" << endl;
-      	throw false;	
+      	throw false;
     }
 }

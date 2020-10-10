@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 
 enum class Model;
 
+extern const Model JETSON_NX;
 extern const Model JETSON_XAVIER;
 extern const Model JETSON_TX2;
 extern const Model JETSON_TX1;
@@ -49,7 +50,7 @@ struct _GPIO_PIN_DEF{
     const std::string TEGRAPin;        // Pin name (TEGRA_SOC mode)
     const std::string PWMSysfsDir;     // PWM chip sysfs directory
     const int PWMID;              // PWM ID within PWM chip
-};  
+};
 
 struct _GPIO_PIN_INFO{
     const int P1_REVISION;
@@ -62,15 +63,15 @@ struct _GPIO_PIN_INFO{
 
 
 struct ChannelInfo{
-    ChannelInfo(const std::string& channel, const std::string& gpio_chip_dir, 
-		int chip_gpio, int gpio, const std::string& pwm_chip_dir, 
+    ChannelInfo(const std::string& channel, const std::string& gpio_chip_dir,
+		int chip_gpio, int gpio, const std::string& pwm_chip_dir,
 		int pwm_id)
 	    : channel(channel),
 	      gpio_chip_dir(gpio_chip_dir),
-	      chip_gpio(chip_gpio), 
-	      gpio(gpio), 
+	      chip_gpio(chip_gpio),
+	      gpio(gpio),
 	      pwm_chip_dir(pwm_chip_dir),
-	      pwm_id(pwm_id) 
+	      pwm_id(pwm_id)
 	    {}
     ChannelInfo(const ChannelInfo&) = default;
 
