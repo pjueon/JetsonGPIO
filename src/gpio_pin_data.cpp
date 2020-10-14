@@ -325,8 +325,8 @@ GPIO_data get_data(){
 
         if (matches(_DATA.compats_nx)){
             model = JETSON_NX;
-            warn_if_not_carrier_board("3509");
-            warn_if_not_carrier_board("3449");
+            //warn_if_not_carrier_board("3509");
+            //warn_if_not_carrier_board("3449");
         }
         else if (matches(_DATA.compats_tx1)){
             model = JETSON_TX1;
