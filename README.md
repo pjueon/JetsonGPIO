@@ -203,4 +203,4 @@ The system pinmux must be configured to connect the hardware PWM controlller(s)
 to the relevant pins. If the pinmux is not configured, PWM signals will not
 reach the pins! The JetsonGPIO library does not dynamically modify the pinmux
 configuration to achieve this. Read the L4T documentation for details on how to
-configure the pinmux.
+configure the pinmux with `jetson_io.py`.
