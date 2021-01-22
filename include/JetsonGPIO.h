@@ -111,7 +111,7 @@ class PWM {
   PWM(const PWM&) = delete;             // Can't create duplicate PWM objects
   PWM& operator=(const PWM&) = delete;  // Can't create duplicate PWM objects
   ~PWM();
-  void start(double duty_cycle_percent);
+  void start(double duty_cycle_percent = 100.0);
   void stop();
   void ChangeFrequency(int frequency_hz);
   void ChangeDutyCycle(double duty_cycle_percent);

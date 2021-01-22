@@ -37,6 +37,6 @@ add_project_arguments(
 
 subdir('include')
 subdir('src')
-# subdir('samples')  # currently do not build
+subdir('samples')
 subdir('test')
 subdir('build')

@@ -38,11 +38,6 @@ using namespace std;
 
 const map<string, int> output_pins{{"JETSON_XAVIER", 18}, {"JETSON_NANO", 33}};
 
-if (output_pins.find(GPIO::model) == output_pins.end()) {
-  cerr << "PWM not supported on this board\n";
-  terminate();
-}
-
 // Pin Definitions
 const int output_pin = output_pins.at(GPIO::model);
 
@@ -57,6 +52,11 @@ void signalHandler(int s) {
 }
 
 int main() {
+  if (output_pins.find(GPIO::model) == output_pins.end()) {
+    cerr << "PWM not supported on this board\n";
+    terminate();
+  }
+
   // When CTRL+C pressed, signalHandler will be called
   signal(SIGINT, signalHandler);
 
@@ -67,10 +67,9 @@ int main() {
   // set pin as an output pin with optional initial state of HIGH
   GPIO::setup(output_pin, GPIO::OUT, GPIO::HIGH);
   GPIO::PWM p(output_pin, 50);
-  p.start()
+  p.start();
 
-          cout
-      << "PWM running. Press CTRL+C to exit." << endl;
+  cout << "PWM running. Press CTRL+C to exit." << endl;
 
   while (!end_this_program) {
     delay(1);
