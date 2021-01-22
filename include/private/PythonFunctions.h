@@ -29,17 +29,16 @@ DEALINGS IN THE SOFTWARE.
 #include <string>
 #include <vector>
 
-bool startswith(const std::string& s, const std::string& prefix);
+bool startswith (const std::string &s, const std::string &prefix);
 
-std::vector<std::string> split(const std::string& s, const char d);
+std::vector<std::string> split (const std::string &s, const char d);
 
-bool os_access(const std::string& path, int mode); // os.access
+bool os_access (const std::string &path, int mode); // os.access
 
-std::vector<std::string> os_listdir(const std::string& path);  // os.listdir
+std::vector<std::string> os_listdir (const std::string &path); // os.listdir
 
-bool os_path_exists(const std::string& path);  // os.path.exists
+bool os_path_exists (const std::string &path); // os.path.exists
 
-std::string strip(const std::string& s);
-
+std::string strip (const std::string &s);
 
 #endif // PYTHON_FUNCTIONS_H

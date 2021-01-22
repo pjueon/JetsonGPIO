@@ -22,25 +22,25 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
+#include <JetsonGPIO.h>
+
 #include <iostream>
 // for delay function.
-#include <chrono> 
-#include <thread>
+#include <chrono>
 #include <map>
 #include <string>
+#include <thread>
 
 // for signal handling
 #include <signal.h>
 
-#include <JetsonGPIO.h>
-
 using namespace std;
 
 const map<string, int> output_pins{{"JETSON_XAVIER", 18}, {"JETSON_NANO", 33}};
- 
-if(output_pins.find(GPIO::model) == output_pins.end() ){
-	cerr << "PWM not supported on this board\n";
-	terminate();
+
+if (output_pins.find(GPIO::model) == output_pins.end()) {
+  cerr << "PWM not supported on this board\n";
+  terminate();
 }
 
 // Pin Definitions
@@ -48,36 +48,36 @@ const int output_pin = output_pins.at(GPIO::model);
 
 bool end_this_program = false;
 
-inline void delay(int s){
-	this_thread::sleep_for(chrono::seconds(s));
+inline void delay(int s) {
+  this_thread::sleep_for(chrono::seconds(s));
 }
 
-void signalHandler (int s){
-	end_this_program = true;
+void signalHandler(int s) {
+  end_this_program = true;
 }
 
+int main() {
+  // When CTRL+C pressed, signalHandler will be called
+  signal(SIGINT, signalHandler);
 
-int main(){
-	// When CTRL+C pressed, signalHandler will be called
-	signal(SIGINT, signalHandler);
+  // Pin Setup.
+  // Board pin-numbering scheme
+  GPIO::setmode(GPIO::BOARD);
 
-	// Pin Setup. 
-	// Board pin-numbering scheme
-	GPIO::setmode(GPIO::BOARD);
+  // set pin as an output pin with optional initial state of HIGH
+  GPIO::setup(output_pin, GPIO::OUT, GPIO::HIGH);
+  GPIO::PWM p(output_pin, 50);
+  p.start()
 
-	// set pin as an output pin with optional initial state of HIGH
-	GPIO::setup(output_pin, GPIO::OUT, GPIO::HIGH);
-	GPIO::PWM p(output_pin, 50);
-	p.start()
+          cout
+      << "PWM running. Press CTRL+C to exit." << endl;
 
-	cout << "PWM running. Press CTRL+C to exit." << endl;
+  while (!end_this_program) {
+    delay(1);
+  }
 
-	while(!end_this_program){
-		delay(1);
-	}
+  p.stop();
+  GPIO::cleanup();
 
-	p.stop();
-	GPIO::cleanup();
-
-	return 0;
+  return 0;
 }
