@@ -48,6 +48,7 @@ inline void delay(int s) {
 }
 
 void signalHandler(int s) {
+  (void)s;
   end_this_program = true;
 }
 

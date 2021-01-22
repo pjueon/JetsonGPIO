@@ -450,6 +450,7 @@ GPIO_data get_data() {
         return chip_pwm_pwmchip_dir.c_str();
         return "None";
       }
+      return "None";
     };
 
     auto model_data = [&global_gpio_id, &pwm_dir](
