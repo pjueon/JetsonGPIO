@@ -15,6 +15,8 @@ The library provides almost same APIs as the the NVIDIA's Jetson GPIO Python lib
  
 # Installation
 Clone this repository, build it, and install it.
+
+using gnu-make
 ```
 git clone https://github.com/pjueon/JetsonGPIO
 cd JetsonGPIO/build
@@ -22,6 +24,13 @@ make all
 sudo make install
 ```
 
+using Meson
+```
+git clone https://github.com/mdegans/JetsonGPIO
+meson builddir --default-library static
+ninja -C builddir
+sudo ninja -C builddir install
+```
 
 # Setting User Permissions
 

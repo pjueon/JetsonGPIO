@@ -26,12 +26,18 @@ DEALINGS IN THE SOFTWARE.
 #ifndef JETSON_GPIO_H
 #define JETSON_GPIO_H
 
+#ifdef USING_MESON
+#include "JetsonGPIO_config.h"
+#endif
+
 #include <memory> // for pImpl
 #include <string>
 
 
 namespace GPIO{
-    constexpr auto VERSION = "0.1.1";
+#ifndef USING_MESON
+    constexpr auto VERSION = "0.1.2";
+#endif
     extern const std::string JETSON_INFO;
     extern const std::string model;
 

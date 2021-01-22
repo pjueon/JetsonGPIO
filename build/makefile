@@ -27,13 +27,14 @@ LIB_NAME = JetsonGPIO
 LIB_FULL_NAME = lib$(LIB_NAME).a
 
 SRC_DIR = ../src
+TEST_DIR = ../test/exitcode
 INCLUDE_DIR = ../include
 
 LIB_SRCS = JetsonGPIO.cpp PythonFunctions.cpp gpio_pin_data.cpp
 LIB_HEADERS = $(INCLUDE_DIR)/$(LIB_NAME).h $(INCLUDE_DIR)/private/PythonFunctions.h $(INCLUDE_DIR)/private/gpio_pin_data.h
 LIB_OBJS = $(LIB_NAME).o PythonFunctions.o gpio_pin_data.o
 
-TEST_SRC = test.cpp
+TEST_SRC = test_pin18_high_low.cpp
 
 INCLUDE_FLAG = -I$(INCLUDE_DIR)
 LIBS_FLAG = -l$(LIB_NAME)
@@ -64,10 +65,10 @@ uninstall :
 	rm -rf $(PREFIX)/lib/$(LIB_FULL_NAME)
 	rm -rf $(PREFIX)/include/$(LIB_NAME).h
 
-Test : $(SRC_DIR)/$(TEST_SRC)
-	g++ -o $@ $(SRC_DIR)/$(TEST_SRC) $(LIBS_FLAG)
+Test : all $(TEST_DIR)/$(TEST_SRC)
+	g++ $(INCLUDE_FLAG) -o $@ $(TEST_DIR)/$(TEST_SRC) -L. $(LIBS_FLAG)
 
 clean :
 	rm -rf  *.o
 	rm -rf  *.a
-
+	rm -f Test
