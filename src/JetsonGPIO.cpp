@@ -47,14 +47,15 @@ using namespace GPIO;
 using namespace std;
 
 
-// The user CAN'T use GPIO::UNKNOW, GPIO::HARD_PWM 
+// The user CAN'T use GPIO::UNKNOW, GPIO::HARD_PWM
 // These are only for implementation
 constexpr Directions UNKNOWN = Directions::UNKNOWN;
 constexpr Directions HARD_PWM = Directions::HARD_PWM;
 
 // Jetson Models
-enum class Model{ JETSON_XAVIER, JETSON_TX2, JETSON_TX1, JETSON_NANO };
+enum class Model{ JETSON_NX, JETSON_XAVIER, JETSON_TX2, JETSON_TX1, JETSON_NANO };
 
+extern const Model JETSON_NX = Model::JETSON_NX;
 extern const Model JETSON_XAVIER = Model::JETSON_XAVIER;
 extern const Model JETSON_TX2 = Model::JETSON_TX2;
 extern const Model JETSON_TX1 = Model::JETSON_TX1;
@@ -66,7 +67,7 @@ constexpr auto _SYSFS_ROOT = "/sys/class/gpio";
 
 
 //================================================================================
-// All global variables are wrapped in a singleton class except for public APIs, 
+// All global variables are wrapped in a singleton class except for public APIs,
 // in order to avoid initialization order problem among global variables in different compilation units.
 
 class GlobalVariableWrapper{
@@ -102,7 +103,7 @@ public:
         static GlobalVariableWrapper singleton;
         return singleton;
     }
-    
+
     // -----Global Variables----
     // NOTE: DON'T change the declaration order of fields.
     // declaration order == initialization order
@@ -117,7 +118,7 @@ public:
 
     bool _gpio_warnings;
     NumberingModes _gpio_mode;
-    map<string, Directions> _channel_configuration; 
+    map<string, Directions> _channel_configuration;
 };
 
 //================================================================================
@@ -151,7 +152,8 @@ const char* _get_model(){
     // is because it belongs to API
     GlobalVariableWrapper& GlobalVariables = GlobalVariableWrapper::get_instance();
 
-    if(GlobalVariables._model == Model::JETSON_XAVIER) return "JETSON_XAVIER";
+    if(GlobalVariables._model == Model::JETSON_NX) return "JETSON_NX";
+    else if(GlobalVariables._model == Model::JETSON_XAVIER) return "JETSON_XAVIER";
     else if(GlobalVariables._model == Model::JETSON_TX1) return "JETSON_TX1";
     else if(GlobalVariables._model == Model::JETSON_TX2) return "JETSON_TX2";
     else if(GlobalVariables._model == Model::JETSON_NANO) return "JETSON_NANO";
@@ -199,7 +201,7 @@ vector<ChannelInfo> _channels_to_infos(const vector<string>& channels, bool need
 }
 
 
-/* Return the current configuration of a channel as reported by sysfs. 
+/* Return the current configuration of a channel as reported by sysfs.
    Any of IN, OUT, HARD_PWM, or UNKNOWN may be returned. */
 Directions _sysfs_channel_configuration(const ChannelInfo& ch_info){
     if (ch_info.pwm_chip_dir != "None") {
@@ -220,7 +222,7 @@ Directions _sysfs_channel_configuration(const ChannelInfo& ch_info){
         gpio_direction = buffer.str();
         gpio_direction = strip(gpio_direction);
         // lower()
-        transform(gpio_direction.begin(), gpio_direction.end(), 
+        transform(gpio_direction.begin(), gpio_direction.end(),
                 gpio_direction.begin(), [](unsigned char c){ return tolower(c); });
     } // scope ends
 
@@ -251,7 +253,7 @@ void _export_gpio(const int gpio){
     } // scope ends
 
     string value_path = string(_SYSFS_ROOT) + "/gpio" + to_string(gpio) + "/value";
-    
+
     int time_count = 0;
     while (!os_access(value_path, R_OK | W_OK)){
         this_thread::sleep_for(chrono::milliseconds(10));
@@ -290,7 +292,7 @@ void _setup_single_out(const ChannelInfo& ch_info, int initial = -1){
 
     if(initial != -1)
         _output_one(ch_info.gpio, initial);
-    
+
     GlobalVariables._channel_configuration[ch_info.channel] = OUT;
 }
 
@@ -340,18 +342,18 @@ string _pwm_enable_path(const ChannelInfo& ch_info){
 void _export_pwm(const ChannelInfo& ch_info){
     if(os_path_exists(_pwm_path(ch_info)))
         return;
-    
+
     { // scope for f
         string path = _pwm_export_path(ch_info);
 	    ofstream f(path);
-	
+
 	if(!f.is_open()) throw runtime_error("Can't open " + path);
 
         f << ch_info.pwm_id;
     } // scope ends
 
     string enable_path = _pwm_enable_path(ch_info);
-	
+
     int time_count = 0;
     while (!os_access(enable_path, R_OK | W_OK)){
         this_thread::sleep_for(chrono::milliseconds(10));
@@ -429,7 +431,7 @@ void GPIO::setwarnings(bool state){
 }
 
 
-// Function used to set the pin mumbering mode. 
+// Function used to set the pin mumbering mode.
 // Possible mode values are BOARD, BCM, TEGRA_SOC and CVM
 void GPIO::setmode(NumberingModes mode){
     try{
@@ -439,10 +441,10 @@ void GPIO::setmode(NumberingModes mode){
                                 "GPIO::BOARD, GPIO::BCM, "
                                 "GPIO::TEGRA_SOC or "
                                 "GPIO::CVM");
-        // check if a different mode has been set                        
+        // check if a different mode has been set
         if(GlobalVariables._gpio_mode != NumberingModes::None && mode != GlobalVariables._gpio_mode)
             throw runtime_error("A different mode has already been set!");
-        
+
         GlobalVariables._channel_data = GlobalVariables._channel_data_by_mode.at(mode);
         GlobalVariables._gpio_mode = mode;
     }
@@ -460,7 +462,7 @@ NumberingModes GPIO::getmode(){
 
 
 /* Function used to setup individual pins or lists/tuples of pins as
-   Input or Output. direction must be IN or OUT, initial must be 
+   Input or Output. direction must be IN or OUT, initial must be
    HIGH or LOW and is only valid when direction is OUT  */
 void GPIO::setup(const string& channel, Directions direction, int initial){
     try{
@@ -473,7 +475,7 @@ void GPIO::setup(const string& channel, Directions direction, int initial){
             if (app_cfg == UNKNOWN && sysfs_cfg != UNKNOWN){
                 cerr << "[WARNING] This channel is already in use, continuing anyway. Use GPIO::setwarnings(false) to disable warnings.\n";
             }
-            
+
         }
 
         if(direction != OUT && direction != IN)
@@ -641,7 +643,7 @@ void GPIO::PWM::Impl::_reconfigure(int frequency_hz, double duty_cycle_percent, 
 
 
 GPIO::PWM::PWM(int channel, int frequency_hz)
-    : pImpl(make_unique<Impl>(Impl{_channel_to_info(to_string(channel), false, true), 
+    : pImpl(make_unique<Impl>(Impl{_channel_to_info(to_string(channel), false, true),
             false, 0, 0, 0.0, 0}))  //temporary values
 {
     try{
@@ -666,7 +668,7 @@ GPIO::PWM::PWM(int channel, int frequency_hz)
                             "Use GPIO::setwarnings(false) to disable warnings" << endl;
             }
         }
-        
+
         _export_pwm(pImpl->_ch_info);
         pImpl->_reconfigure(frequency_hz, 50.0);
         GlobalVariables._channel_configuration[to_string(channel)] = HARD_PWM;
@@ -734,7 +736,7 @@ void GPIO::PWM::stop(){
     try{
         if (!pImpl->_started)
             return;
-        
+
         _disable_pwm(pImpl->_ch_info);
     }
     catch(exception& e){
@@ -761,10 +763,10 @@ public:
     }
 
     ~_cleaner(){
-        try{  
+        try{
             // When the user forgot to call cleanup() at the end of the program,
             // _cleaner object will call it.
-            _cleanup_all(); 
+            _cleanup_all();
         }
         catch(exception& e){
             cerr << "Exception: " << e.what() << endl;
@@ -778,8 +780,7 @@ public:
 // GlobalVariables._channel_configuration and GlobalVariables._gpio_mode MUST NOT be destructed before AutoCleaner.
 // But the static objects are destructed in the reverse order of construction,
 // and objects defined in the same compilation unit will be constructed in the order of definition.
-// So it's supposed to work properly. 
-_cleaner& AutoCleaner = _cleaner::get_instance(); 
+// So it's supposed to work properly.
+_cleaner& AutoCleaner = _cleaner::get_instance();
 
 //=========================================================================
-
