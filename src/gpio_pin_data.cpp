@@ -428,6 +428,7 @@ GPIO_data get_data(){
                 if(key == BOARD){
                     pinName = x.BoardPin;
 		    if (pinName == "32"){pwm_dir(x.PWMSysfsDir);}
+		    if (pinName == "13" or pinName == "15" or pinName == "18"){pwm_dir(x.PWMSysfsDir);}
                 }
                 else if(key == BCM){
                     pinName = x.BCMPin;
