@@ -395,7 +395,7 @@ GPIO_data get_data(){
         };
 
 
-        auto pwm_dir = [&pwm_dirs](string chip_dir) -> string {
+        auto pwm_dir = [&pwm_dirs](string chip_dir) mutable -> string {
             if (chip_dir == "None")
                 return "None";
             if (pwm_dirs.find(chip_dir) != pwm_dirs.end())
