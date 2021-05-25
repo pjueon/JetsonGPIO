@@ -395,11 +395,11 @@ GPIO_data get_data(){
         };
 
 
-        auto pwm_dir = [&pwm_dirs](string chip_dir) mutable {
+        auto pwm_dir = [&pwm_dirs](string chip_dir) -> string {
             if (chip_dir == "None")
                 return "None";
             if (pwm_dirs.find(chip_dir) != pwm_dirs.end())
-                return pwm_dirs[chip_dir].c_str();
+                return pwm_dirs[chip_dir];
 
             string chip_pwm_dir = chip_dir + "/pwm";
             /* Some PWM controllers aren't enabled in all versions of the DT. In
@@ -414,7 +414,7 @@ GPIO_data get_data(){
 
                 string chip_pwm_pwmchip_dir = chip_pwm_dir + "/" + fn;
                 pwm_dirs[chip_dir] = chip_pwm_pwmchip_dir;
-                return chip_pwm_pwmchip_dir.c_str();
+                return chip_pwm_pwmchip_dir;
             }
             return "None";
         };
@@ -437,10 +437,6 @@ GPIO_data get_data(){
                 else{ // TEGRA_SOC
                     pinName = x.TEGRAPin;
                 }
-
-		// Temporary fix for PWM Jetson AGX Xavier issue. 
-                // Don't know why this solves the problem yet. 
-                pwm_dir(x.PWMSysfsDir);
 		    
                 ret.insert({ pinName,
                             ChannelInfo{ pinName,
