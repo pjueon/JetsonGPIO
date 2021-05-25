@@ -395,7 +395,7 @@ GPIO_data get_data(){
         };
 
 
-        auto pwm_dir = [&pwm_dirs](string chip_dir){
+        auto pwm_dir = [&pwm_dirs](string chip_dir) mutable {
             if (chip_dir == "None")
                 return "None";
             if (pwm_dirs.find(chip_dir) != pwm_dirs.end())
@@ -427,8 +427,6 @@ GPIO_data get_data(){
                 string pinName;
                 if(key == BOARD){
                     pinName = x.BoardPin;
-		    if (pinName == "32"){pwm_dir(x.PWMSysfsDir);}
-		    if (pinName == "13" or pinName == "15" or pinName == "18"){pwm_dir(x.PWMSysfsDir);}
                 }
                 else if(key == BCM){
                     pinName = x.BCMPin;
@@ -440,6 +438,10 @@ GPIO_data get_data(){
                     pinName = x.TEGRAPin;
                 }
 
+		// Temporary fix for PWM Jetson AGX Xavier issue. 
+                // Don't know why this solves the problem yet. 
+                pwm_dir(x.PWMSysfsDir);
+		    
                 ret.insert({ pinName,
                             ChannelInfo{ pinName,
                                         x.SysfsDir,
