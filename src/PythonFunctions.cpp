@@ -31,14 +31,16 @@ DEALINGS IN THE SOFTWARE.
 
 using namespace std;
 
-bool startswith(const string& s, const string& prefix) {
+bool startswith(const string& s, const string& prefix) 
+{
 	size_t pre_size = prefix.size();
 	if (s.size() < pre_size) return false;
 	
 	return prefix == s.substr(0, prefix.size());
 }
 
-vector<string> split(const string& s, const char d){
+vector<string> split(const string& s, const char d)
+{
     stringstream buffer(s);
 
     string tmp;
@@ -50,42 +52,51 @@ vector<string> split(const string& s, const char d){
     return outputVector;
 }
 
-bool os_access(const string& path, int mode){  // os.access
+bool os_access(const string& path, int mode)  // os.access
+{  
     return access(path.c_str(), mode) == 0;
 }
 
-vector<string> os_listdir(const string& path){  // os.listdir
+vector<string> os_listdir(const string& path)  // os.listdir
+{  
     DIR *dir;
     struct dirent *ent;
     vector<string> outputVector;
 
-    if ((dir = opendir (path.c_str())) != nullptr) {
-        while ((ent = readdir (dir)) != nullptr) {
+    if ((dir = opendir(path.c_str())) != nullptr)
+    {
+        while ((ent = readdir(dir)) != nullptr)
+        {
             outputVector.emplace_back(ent->d_name);
         }
-    closedir (dir);
-    return outputVector;
-    } 
-    else {
+        closedir(dir);
+        return outputVector;
+    }
+    else 
+    {
         throw runtime_error("could not open directory: " + path);
     }
 }
 
-bool os_path_exists(const string& path){  // os.path.exists
+bool os_path_exists(const string& path)  // os.path.exists
+{  
     return os_access(path, F_OK);
 }
 
-string strip(const string& s){
+string strip(const string& s)
+{
     int start_idx = 0;
     int total = s.size();
     int end_idx = total - 1;
-    for (; start_idx < total; start_idx++){
+    for (; start_idx < total; start_idx++)
+    {
         if(!isspace(s[start_idx]))
             break;
     }
     if(start_idx == total)
         return "";
-    for(; end_idx > start_idx; end_idx--){
+    for(; end_idx > start_idx; end_idx--)
+    {
         if(!isspace(s[end_idx]))
             break;
     }

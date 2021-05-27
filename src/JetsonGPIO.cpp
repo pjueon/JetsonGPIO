@@ -70,7 +70,8 @@ constexpr auto _SYSFS_ROOT = "/sys/class/gpio";
 // All global variables are wrapped in a singleton class except for public APIs,
 // in order to avoid initialization order problem among global variables in different compilation units.
 
-class GlobalVariableWrapper{
+class GlobalVariableWrapper
+{
 private:
     GlobalVariableWrapper()
     : _gpio_data(get_data()), // Get GPIO pin data
@@ -82,7 +83,8 @@ private:
         _CheckPermission();
     }
 
-    void _CheckPermission(){
+    void _CheckPermission()
+    {
         string path1 = string(_SYSFS_ROOT) + "/export";
         string path2 = string(_SYSFS_ROOT) + "/unexport";
         if(!os_access(path1, W_OK) || !os_access(path2, W_OK) ){
@@ -99,7 +101,8 @@ public:
 
     ~GlobalVariableWrapper() = default;
 
-    static GlobalVariableWrapper& get_instance(){
+    static GlobalVariableWrapper& get_instance()
+    {
         static GlobalVariableWrapper singleton;
         return singleton;
     }
@@ -128,7 +131,8 @@ GlobalVariableWrapper& GlobalVariables = GlobalVariableWrapper::get_instance();
 
 
 // This function will be called when the global variable named "JETSON_INFO" is initialized.
-const string _get_JETSON_INFO(){
+const string _get_JETSON_INFO()
+{
     // GlobalVariableWrapper singleton object must be initialized before JETSON_INFO.
     // The reason that JETSON_INFO is not wrapped by GlobalVariableWrapper
     // is because it belongs to API
@@ -146,7 +150,8 @@ const string _get_JETSON_INFO(){
 }
 
 // This function will be called when the global variable named "model" is initialized.
-const char* _get_model(){
+const char* _get_model()
+{
     // GlobalVariableWrapper singleton object must be initialized before model.
     // The reason that model is not wrapped by GlobalVariableWrapper
     // is because it belongs to API
@@ -164,7 +169,8 @@ const char* _get_model(){
 
 
 
-void _validate_mode_set(){
+void _validate_mode_set()
+{
     if(GlobalVariables._gpio_mode == NumberingModes::None)
         throw runtime_error("Please set pin numbering mode using "
                            "GPIO::setmode(GPIO::BOARD), GPIO::setmode(GPIO::BCM), "
@@ -173,7 +179,8 @@ void _validate_mode_set(){
 }
 
 
-ChannelInfo _channel_to_info_lookup(const string& channel, bool need_gpio, bool need_pwm){
+ChannelInfo _channel_to_info_lookup(const string& channel, bool need_gpio, bool need_pwm)
+{
     if(GlobalVariables._channel_data.find(channel) == GlobalVariables._channel_data.end())
         throw runtime_error("Channel " + channel + " is invalid");
     ChannelInfo ch_info = GlobalVariables._channel_data.at(channel);
@@ -185,13 +192,15 @@ ChannelInfo _channel_to_info_lookup(const string& channel, bool need_gpio, bool 
 }
 
 
-ChannelInfo _channel_to_info(const string& channel, bool need_gpio = false, bool need_pwm = false){
+ChannelInfo _channel_to_info(const string& channel, bool need_gpio = false, bool need_pwm = false)
+{
     _validate_mode_set();
     return _channel_to_info_lookup(channel, need_gpio, need_pwm);
 }
 
 
-vector<ChannelInfo> _channels_to_infos(const vector<string>& channels, bool need_gpio = false, bool need_pwm = false){
+vector<ChannelInfo> _channels_to_infos(const vector<string>& channels, bool need_gpio = false, bool need_pwm = false)
+{
     _validate_mode_set();
     vector<ChannelInfo> ch_infos;
     for (const auto& c : channels){
@@ -203,7 +212,8 @@ vector<ChannelInfo> _channels_to_infos(const vector<string>& channels, bool need
 
 /* Return the current configuration of a channel as reported by sysfs.
    Any of IN, OUT, HARD_PWM, or UNKNOWN may be returned. */
-Directions _sysfs_channel_configuration(const ChannelInfo& ch_info){
+Directions _sysfs_channel_configuration(const ChannelInfo& ch_info)
+{
     if (ch_info.pwm_chip_dir != "None") {
         string pwm_dir = ch_info.pwm_chip_dir + "/pwm" + to_string(ch_info.pwm_id);
         if (os_path_exists(pwm_dir))
@@ -237,14 +247,16 @@ Directions _sysfs_channel_configuration(const ChannelInfo& ch_info){
 
 /* Return the current configuration of a channel as requested by this
    module in this process. Any of IN, OUT, or UNKNOWN may be returned. */
-Directions _app_channel_configuration(const ChannelInfo& ch_info){
+Directions _app_channel_configuration(const ChannelInfo& ch_info)
+{
     if (GlobalVariables._channel_configuration.find(ch_info.channel) == GlobalVariables._channel_configuration.end())
         return UNKNOWN;   // Originally returns None in NVIDIA's GPIO Python Library
     return GlobalVariables._channel_configuration[ch_info.channel];
 }
 
 
-void _export_gpio(const int gpio){
+void _export_gpio(const int gpio)
+{
     if(os_path_exists(string(_SYSFS_ROOT) + "/gpio" + to_string(gpio) ))
         return;
     { // scope for f_export
@@ -255,14 +267,16 @@ void _export_gpio(const int gpio){
     string value_path = string(_SYSFS_ROOT) + "/gpio" + to_string(gpio) + "/value";
 
     int time_count = 0;
-    while (!os_access(value_path, R_OK | W_OK)){
+    while (!os_access(value_path, R_OK | W_OK))
+    {
         this_thread::sleep_for(chrono::milliseconds(10));
-	if(time_count++ > 100) throw runtime_error("Permission denied: path: " + value_path + "\n Please configure permissions or use the root user to run this.");
+	    if(time_count++ > 100) throw runtime_error("Permission denied: path: " + value_path + "\n Please configure permissions or use the root user to run this.");
     }
 }
 
 
-void _unexport_gpio(const int gpio){
+void _unexport_gpio(const int gpio)
+{
     if (!os_path_exists(string(_SYSFS_ROOT) + "/gpio" + to_string(gpio)))
         return;
 
@@ -271,17 +285,20 @@ void _unexport_gpio(const int gpio){
 }
 
 
-void _output_one(const string gpio, const int value){
+void _output_one(const string gpio, const int value)
+{
     ofstream value_file(string(_SYSFS_ROOT) + "/gpio" + gpio + "/value");
     value_file << int(bool(value));
 }
 
-void _output_one(const int gpio, const int value){
+void _output_one(const int gpio, const int value)
+{
     _output_one(to_string(gpio), value);
 }
 
 
-void _setup_single_out(const ChannelInfo& ch_info, int initial = -1){
+void _setup_single_out(const ChannelInfo& ch_info, int initial = -1)
+{
     _export_gpio(ch_info.gpio);
 
     string gpio_dir_path = string(_SYSFS_ROOT) + "/gpio" + to_string(ch_info.gpio) + "/direction";
@@ -297,7 +314,8 @@ void _setup_single_out(const ChannelInfo& ch_info, int initial = -1){
 }
 
 
-void _setup_single_in(const ChannelInfo& ch_info){
+void _setup_single_in(const ChannelInfo& ch_info)
+{
     _export_gpio(ch_info.gpio);
 
     string gpio_dir_path = string(_SYSFS_ROOT) + "/gpio" + to_string(ch_info.gpio) + "/direction";
@@ -309,37 +327,44 @@ void _setup_single_in(const ChannelInfo& ch_info){
     GlobalVariables._channel_configuration[ch_info.channel] = IN;
 }
 
-string _pwm_path(const ChannelInfo& ch_info){
+string _pwm_path(const ChannelInfo& ch_info)
+{
     return ch_info.pwm_chip_dir + "/pwm" + to_string(ch_info.pwm_id);
 }
 
 
-string _pwm_export_path(const ChannelInfo& ch_info){
+string _pwm_export_path(const ChannelInfo& ch_info)
+{
     return ch_info.pwm_chip_dir + "/export";
 }
 
 
-string _pwm_unexport_path(const ChannelInfo& ch_info){
+string _pwm_unexport_path(const ChannelInfo& ch_info)
+{
     return ch_info.pwm_chip_dir + "/unexport";
 }
 
 
-string _pwm_period_path(const ChannelInfo& ch_info){
+string _pwm_period_path(const ChannelInfo& ch_info)
+{
     return _pwm_path(ch_info) + "/period";
 }
 
 
-string _pwm_duty_cycle_path(const ChannelInfo& ch_info){
+string _pwm_duty_cycle_path(const ChannelInfo& ch_info)
+{
     return _pwm_path(ch_info) + "/duty_cycle";
 }
 
 
-string _pwm_enable_path(const ChannelInfo& ch_info){
+string _pwm_enable_path(const ChannelInfo& ch_info)
+{
     return _pwm_path(ch_info) + "/enable";
 }
 
 
-void _export_pwm(const ChannelInfo& ch_info){
+void _export_pwm(const ChannelInfo& ch_info)
+{
     if(os_path_exists(_pwm_path(ch_info)))
         return;
 
@@ -355,50 +380,59 @@ void _export_pwm(const ChannelInfo& ch_info){
     string enable_path = _pwm_enable_path(ch_info);
 
     int time_count = 0;
-    while (!os_access(enable_path, R_OK | W_OK)){
+    while (!os_access(enable_path, R_OK | W_OK))
+    {
         this_thread::sleep_for(chrono::milliseconds(10));
-	if(time_count++ > 100) throw runtime_error("Permission denied: path: " + enable_path + "\n Please configure permissions or use the root user to run this.");
+	    if(time_count++ > 100) throw runtime_error("Permission denied: path: " + enable_path + "\n Please configure permissions or use the root user to run this.");
     }
 }
 
 
-void _unexport_pwm(const ChannelInfo& ch_info){
+void _unexport_pwm(const ChannelInfo& ch_info)
+{
     ofstream f(_pwm_unexport_path(ch_info));
     f << ch_info.pwm_id;
 }
 
 
-void _set_pwm_period(const ChannelInfo& ch_info, const int period_ns){
+void _set_pwm_period(const ChannelInfo& ch_info, const int period_ns)
+{
     ofstream f(_pwm_period_path(ch_info));
     f << period_ns;
 }
 
 
-void _set_pwm_duty_cycle(const ChannelInfo& ch_info, const int duty_cycle_ns){
+void _set_pwm_duty_cycle(const ChannelInfo& ch_info, const int duty_cycle_ns)
+{
     ofstream f(_pwm_duty_cycle_path(ch_info));
     f << duty_cycle_ns;
 }
 
 
-void _enable_pwm(const ChannelInfo& ch_info){
+void _enable_pwm(const ChannelInfo& ch_info)
+{
     ofstream f(_pwm_enable_path(ch_info));
     f << 1;
 }
 
 
-void _disable_pwm(const ChannelInfo& ch_info){
+void _disable_pwm(const ChannelInfo& ch_info)
+{
     ofstream f(_pwm_enable_path(ch_info));
     f << 0;
 }
 
 
-void  _cleanup_one(const ChannelInfo& ch_info){
+void  _cleanup_one(const ChannelInfo& ch_info)
+{
     Directions app_cfg = GlobalVariables._channel_configuration[ch_info.channel];
-    if (app_cfg == HARD_PWM){
+    if (app_cfg == HARD_PWM)
+    {
         _disable_pwm(ch_info);
         _unexport_pwm(ch_info);
     }
-    else{
+    else
+    {
         // event.event_cleanup(ch_info.gpio)  // not implemented yet
         _unexport_gpio(ch_info.gpio);
     }
@@ -406,13 +440,15 @@ void  _cleanup_one(const ChannelInfo& ch_info){
 }
 
 
-void _cleanup_all(){
-    for (const auto& _pair : GlobalVariables._channel_configuration){
+void _cleanup_all()
+{
+    for (const auto& _pair : GlobalVariables._channel_configuration)
+    {
         const auto& channel = _pair.first;
         ChannelInfo ch_info = _channel_to_info(channel);
         _cleanup_one(ch_info);
     }
-     GlobalVariables._gpio_mode = NumberingModes::None;
+    GlobalVariables._gpio_mode = NumberingModes::None;
 }
 
 
@@ -426,15 +462,18 @@ extern const string GPIO::JETSON_INFO = _get_JETSON_INFO();
 
 
 /* Function used to enable/disable warnings during setup and cleanup. */
-void GPIO::setwarnings(bool state){
+void GPIO::setwarnings(bool state)
+{
     GlobalVariables._gpio_warnings = state;
 }
 
 
 // Function used to set the pin mumbering mode.
 // Possible mode values are BOARD, BCM, TEGRA_SOC and CVM
-void GPIO::setmode(NumberingModes mode){
-    try{
+void GPIO::setmode(NumberingModes mode)
+{
+    try
+    {
         // check if mode is valid
         if(mode == NumberingModes::None)
             throw runtime_error("Pin numbering mode must be "
@@ -448,7 +487,8 @@ void GPIO::setmode(NumberingModes mode){
         GlobalVariables._channel_data = GlobalVariables._channel_data_by_mode.at(mode);
         GlobalVariables._gpio_mode = mode;
     }
-    catch(exception& e){
+    catch(exception& e)
+    {
         cerr << "[Exception] " << e.what() << " (catched from: setmode())" << endl;
         terminate();
     }
@@ -456,7 +496,8 @@ void GPIO::setmode(NumberingModes mode){
 
 
 // Function used to get the currently set pin numbering mode
-NumberingModes GPIO::getmode(){
+NumberingModes GPIO::getmode()
+{
     return GlobalVariables._gpio_mode;
 }
 
@@ -464,11 +505,14 @@ NumberingModes GPIO::getmode(){
 /* Function used to setup individual pins or lists/tuples of pins as
    Input or Output. direction must be IN or OUT, initial must be
    HIGH or LOW and is only valid when direction is OUT  */
-void GPIO::setup(const string& channel, Directions direction, int initial){
-    try{
+void GPIO::setup(const string& channel, Directions direction, int initial)
+{
+    try
+    {
         ChannelInfo ch_info = _channel_to_info(channel, true);
 
-        if (GlobalVariables._gpio_warnings){
+        if (GlobalVariables._gpio_warnings)
+        {
             Directions sysfs_cfg = _sysfs_channel_configuration(ch_info);
             Directions app_cfg = _app_channel_configuration(ch_info);
 
@@ -481,63 +525,76 @@ void GPIO::setup(const string& channel, Directions direction, int initial){
         if(direction != OUT && direction != IN)
             throw runtime_error("GPIO direction must be GPIO::IN or GPIO::OUT");
 
-        if(direction == OUT){
+        if(direction == OUT)
+        {
             _setup_single_out(ch_info, initial);
         }
-        else{ // IN
+        else // IN
+        { 
             if(initial != -1) throw runtime_error("initial parameter is not valid for inputs");
             _setup_single_in(ch_info);
         }
     }
-    catch(exception& e){
+    catch(exception& e)
+    {
         cerr << "[Exception] " << e.what() << " (catched from: setup())" << endl;
         terminate();
     }
 }
 
 
-void GPIO::setup(int channel, Directions direction, int initial){
+void GPIO::setup(int channel, Directions direction, int initial)
+{
     setup(to_string(channel), direction, initial);
 }
 
 
 /* Function used to cleanup channels at the end of the program.
    If no channel is provided, all channels are cleaned */
-void GPIO::cleanup(const string& channel){
-    try{
+void GPIO::cleanup(const string& channel)
+{
+    try
+    {
         // warn if no channel is setup
-        if (GlobalVariables._gpio_mode == NumberingModes::None && GlobalVariables._gpio_warnings){
+        if (GlobalVariables._gpio_mode == NumberingModes::None && GlobalVariables._gpio_warnings)
+        {
             cerr << "[WARNING] No channels have been set up yet - nothing to clean up! "
                     "Try cleaning up at the end of your program instead!";
             return;
         }
 
         // clean all channels if no channel param provided
-        if (channel == "None"){
+        if (channel == "None")
+        {
             _cleanup_all();
             return;
         }
 
         ChannelInfo ch_info = _channel_to_info(channel);
-        if (GlobalVariables._channel_configuration.find(ch_info.channel) != GlobalVariables._channel_configuration.end()){
+        if (GlobalVariables._channel_configuration.find(ch_info.channel) != GlobalVariables._channel_configuration.end())
+        {
             _cleanup_one(ch_info);
         }
     }
-    catch (exception& e){
+    catch (exception& e)
+    {
         cerr << "[Exception] " << e.what() << " (catched from: cleanup())" << endl;
         terminate();
     }
 }
 
-void GPIO::cleanup(int channel){
+void GPIO::cleanup(int channel)
+{
     string str_channel = to_string(channel);
     cleanup(str_channel);
 }
 
 /* Function used to return the current value of the specified channel.
    Function returns either HIGH or LOW */
-int GPIO::input(const string& channel){
-    try{
+int GPIO::input(const string& channel)
+{
+    try
+    {
         ChannelInfo ch_info = _channel_to_info(channel, true);
 
         Directions app_cfg = _app_channel_configuration(ch_info);
@@ -552,58 +609,69 @@ int GPIO::input(const string& channel){
             return value_read;
         } // scope ends
     }
-    catch (exception& e){
+    catch (exception& e)
+    {
         cerr << "[Exception] " << e.what() << " (catched from: input())" << endl;
         terminate();
     }
 }
 
-int GPIO::input(int channel){
+int GPIO::input(int channel)
+{
     return input(to_string(channel));
 }
 
 
 /* Function used to set a value to a channel.
    Values must be either HIGH or LOW */
-void GPIO::output(const string& channel, int value){
-    try{
+void GPIO::output(const string& channel, int value)
+{
+    try
+    {
         ChannelInfo ch_info = _channel_to_info(channel, true);
         // check that the channel has been set as output
         if(_app_channel_configuration(ch_info) != OUT)
             throw runtime_error("The GPIO channel has not been set up as an OUTPUT");
         _output_one(ch_info.gpio, value);
     }
-    catch (exception& e){
+    catch (exception& e)
+    {
         cerr << "[Exception] " << e.what() << " (catched from: output())" << endl;
         terminate();
     }
 }
 
-void GPIO::output(int channel, int value){
+void GPIO::output(int channel, int value)
+{
     output(to_string(channel), value);
 }
 
 
 /* Function used to check the currently set function of the channel specified. */
-Directions GPIO::gpio_function(const string& channel){
-    try{
+Directions GPIO::gpio_function(const string& channel)
+{
+    try
+    {
         ChannelInfo ch_info = _channel_to_info(channel);
         return _sysfs_channel_configuration(ch_info);
     }
-    catch (exception& e){
+    catch (exception& e)
+    {
         cerr << "[Exception] " << e.what() << " (catched from: gpio_function())" << endl;
         terminate();
     }
 }
 
-Directions GPIO::gpio_function(int channel){
+Directions GPIO::gpio_function(int channel)
+{
     gpio_function(to_string(channel));
 }
 
 
 
 //PWM class ==========================================================
-struct GPIO::PWM::Impl {
+struct GPIO::PWM::Impl 
+{
     ChannelInfo _ch_info;
     bool _started;
     int _frequency_hz;
@@ -615,13 +683,15 @@ struct GPIO::PWM::Impl {
     void _reconfigure(int frequency_hz, double duty_cycle_percent, bool start = false);
 };
 
-void GPIO::PWM::Impl::_reconfigure(int frequency_hz, double duty_cycle_percent, bool start){
+void GPIO::PWM::Impl::_reconfigure(int frequency_hz, double duty_cycle_percent, bool start)
+{
 
     if (duty_cycle_percent < 0.0 || duty_cycle_percent > 100.0)
             throw runtime_error("invalid duty_cycle_percent");
     bool restart = start || _started;
 
-    if (_started){
+    if (_started)
+    {
         _started = false;
         _disable_pwm(_ch_info);
     }
@@ -634,7 +704,8 @@ void GPIO::PWM::Impl::_reconfigure(int frequency_hz, double duty_cycle_percent, 
     _duty_cycle_ns = int(_period_ns * (duty_cycle_percent / 100.0));
     _set_pwm_duty_cycle(_ch_info, _duty_cycle_ns);
 
-    if (restart){
+    if (restart)
+    {
         _enable_pwm(_ch_info);
         _started = true;
     }
@@ -646,7 +717,8 @@ GPIO::PWM::PWM(int channel, int frequency_hz)
     : pImpl(make_unique<Impl>(Impl{_channel_to_info(to_string(channel), false, true),
             false, 0, 0, 0.0, 0}))  //temporary values
 {
-    try{
+    try
+    {
 
         Directions app_cfg = _app_channel_configuration(pImpl->_ch_info);
         if(app_cfg == HARD_PWM)
@@ -658,12 +730,14 @@ GPIO::PWM::PWM(int channel, int frequency_hz)
         */
         if(app_cfg == IN || app_cfg == OUT) cleanup(channel);
 
-        if (GlobalVariables._gpio_warnings){
+        if (GlobalVariables._gpio_warnings)
+        {
             auto sysfs_cfg = _sysfs_channel_configuration(pImpl->_ch_info);
             app_cfg = _app_channel_configuration(pImpl->_ch_info);
 
             // warn if channel has been setup external to current program
-            if (app_cfg == UNKNOWN && sysfs_cfg != UNKNOWN){
+            if (app_cfg == UNKNOWN && sysfs_cfg != UNKNOWN)
+            {
                 cerr <<  "[WARNING] This channel is already in use, continuing anyway. "
                             "Use GPIO::setwarnings(false) to disable warnings" << endl;
             }
@@ -674,7 +748,8 @@ GPIO::PWM::PWM(int channel, int frequency_hz)
         GlobalVariables._channel_configuration[to_string(channel)] = HARD_PWM;
 
     }
-    catch (exception& e){
+    catch (exception& e)
+    {
         cerr << "[Exception] " << e.what() << " (catched from: PWM::PWM())" << endl;
         _cleanup_all();
         terminate();
@@ -682,27 +757,33 @@ GPIO::PWM::PWM(int channel, int frequency_hz)
 
 }
 
-GPIO::PWM::~PWM(){
+GPIO::PWM::~PWM()
+{
     auto itr = GlobalVariables._channel_configuration.find(pImpl->_ch_info.channel);
-    if (itr == GlobalVariables._channel_configuration.end() || itr->second != HARD_PWM){
+    if (itr == GlobalVariables._channel_configuration.end() || itr->second != HARD_PWM)
+    {
         /* The user probably ran cleanup() on the channel already, so avoid
            attempts to repeat the cleanup operations. */
        return;
     }
-    try{
+    try
+    {
         stop();
         _unexport_pwm(pImpl->_ch_info);
         GlobalVariables._channel_configuration.erase(pImpl->_ch_info.channel);
-        }
-    catch(...){
+    }
+    catch(...)
+    {
         cerr << "[Exception] ~PWM Exception! shut down the program." << endl;
         _cleanup_all();
         terminate();
     }
 }
 
-void GPIO::PWM::start(double  duty_cycle_percent){
-    try{
+void GPIO::PWM::start(double  duty_cycle_percent)
+{
+    try
+    {
         pImpl->_reconfigure(pImpl->_frequency_hz, duty_cycle_percent, true);
     }
     catch(exception& e){
@@ -712,34 +793,43 @@ void GPIO::PWM::start(double  duty_cycle_percent){
     }
 }
 
-void GPIO::PWM::ChangeFrequency(int frequency_hz){
-    try{
+void GPIO::PWM::ChangeFrequency(int frequency_hz)
+{
+    try
+    {
         pImpl->_reconfigure(frequency_hz, pImpl->_duty_cycle_percent);
     }
-    catch(exception& e){
+    catch(exception& e)
+    {
         cerr << "[Exception] " << e.what() << " (catched from: PWM::ChangeFrequency())" << endl;
         terminate();
     }
 }
 
-void GPIO::PWM::ChangeDutyCycle(double duty_cycle_percent){
-    try{
+void GPIO::PWM::ChangeDutyCycle(double duty_cycle_percent)
+{
+    try
+    {
         pImpl->_reconfigure(pImpl->_frequency_hz, duty_cycle_percent);
     }
-    catch(exception& e){
+    catch(exception& e)
+    {
         cerr << "[Exception] " << e.what() << " (catched from: PWM::ChangeDutyCycle())" << endl;
         terminate();
     }
 }
 
-void GPIO::PWM::stop(){
-    try{
+void GPIO::PWM::stop()
+{
+    try
+    {
         if (!pImpl->_started)
             return;
 
         _disable_pwm(pImpl->_ch_info);
     }
-    catch(exception& e){
+    catch(exception& e)
+    {
         cerr << "[Exception] " << e.what() << " (catched from: PWM::stop())" << endl;
         throw runtime_error("Exeception from GPIO::PWM::stop");
     }
@@ -749,7 +839,8 @@ void GPIO::PWM::stop(){
 
 
 //=========================== Originally added ===========================
-struct _cleaner{
+struct _cleaner
+{
 private:
     _cleaner() = default;
 
@@ -757,18 +848,22 @@ public:
     _cleaner(const _cleaner&) = delete;
     _cleaner& operator=(const _cleaner&) = delete;
 
-    static _cleaner& get_instance(){
+    static _cleaner& get_instance()
+    {
         static _cleaner singleton;
         return singleton;
     }
 
-    ~_cleaner(){
-        try{
+    ~_cleaner()
+    {
+        try
+        {
             // When the user forgot to call cleanup() at the end of the program,
             // _cleaner object will call it.
             _cleanup_all();
         }
-        catch(exception& e){
+        catch(exception& e)
+        {
             cerr << "Exception: " << e.what() << endl;
             cerr << "Exception from destructor of _cleaner class." << endl;
         }

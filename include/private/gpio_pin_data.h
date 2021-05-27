@@ -32,7 +32,6 @@ DEALINGS IN THE SOFTWARE.
 
 #include "JetsonGPIO.h"
 
-
 enum class Model;
 
 extern const Model JETSON_NX;
@@ -41,18 +40,20 @@ extern const Model JETSON_TX2;
 extern const Model JETSON_TX1;
 extern const Model JETSON_NANO;
 
-struct _GPIO_PIN_DEF{
-    const int LinuxPin;           // Linux GPIO pin number
-    const std::string SysfsDir;        // GPIO chip sysfs directory
-    const std::string BoardPin;        // Pin number (BOARD mode)
-    const std::string BCMPin;          // Pin number (BCM mode)
-    const std::string CVMPin;          // Pin name (CVM mode)
-    const std::string TEGRAPin;        // Pin name (TEGRA_SOC mode)
-    const std::string PWMSysfsDir;     // PWM chip sysfs directory
-    const int PWMID;              // PWM ID within PWM chip
+struct _GPIO_PIN_DEF
+{
+    const int LinuxPin;            // Linux GPIO pin number
+    const std::string SysfsDir;    // GPIO chip sysfs directory
+    const std::string BoardPin;    // Pin number (BOARD mode)
+    const std::string BCMPin;      // Pin number (BCM mode)
+    const std::string CVMPin;      // Pin name (CVM mode)
+    const std::string TEGRAPin;    // Pin name (TEGRA_SOC mode)
+    const std::string PWMSysfsDir; // PWM chip sysfs directory
+    const int PWMID;               // PWM ID within PWM chip
 };
 
-struct _GPIO_PIN_INFO{
+struct _GPIO_PIN_INFO
+{
     const int P1_REVISION;
     const std::string RAM;
     const std::string REVISION;
@@ -61,19 +62,20 @@ struct _GPIO_PIN_INFO{
     const std::string PROCESSOR;
 };
 
-
-struct ChannelInfo{
-    ChannelInfo(const std::string& channel, const std::string& gpio_chip_dir,
-		int chip_gpio, int gpio, const std::string& pwm_chip_dir,
-		int pwm_id)
-	    : channel(channel),
-	      gpio_chip_dir(gpio_chip_dir),
-	      chip_gpio(chip_gpio),
-	      gpio(gpio),
-	      pwm_chip_dir(pwm_chip_dir),
-	      pwm_id(pwm_id)
-	    {}
-    ChannelInfo(const ChannelInfo&) = default;
+struct ChannelInfo
+{
+    ChannelInfo(const std::string &channel, const std::string &gpio_chip_dir,
+                int chip_gpio, int gpio, const std::string &pwm_chip_dir,
+                int pwm_id)
+        : channel(channel),
+          gpio_chip_dir(gpio_chip_dir),
+          chip_gpio(chip_gpio),
+          gpio(gpio),
+          pwm_chip_dir(pwm_chip_dir),
+          pwm_id(pwm_id)
+    {
+    }
+    ChannelInfo(const ChannelInfo &) = default;
 
     const std::string channel;
     const std::string gpio_chip_dir;
@@ -83,14 +85,13 @@ struct ChannelInfo{
     const int pwm_id;
 };
 
-struct GPIO_data{
+struct GPIO_data
+{
     Model model;
     _GPIO_PIN_INFO pin_info;
     std::map<GPIO::NumberingModes, std::map<std::string, ChannelInfo>> channel_data;
 };
 
-
 GPIO_data get_data();
-
 
 #endif // GPIO_PIN_DATA_H
