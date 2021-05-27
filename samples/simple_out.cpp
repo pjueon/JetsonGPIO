@@ -24,7 +24,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <iostream>
 // for delay function.
-#include <chrono> 
+#include <chrono>
 #include <thread>
 
 // for signal handling
@@ -34,25 +34,28 @@ DEALINGS IN THE SOFTWARE.
 
 using namespace std;
 
-// Pin Definitions
-int output_pin = 18; // BOARD pin 12, BCM pin 18
+static bool end_this_program = false;
 
-bool end_this_program = false;
-
-inline void delay(int s){
+inline void delay(int s)
+{
 	this_thread::sleep_for(chrono::seconds(s));
 }
 
-void signalHandler (int s){
+void signalHandler(int s)
+{
 	end_this_program = true;
 }
 
 
-int main(){
+int main()
+{
 	// When CTRL+C pressed, signalHandler will be called
 	signal(SIGINT, signalHandler);
 
-	// Pin Setup. 
+	// Pin Definitions
+	int output_pin = 18; // BOARD pin 12, BCM pin 18
+
+	// Pin Setup.
 	GPIO::setmode(GPIO::BCM);
 	// set pin as an output pin with optional initial state of HIGH
 	GPIO::setup(output_pin, GPIO::OUT, GPIO::HIGH);
@@ -60,7 +63,8 @@ int main(){
 	cout << "Strating demo now! Press CTRL+C to exit" << endl;
 	int curr_value = GPIO::HIGH;
 
-	while(!end_this_program){
+	while (!end_this_program)
+	{
 		delay(1);
 		// Toggle the output every second
 		cout << "Outputting " << curr_value << " to pin ";
