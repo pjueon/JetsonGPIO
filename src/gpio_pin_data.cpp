@@ -41,7 +41,7 @@ DEALINGS IN THE SOFTWARE.
 
 using namespace GPIO;
 using namespace std;
-
+using namespace std::string_literals; // enables s-suffix for std::string literals
 
 // ========================================= Begin of "gpio_pin_data.py" =========================================
 
@@ -308,7 +308,7 @@ GPIO_data get_data()
             return false;
         };
 
-        auto find_pmgr_board = [&](const string& prefix)
+        auto find_pmgr_board = [&](const string& prefix)->string
         {
             if (!os_path_exists(ids_path))
             {
@@ -323,50 +323,51 @@ GPIO_data get_data()
             }
 
             vector<string> files = os_listdir(ids_path);
-            for (const string& file : files)
+            for (const auto& file : files)
             {
                 if (startswith(file, prefix))
-                    return file.c_str();
+                    return file;
             }
 
             return "None";
         };
 
-        auto warn_if_not_carrier_board = [&](string carrier_board)
+        auto warn_if_not_carrier_board = [&find_pmgr_board](const vector<string>& carrier_boards)
         {
+            std::string found = "None";
 
-            string found = find_pmgr_board(carrier_board + "-");
+            for (auto&& b : carrier_boards)
+            {
+                found = find_pmgr_board(b + "-"s);
+                if(found != "None")
+                    break;
+            }
+
             if (found == "None")
             {
                 string msg = "WARNING: Carrier board is not from a Jetson Developer Kit.\n"
-                            "WARNNIG: Jetson.GPIO library has not been verified with this carrier board,\n"
-                            "WARNING: and in fact is unlikely to work correctly.";
+                             "WARNNIG: Jetson.GPIO library has not been verified with this carrier board,\n"
+                             "WARNING: and in fact is unlikely to work correctly.";
                 cerr << msg << endl;
             }
         };
 
         Model model;
 
-        if (matches(_DATA.compats_nx))
-        {
-            model = JETSON_NX;
-            //warn_if_not_carrier_board("3509");
-            //warn_if_not_carrier_board("3449");
-        }
-        else if (matches(_DATA.compats_tx1))
+        if (matches(_DATA.compats_tx1))
         {
             model = JETSON_TX1;
-            warn_if_not_carrier_board("2597");
+            warn_if_not_carrier_board({"2597"s});
         }
         else if (matches(_DATA.compats_tx2))
         {
             model = JETSON_TX2;
-            warn_if_not_carrier_board("2597");
+            warn_if_not_carrier_board({"2597"s});
         }
         else if (matches(_DATA.compats_xavier))
         {
             model = JETSON_XAVIER;
-            warn_if_not_carrier_board("2822");
+            warn_if_not_carrier_board({"2822"s});
         }
         else if (matches(_DATA.compats_nano))
         {
@@ -380,7 +381,12 @@ GPIO_data get_data()
             if (revision < "200")
                 throw runtime_error("Jetson Nano module revision must be A02 or later");
 
-            warn_if_not_carrier_board("3449");
+            warn_if_not_carrier_board({"3449"s});
+        }
+        else if (matches(_DATA.compats_nx))
+        {
+            model = JETSON_NX;
+            warn_if_not_carrier_board({"3509"s, "3449"s});
         }
         else
         {
