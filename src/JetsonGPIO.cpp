@@ -405,6 +405,26 @@ void _set_pwm_period(const ChannelInfo& ch_info, const int period_ns)
 
 void _set_pwm_duty_cycle(const ChannelInfo& ch_info, const int duty_cycle_ns)
 {
+    // On boot, both period and duty cycle are both 0. In this state, the period
+    // must be set first; any configuration change made while period==0 is
+    // rejected. This is fine if we actually want a duty cycle of 0. Later, once
+    // any period has been set, we will always be able to set a duty cycle of 0.
+    // The code could be written to always read the current value, and only
+    // write the value if the desired value is different. However, we enable
+    // this check only for the 0 duty cycle case, to avoid having to read the
+    // current value every time the duty cycle is set.
+    if(duty_cycle_ns == 0)
+    {
+        ifstream f(_pwm_duty_cycle_path(ch_info));
+        stringstream buffer;
+        buffer << f.rdbuf();
+        auto cur = buffer.str();
+        cur = strip(cur);
+        
+        if (cur == "0")
+            return;
+    }
+
     ofstream f(_pwm_duty_cycle_path(ch_info));
     f << duty_cycle_ns;
 }
@@ -745,9 +765,9 @@ GPIO::PWM::PWM(int channel, int frequency_hz)
         }
 
         _export_pwm(pImpl->_ch_info);
-        pImpl->_reconfigure(frequency_hz, 50.0);
+        _set_pwm_duty_cycle(pImpl->_ch_info, 0);
+        pImpl->_reconfigure(frequency_hz, 0.0);
         GlobalVariables._channel_configuration[to_string(channel)] = HARD_PWM;
-
     }
     catch (exception& e)
     {
