@@ -428,7 +428,7 @@ GPIO_data get_data()
             if (revision < "200")
                 throw runtime_error("Jetson Nano module revision must be A02 or later");
 
-            warn_if_not_carrier_board({"3449"s});
+            warn_if_not_carrier_board({"3449"s, "3542"s});
         }
         else if (matches(_DATA.compats_nx))
         {
