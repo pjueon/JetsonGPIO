@@ -54,8 +54,9 @@ constexpr Directions UNKNOWN = Directions::UNKNOWN;
 constexpr Directions HARD_PWM = Directions::HARD_PWM;
 
 // Jetson Models
-enum class Model{ JETSON_NX, JETSON_XAVIER, JETSON_TX2, JETSON_TX1, JETSON_NANO };
+enum class Model{ CLARA_AGX_XAVIER, JETSON_NX, JETSON_XAVIER, JETSON_TX2, JETSON_TX1, JETSON_NANO };
 
+extern const Model CLARA_AGX_XAVIER = Model::CLARA_AGX_XAVIER;
 extern const Model JETSON_NX = Model::JETSON_NX;
 extern const Model JETSON_XAVIER = Model::JETSON_XAVIER;
 extern const Model JETSON_TX2 = Model::JETSON_TX2;

@@ -34,6 +34,7 @@ DEALINGS IN THE SOFTWARE.
 
 enum class Model;
 
+extern const Model CLARA_AGX_XAVIER;
 extern const Model JETSON_NX;
 extern const Model JETSON_XAVIER;
 extern const Model JETSON_TX2;

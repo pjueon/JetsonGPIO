@@ -58,6 +58,8 @@ private:
     PIN_DATA();
 
 public:
+    const vector<_GPIO_PIN_DEF> CLARA_AGX_XAVIER_PIN_DEFS;
+    const vector<string> compats_clara_agx_xavier;
     const vector<_GPIO_PIN_DEF> JETSON_NX_PIN_DEFS;
     const vector<string> compats_nx;
     const vector<_GPIO_PIN_DEF> JETSON_XAVIER_PIN_DEFS;
@@ -84,30 +86,63 @@ public:
 
 PIN_DATA::PIN_DATA()
     : 
+    CLARA_AGX_XAVIER_PIN_DEFS
+    {
+        { 134, "/sys/devices/2200000.gpio", "7", "4", "MCLK05", "SOC_GPIO42", "None", -1 },
+        { 140, "/sys/devices/2200000.gpio", "11", "17", "UART1_RTS", "UART1_RTS", "None", -1 },
+        { 63, "/sys/devices/2200000.gpio", "12", "18", "I2S2_CLK", "DAP2_SCLK", "None", -1 },
+        { 124, "/sys/devices/2200000.gpio", "13", "27", "GPIO32", "SOC_GPIO04", "None", -1 },
+        // Older versions of L4T don"t enable this PWM controller in DT, so this PWM
+        // channel may not be available.
+        { 105, "/sys/devices/2200000.gpio", "15", "22", "GPIO27", "SOC_GPIO54", "/sys/devices/3280000.pwm", 0 },
+        { 8, "/sys/devices/c2f0000.gpio", "16", "23", "GPIO8", "CAN1_STB", "None", -1 },
+        { 56, "/sys/devices/2200000.gpio", "18", "24", "GPIO35", "SOC_GPIO12", "/sys/devices/32c0000.pwm", 0 },
+        { 205, "/sys/devices/2200000.gpio", "19", "10", "SPI1_MOSI", "SPI1_MOSI", "None", -1 },
+        { 204, "/sys/devices/2200000.gpio", "21", "9", "SPI1_MISO", "SPI1_MISO", "None", -1 },
+        { 129, "/sys/devices/2200000.gpio", "22", "25", "GPIO17", "SOC_GPIO21", "None", -1 },
+        { 203, "/sys/devices/2200000.gpio", "23", "11", "SPI1_CLK", "SPI1_SCK", "None", -1 },
+        { 206, "/sys/devices/2200000.gpio", "24", "8", "SPI1_CS0_N", "SPI1_CS0_N", "None", -1 },
+        { 207, "/sys/devices/2200000.gpio", "26", "7", "SPI1_CS1_N", "SPI1_CS1_N", "None", -1 },
+        { 3, "/sys/devices/c2f0000.gpio", "29", "5", "CAN0_DIN", "CAN0_DIN", "None", -1 },
+        { 2, "/sys/devices/c2f0000.gpio", "31", "6", "CAN0_DOUT", "CAN0_DOUT", "None", -1 },
+        { 9, "/sys/devices/c2f0000.gpio", "32", "12", "GPIO9", "CAN1_EN", "None", -1 },
+        { 0, "/sys/devices/c2f0000.gpio", "33", "13", "CAN1_DOUT", "CAN1_DOUT", "None", -1 },
+        { 66, "/sys/devices/2200000.gpio", "35", "19", "I2S2_FS", "DAP2_FS", "None", -1 },
+        // Input-only (due to base board)
+        { 141, "/sys/devices/2200000.gpio", "36", "16", "UART1_CTS", "UART1_CTS", "None", -1 },
+        { 1, "/sys/devices/c2f0000.gpio", "37", "26", "CAN1_DIN", "CAN1_DIN", "None", -1 },
+        { 65, "/sys/devices/2200000.gpio", "38", "20", "I2S2_DIN", "DAP2_DIN", "None", -1 },
+        { 64, "/sys/devices/2200000.gpio", "40", "21", "I2S2_DOUT", "DAP2_DOUT", "None", -1 }
+    },
+    compats_clara_agx_xavier
+    {
+        "nvidia,e3900-0000+p2888-0004"
+    },
+
     JETSON_NX_PIN_DEFS
     {
-        {148, "/sys/devices/2200000.gpio", "7", "4", "GPIO09", "AUD_MCLK", "None", -1},
-        {140, "/sys/devices/2200000.gpio", "11", "17", "UART1_RTS", "UART1_RTS", "None", -1},
-        {157, "/sys/devices/2200000.gpio", "12", "18", "I2S0_SCLK", "DAP5_SCLK", "None", -1},
-        {192, "/sys/devices/2200000.gpio", "13", "27", "SPI1_SCK", "SPI3_SCK", "None", -1},
-        {20, "/sys/devices/c2f0000.gpio", "15", "22", "GPIO12", "TOUCH_CLK", "None", -1},
-        {196, "/sys/devices/2200000.gpio", "16", "23", "SPI1_CS1", "SPI3_CS1_N", "None", -1},
-        {195, "/sys/devices/2200000.gpio", "18", "24", "SPI1_CS0", "SPI3_CS0_N", "None", -1},
-        {205, "/sys/devices/2200000.gpio", "19", "10", "SPI0_MOSI", "SPI1_MOSI", "None", -1},
-        {204, "/sys/devices/2200000.gpio", "21", "9", "SPI0_MISO", "SPI1_MISO", "None", -1},
-        {193, "/sys/devices/2200000.gpio", "22", "25", "SPI1_MISO", "SPI3_MISO", "None", -1},
-        {203, "/sys/devices/2200000.gpio", "23", "11", "SPI0_SCK", "SPI1_SCK", "None", -1},
-        {206, "/sys/devices/2200000.gpio", "24", "8", "SPI0_CS0", "SPI1_CS0_N", "None", -1},
-        {207, "/sys/devices/2200000.gpio", "26", "7", "SPI0_CS1", "SPI1_CS1_N", "None", -1},
-        {133, "/sys/devices/2200000.gpio", "29", "5", "GPIO01", "SOC_GPIO41", "None", -1},
-        {134, "/sys/devices/2200000.gpio", "31", "6", "GPIO11", "SOC_GPIO42", "None", -1},
-        {136, "/sys/devices/2200000.gpio", "32", "12", "GPIO07", "SOC_GPIO44", "/sys/devices/32f0000.pwm", 0},
-        {105, "/sys/devices/2200000.gpio", "33", "13", "GPIO13", "SOC_GPIO54", "/sys/devices/3280000.pwm", 0},
-        {160, "/sys/devices/2200000.gpio", "35", "19", "I2S0_FS", "DAP5_FS", "None", -1},
-        {141, "/sys/devices/2200000.gpio", "36", "16", "UART1_CTS", "UART1_CTS", "None", -1},
-        {194, "/sys/devices/2200000.gpio", "37", "26", "SPI1_MOSI", "SPI3_MOSI", "None", -1},
-        {159, "/sys/devices/2200000.gpio", "38", "20", "I2S0_DIN", "DAP5_DIN", "None", -1},
-        {158, "/sys/devices/2200000.gpio", "40", "21", "I2S0_DOUT", "DAP5_DOUT", "None", -1}
+        { 148, "/sys/devices/2200000.gpio", "7", "4", "GPIO09", "AUD_MCLK", "None", -1 },
+        { 140, "/sys/devices/2200000.gpio", "11", "17", "UART1_RTS", "UART1_RTS", "None", -1 },
+        { 157, "/sys/devices/2200000.gpio", "12", "18", "I2S0_SCLK", "DAP5_SCLK", "None", -1 },
+        { 192, "/sys/devices/2200000.gpio", "13", "27", "SPI1_SCK", "SPI3_SCK", "None", -1 },
+        { 20, "/sys/devices/c2f0000.gpio", "15", "22", "GPIO12", "TOUCH_CLK", "None", -1 },
+        { 196, "/sys/devices/2200000.gpio", "16", "23", "SPI1_CS1", "SPI3_CS1_N", "None", -1 },
+        { 195, "/sys/devices/2200000.gpio", "18", "24", "SPI1_CS0", "SPI3_CS0_N", "None", -1 },
+        { 205, "/sys/devices/2200000.gpio", "19", "10", "SPI0_MOSI", "SPI1_MOSI", "None", -1 },
+        { 204, "/sys/devices/2200000.gpio", "21", "9", "SPI0_MISO", "SPI1_MISO", "None", -1 },
+        { 193, "/sys/devices/2200000.gpio", "22", "25", "SPI1_MISO", "SPI3_MISO", "None", -1 },
+        { 203, "/sys/devices/2200000.gpio", "23", "11", "SPI0_SCK", "SPI1_SCK", "None", -1 },
+        { 206, "/sys/devices/2200000.gpio", "24", "8", "SPI0_CS0", "SPI1_CS0_N", "None", -1 },
+        { 207, "/sys/devices/2200000.gpio", "26", "7", "SPI0_CS1", "SPI1_CS1_N", "None", -1 },
+        { 133, "/sys/devices/2200000.gpio", "29", "5", "GPIO01", "SOC_GPIO41", "None", -1 },
+        { 134, "/sys/devices/2200000.gpio", "31", "6", "GPIO11", "SOC_GPIO42", "None", -1 },
+        { 136, "/sys/devices/2200000.gpio", "32", "12", "GPIO07", "SOC_GPIO44", "/sys/devices/32f0000.pwm", 0 },
+        { 105, "/sys/devices/2200000.gpio", "33", "13", "GPIO13", "SOC_GPIO54", "/sys/devices/3280000.pwm", 0 },
+        { 160, "/sys/devices/2200000.gpio", "35", "19", "I2S0_FS", "DAP5_FS", "None", -1 },
+        { 141, "/sys/devices/2200000.gpio", "36", "16", "UART1_CTS", "UART1_CTS", "None", -1 },
+        { 194, "/sys/devices/2200000.gpio", "37", "26", "SPI1_MOSI", "SPI3_MOSI", "None", -1 },
+        { 159, "/sys/devices/2200000.gpio", "38", "20", "I2S0_DIN", "DAP5_DIN", "None", -1 },
+        { 158, "/sys/devices/2200000.gpio", "40", "21", "I2S0_DOUT", "DAP5_DOUT", "None", -1 }
     },
     compats_nx
     {
@@ -116,6 +151,7 @@ PIN_DATA::PIN_DATA()
         "nvidia,p3449-0000+p3668-0000",
         "nvidia,p3449-0000+p3668-0001"
     },
+
     JETSON_XAVIER_PIN_DEFS
     {
         { 134, "/sys/devices/2200000.gpio", "7", "4", "MCLK05", "SOC_GPIO42", "None", -1 },
@@ -150,6 +186,7 @@ PIN_DATA::PIN_DATA()
         "nvidia,p2972-0006",
         "nvidia,jetson-xavier"
     },
+
     JETSON_TX2_PIN_DEFS
     {
         { 76, "/sys/devices/2200000.gpio", "7", "4", "AUDIO_MCLK", "AUD_MCLK", "None", -1 },
@@ -189,6 +226,7 @@ PIN_DATA::PIN_DATA()
         "nvidia,quill",
         "nvidia,storm"
     },
+
     JETSON_TX1_PIN_DEFS
     {
         { 216, "/sys/devices/6000d000.gpio", "7", "4", "AUDIO_MCLK", "AUD_MCLK", "None", -1 },
@@ -222,6 +260,7 @@ PIN_DATA::PIN_DATA()
         "nvidia,p2371-2180",
         "nvidia,jetson-cv"
     },
+
     JETSON_NANO_PIN_DEFS
     {
         { 216, "/sys/devices/6000d000.gpio", "7", "4", "GPIO9", "AUD_MCLK", "None", -1 },
@@ -255,8 +294,10 @@ PIN_DATA::PIN_DATA()
         "nvidia,p3450-0002",
         "nvidia,jetson-nano"
     },
+
     PIN_DEFS_MAP
     {
+        { CLARA_AGX_XAVIER, CLARA_AGX_XAVIER_PIN_DEFS },
         { JETSON_NX, JETSON_NX_PIN_DEFS },
         { JETSON_XAVIER, JETSON_XAVIER_PIN_DEFS },
         { JETSON_TX2, JETSON_TX2_PIN_DEFS },
@@ -265,6 +306,7 @@ PIN_DATA::PIN_DATA()
     },
     JETSON_INFO_MAP
     {
+        { CLARA_AGX_XAVIER, {1, "16384M",  "Unknown", "CLARA_AGX_XAVIER", "NVIDIA", "ARM Carmel"} },
         { JETSON_NX, {1, "16384M", "Unknown", "Jetson NX", "NVIDIA", "ARM Carmel"} },
         { JETSON_XAVIER, {1, "16384M", "Unknown", "Jetson Xavier", "NVIDIA", "ARM Carmel"} },
         { JETSON_TX2, {1, "8192M", "Unknown", "Jetson TX2", "NVIDIA", "ARM A57 + Denver"} },
@@ -363,6 +405,11 @@ GPIO_data get_data()
         {
             model = JETSON_TX2;
             warn_if_not_carrier_board({"2597"s});
+        }
+        else if (matches(_DATA.compats_clara_agx_xavier))
+        {
+            model = CLARA_AGX_XAVIER;
+            warn_if_not_carrier_board({"3900"s});
         }
         else if (matches(_DATA.compats_xavier))
         {
