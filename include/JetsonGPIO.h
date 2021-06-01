@@ -114,8 +114,10 @@ namespace GPIO
    {
    public:
       PWM(int channel, int frequency_hz);
+      PWM(PWM&& other);
+      PWM& operator=(PWM&& other);
       PWM(const PWM &) = delete;            // Can't create duplicate PWM objects
-      PWM &operator=(const PWM &) = delete; // Can't create duplicate PWM objects
+      PWM& operator=(const PWM &) = delete; // Can't create duplicate PWM objects
       ~PWM();
       void start(double duty_cycle_percent);
       void stop();
@@ -124,7 +126,7 @@ namespace GPIO
 
    private:
       struct Impl;
-      const std::unique_ptr<Impl> pImpl;
+      std::unique_ptr<Impl> pImpl;
    };
 }
 

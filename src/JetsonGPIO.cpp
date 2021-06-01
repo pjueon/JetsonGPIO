@@ -38,6 +38,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <chrono>
 #include <thread>
+#include <utility>
 
 #include "JetsonGPIO.h"
 #include "private/gpio_pin_data.h"
@@ -757,6 +758,7 @@ GPIO::PWM::PWM(int channel, int frequency_hz)
 
 }
 
+
 GPIO::PWM::~PWM()
 {
     auto itr = GlobalVariables._channel_configuration.find(pImpl->_ch_info.channel);
@@ -779,6 +781,21 @@ GPIO::PWM::~PWM()
         terminate();
     }
 }
+
+// move construct
+GPIO::PWM::PWM(GPIO::PWM&& other) = default;
+
+// move assign
+GPIO::PWM& GPIO::PWM::operator=(GPIO::PWM&& other)
+{
+    if(this == &other)
+        return *this;
+
+    pImpl = std::move(other.pImpl);
+    return *this;
+}
+
+
 
 void GPIO::PWM::start(double  duty_cycle_percent)
 {
