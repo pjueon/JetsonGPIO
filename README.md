@@ -54,12 +54,12 @@ The following discusses the use of each API:
 #### 1. Include the libary
 
 To include the JetsonGPIO use:
-```
+```cpp
 #include <JetsonGPIO>
 ```
 
 All public APIs are declared in namespace "GPIO". If you want to make your code shorter, you can use:  
-```
+```cpp
 using namespace GPIO; // optional
 ```
 
@@ -80,7 +80,7 @@ connector and the Tegra SoC respectively.
 
 To specify which mode you are using (mandatory), use the following function
 call:
-```
+```cpp
 GPIO::setmode(GPIO::BOARD);
 // or
 GPIO::setmode(GPIO::BCM);
@@ -91,7 +91,7 @@ GPIO::setmode(GPIO::TEGRA_SOC);
 ```
 
 To check which mode has be set, you can call:
-```
+```cpp
 GPIO::NumberingModes mode = GPIO::getmode();
 ```
 This function returns an instance of enum class GPIO::NumberingModes. The mode must be one of GPIO::BOARD(GPIO::NumberingModes::BOARD), GPIO::BCM(GPIO::NumberingModes::BCM), GPIO::CVM(GPIO::NumberingModes::CVM), GPIO::TEGRA_SOC(GPIO::NumberingModes::TEGRA_SOC) or GPIO::NumberingModes::None.
@@ -103,7 +103,7 @@ external to the current application. In such a condition, the Jetson GPIO
 library will warn you if the GPIO being used is configured to anything but the
 default direction (input). It will also warn you if you try cleaning up before
 setting up the mode and channels. To disable warnings, call:
-```
+```cpp
 GPIO::setwarnings(false);
 ```
 
@@ -111,18 +111,18 @@ GPIO::setwarnings(false);
 
 The GPIO channel must be set up before use as input or output. To configure
 the channel as input, call:
-```
+```cpp
 // (where channel is based on the pin numbering mode discussed above)
 GPIO::setup(channel, GPIO::IN); // channel must be int or std::string
 ```
 
 To set up a channel as output, call:
-```
+```cpp
 GPIO::setup(channel, GPIO::OUT);
 ```
 
 It is also possible to specify an initial value for the output channel:
-```
+```cpp
 GPIO::setup(channel, GPIO::OUT, GPIO::HIGH);
 ```
 
@@ -131,7 +131,7 @@ GPIO::setup(channel, GPIO::OUT, GPIO::HIGH);
 
 To read the value of a channel, use:
 
-```
+```cpp
 int value = GPIO::input(channel);
 ```
 
@@ -141,7 +141,7 @@ This will return either GPIO::LOW(== 0) or GPIO::HIGH(== 1).
 
 To set the value of a pin configured as output, use:
 
-```
+```cpp
 GPIO::output(channel, state);
 ```
 
@@ -153,14 +153,14 @@ where state can be GPIO::LOW(== 0) or GPIO::HIGH(== 1).
 At the end of the program, it is good to clean up the channels so that all pins
 are set in their default state. To clean up all channels used, call:
 
-```
+```cpp
 GPIO::cleanup();
 ```
 
 If you don't want to clean all channels, it is also possible to clean up
 individual channels:
 
-```
+```cpp
 GPIO::cleanup(chan1); // cleanup only chan1
 ```
 
@@ -168,19 +168,19 @@ GPIO::cleanup(chan1); // cleanup only chan1
 
 To get information about the Jetson module, use/read:
 
-```
+```cpp
 std::string info = GPIO::JETSON_INFO;
 ```
 
 To get the model name of your Jetson device, use/read:
 
-```
+```cpp
 std::string model = GPIO::model;
 ```
 
 To get information about the library version, use/read:
 
-```
+```cpp
 std::string version = GPIO::VERSION;
 ```
 
@@ -190,7 +190,7 @@ This provides a string with the X.Y.Z version format.
 
 This feature allows you to check the function of the provided GPIO channel:
 
-```
+```cpp
 GPIO::Directions direction = GPIO::gpio_function(channel);
 ```
 
