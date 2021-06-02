@@ -43,6 +43,7 @@ DEALINGS IN THE SOFTWARE.
 #include "JetsonGPIO.h"
 #include "private/gpio_pin_data.h"
 #include "private/PythonFunctions.h"
+#include "private/Model.h"
 
 using namespace GPIO;
 using namespace std;
@@ -53,15 +54,7 @@ using namespace std;
 constexpr Directions UNKNOWN = Directions::UNKNOWN;
 constexpr Directions HARD_PWM = Directions::HARD_PWM;
 
-// Jetson Models
-enum class Model{ CLARA_AGX_XAVIER, JETSON_NX, JETSON_XAVIER, JETSON_TX2, JETSON_TX1, JETSON_NANO };
 
-extern const Model CLARA_AGX_XAVIER = Model::CLARA_AGX_XAVIER;
-extern const Model JETSON_NX = Model::JETSON_NX;
-extern const Model JETSON_XAVIER = Model::JETSON_XAVIER;
-extern const Model JETSON_TX2 = Model::JETSON_TX2;
-extern const Model JETSON_TX1 = Model::JETSON_TX1;
-extern const Model JETSON_NANO = Model::JETSON_NANO;
 
 
 
@@ -74,6 +67,58 @@ constexpr auto _SYSFS_ROOT = "/sys/class/gpio";
 
 class GlobalVariableWrapper
 {
+public:
+    // -----Global Variables----
+    // NOTE: DON'T change the declaration order of fields.
+    // declaration order == initialization order
+
+    GPIO_data _gpio_data;
+    const Model _model;
+    const PinInfo _JETSON_INFO;
+    const map<GPIO::NumberingModes, map<string, ChannelInfo>> _channel_data_by_mode;
+
+    // A map used as lookup tables for pin to linux gpio mapping
+    map<string, ChannelInfo> _channel_data;
+
+    bool _gpio_warnings;
+    NumberingModes _gpio_mode;
+    map<string, Directions> _channel_configuration;
+
+
+    GlobalVariableWrapper(const GlobalVariableWrapper&) = delete;
+    GlobalVariableWrapper& operator=(const GlobalVariableWrapper&) = delete;
+
+    static GlobalVariableWrapper& get_instance()
+    {
+        static GlobalVariableWrapper singleton;
+        return singleton;
+    }
+
+    static string get_model()
+    {
+        auto& instance = get_instance();
+        auto ret = ModelToString(instance._model);
+        if(ret == "None")
+            throw runtime_error("get_model error");
+
+        return ret;
+    }
+
+    static string get_JETSON_INFO()
+    {
+        auto &instance = GlobalVariableWrapper::get_instance();
+
+        stringstream ss;
+        ss << "[JETSON_INFO]\n";
+        ss << "P1_REVISION: " << instance._JETSON_INFO.P1_REVISION << endl;
+        ss << "RAM: " << instance._JETSON_INFO.RAM << endl;
+        ss << "REVISION: " << instance._JETSON_INFO.REVISION << endl;
+        ss << "TYPE: " << instance._JETSON_INFO.TYPE << endl;
+        ss << "MANUFACTURER: " << instance._JETSON_INFO.MANUFACTURER << endl;
+        ss << "PROCESSOR: " << instance._JETSON_INFO.PROCESSOR << endl;
+        return ss.str();
+    }
+
 private:
     GlobalVariableWrapper()
     : _gpio_data(get_data()), // Get GPIO pin data
@@ -87,8 +132,8 @@ private:
 
     void _CheckPermission()
     {
-        string path1 = string(_SYSFS_ROOT) + "/export";
-        string path2 = string(_SYSFS_ROOT) + "/unexport";
+        string path1 = _SYSFS_ROOT + "/export"s;
+        string path2 = _SYSFS_ROOT + "/unexport"s;
         if(!os_access(path1, W_OK) || !os_access(path2, W_OK) ){
             cerr << "[ERROR] The current user does not have permissions set to "
                     "access the library functionalites. Please configure "
@@ -96,85 +141,16 @@ private:
             throw runtime_error("Permission Denied.");
         }
     }
-
-public:
-    GlobalVariableWrapper(const GlobalVariableWrapper&) = delete;
-    GlobalVariableWrapper& operator=(const GlobalVariableWrapper&) = delete;
-
-    ~GlobalVariableWrapper() = default;
-
-    static GlobalVariableWrapper& get_instance()
-    {
-        static GlobalVariableWrapper singleton;
-        return singleton;
-    }
-
-    // -----Global Variables----
-    // NOTE: DON'T change the declaration order of fields.
-    // declaration order == initialization order
-
-    GPIO_data _gpio_data;
-    const Model _model;
-    const _GPIO_PIN_INFO _JETSON_INFO;
-    const map<GPIO::NumberingModes, map<string, ChannelInfo>> _channel_data_by_mode;
-
-    // A map used as lookup tables for pin to linux gpio mapping
-    map<string, ChannelInfo> _channel_data;
-
-    bool _gpio_warnings;
-    NumberingModes _gpio_mode;
-    map<string, Directions> _channel_configuration;
 };
 
 //================================================================================
-GlobalVariableWrapper& GlobalVariables = GlobalVariableWrapper::get_instance();
+auto& global = GlobalVariableWrapper::get_instance();
 
 //================================================================================
 
-
-// This function will be called when the global variable named "JETSON_INFO" is initialized.
-const string _get_JETSON_INFO()
-{
-    // GlobalVariableWrapper singleton object must be initialized before JETSON_INFO.
-    // The reason that JETSON_INFO is not wrapped by GlobalVariableWrapper
-    // is because it belongs to API
-    GlobalVariableWrapper& GlobalVariables = GlobalVariableWrapper::get_instance();
-
-    stringstream ss;
-    ss << "[JETSON_INFO]\n";
-    ss << "P1_REVISION: " << GlobalVariables._JETSON_INFO.P1_REVISION << endl;
-    ss << "RAM: " << GlobalVariables._JETSON_INFO.RAM << endl;
-    ss << "REVISION: " << GlobalVariables._JETSON_INFO.REVISION << endl;
-    ss << "TYPE: " << GlobalVariables._JETSON_INFO.TYPE << endl;
-    ss << "MANUFACTURER: " << GlobalVariables._JETSON_INFO.MANUFACTURER << endl;
-    ss << "PROCESSOR: " << GlobalVariables._JETSON_INFO.PROCESSOR << endl;
-    return ss.str();
-}
-
-// This function will be called when the global variable named "model" is initialized.
-const char* _get_model()
-{
-    // GlobalVariableWrapper singleton object must be initialized before model.
-    // The reason that model is not wrapped by GlobalVariableWrapper
-    // is because it belongs to API
-    GlobalVariableWrapper& GlobalVariables = GlobalVariableWrapper::get_instance();
-
-    if(GlobalVariables._model == Model::CLARA_AGX_XAVIER) return "CLARA_AGX_XAVIER";
-    else if(GlobalVariables._model == Model::JETSON_NX) return "JETSON_NX";
-    else if(GlobalVariables._model == Model::JETSON_XAVIER) return "JETSON_XAVIER";
-    else if(GlobalVariables._model == Model::JETSON_TX1) return "JETSON_TX1";
-    else if(GlobalVariables._model == Model::JETSON_TX2) return "JETSON_TX2";
-    else if(GlobalVariables._model == Model::JETSON_NANO) return "JETSON_NANO";
-    else{
-        throw runtime_error("get_model error");
-    };
-}
-
-
-
 void _validate_mode_set()
 {
-    if(GlobalVariables._gpio_mode == NumberingModes::None)
+    if(global._gpio_mode == NumberingModes::None)
         throw runtime_error("Please set pin numbering mode using "
                            "GPIO::setmode(GPIO::BOARD), GPIO::setmode(GPIO::BCM), "
                            "GPIO::setmode(GPIO::TEGRA_SOC) or "
@@ -184,9 +160,9 @@ void _validate_mode_set()
 
 ChannelInfo _channel_to_info_lookup(const string& channel, bool need_gpio, bool need_pwm)
 {
-    if(GlobalVariables._channel_data.find(channel) == GlobalVariables._channel_data.end())
+    if(global._channel_data.find(channel) == global._channel_data.end())
         throw runtime_error("Channel " + channel + " is invalid");
-    ChannelInfo ch_info = GlobalVariables._channel_data.at(channel);
+    ChannelInfo ch_info = global._channel_data.at(channel);
     if (need_gpio && ch_info.gpio_chip_dir == "None")
         throw runtime_error("Channel " + channel + " is not a GPIO");
     if (need_pwm && ch_info.pwm_chip_dir == "None")
@@ -223,7 +199,7 @@ Directions _sysfs_channel_configuration(const ChannelInfo& ch_info)
             return HARD_PWM;
     }
 
-    string gpio_dir = string(_SYSFS_ROOT) + "/gpio" + to_string(ch_info.gpio);
+    string gpio_dir = _SYSFS_ROOT + "/gpio"s + to_string(ch_info.gpio);
     if (!os_path_exists(gpio_dir))
         return UNKNOWN;  // Originally returns None in NVIDIA's GPIO Python Library
 
@@ -252,22 +228,22 @@ Directions _sysfs_channel_configuration(const ChannelInfo& ch_info)
    module in this process. Any of IN, OUT, or UNKNOWN may be returned. */
 Directions _app_channel_configuration(const ChannelInfo& ch_info)
 {
-    if (GlobalVariables._channel_configuration.find(ch_info.channel) == GlobalVariables._channel_configuration.end())
+    if (global._channel_configuration.find(ch_info.channel) == global._channel_configuration.end())
         return UNKNOWN;   // Originally returns None in NVIDIA's GPIO Python Library
-    return GlobalVariables._channel_configuration[ch_info.channel];
+    return global._channel_configuration[ch_info.channel];
 }
 
 
 void _export_gpio(const int gpio)
 {
-    if(os_path_exists(string(_SYSFS_ROOT) + "/gpio" + to_string(gpio) ))
+    if(os_path_exists(_SYSFS_ROOT + "/gpio"s + to_string(gpio) ))
         return;
     { // scope for f_export
-        ofstream f_export(string(_SYSFS_ROOT) + "/export");
+        ofstream f_export(_SYSFS_ROOT + "/export"s);
         f_export << gpio;
     } // scope ends
 
-    string value_path = string(_SYSFS_ROOT) + "/gpio" + to_string(gpio) + "/value";
+    string value_path = _SYSFS_ROOT + "/gpio"s + to_string(gpio) + "/value"s;
 
     int time_count = 0;
     while (!os_access(value_path, R_OK | W_OK))
@@ -280,17 +256,17 @@ void _export_gpio(const int gpio)
 
 void _unexport_gpio(const int gpio)
 {
-    if (!os_path_exists(string(_SYSFS_ROOT) + "/gpio" + to_string(gpio)))
+    if (!os_path_exists(_SYSFS_ROOT + "/gpio"s + to_string(gpio)))
         return;
 
-    ofstream f_unexport(string(_SYSFS_ROOT) + "/unexport");
+    ofstream f_unexport(_SYSFS_ROOT + "/unexport"s);
     f_unexport << gpio;
 }
 
 
 void _output_one(const string gpio, const int value)
 {
-    ofstream value_file(string(_SYSFS_ROOT) + "/gpio" + gpio + "/value");
+    ofstream value_file(_SYSFS_ROOT + "/gpio"s + gpio + "/value"s);
     value_file << int(bool(value));
 }
 
@@ -304,7 +280,7 @@ void _setup_single_out(const ChannelInfo& ch_info, int initial = -1)
 {
     _export_gpio(ch_info.gpio);
 
-    string gpio_dir_path = string(_SYSFS_ROOT) + "/gpio" + to_string(ch_info.gpio) + "/direction";
+    string gpio_dir_path = _SYSFS_ROOT + "/gpio"s + to_string(ch_info.gpio) + "/direction"s;
     { // scope for direction_file
         ofstream direction_file(gpio_dir_path);
         direction_file << "out";
@@ -313,7 +289,7 @@ void _setup_single_out(const ChannelInfo& ch_info, int initial = -1)
     if(initial != -1)
         _output_one(ch_info.gpio, initial);
 
-    GlobalVariables._channel_configuration[ch_info.channel] = OUT;
+    global._channel_configuration[ch_info.channel] = OUT;
 }
 
 
@@ -321,13 +297,13 @@ void _setup_single_in(const ChannelInfo& ch_info)
 {
     _export_gpio(ch_info.gpio);
 
-    string gpio_dir_path = string(_SYSFS_ROOT) + "/gpio" + to_string(ch_info.gpio) + "/direction";
+    string gpio_dir_path = _SYSFS_ROOT + "/gpio"s + to_string(ch_info.gpio) + "/direction"s;
     { // scope for direction_file
         ofstream direction_file(gpio_dir_path);
         direction_file << "in";
     } // scope ends
 
-    GlobalVariables._channel_configuration[ch_info.channel] = IN;
+    global._channel_configuration[ch_info.channel] = IN;
 }
 
 string _pwm_path(const ChannelInfo& ch_info)
@@ -386,7 +362,8 @@ void _export_pwm(const ChannelInfo& ch_info)
     while (!os_access(enable_path, R_OK | W_OK))
     {
         this_thread::sleep_for(chrono::milliseconds(10));
-	    if(time_count++ > 100) throw runtime_error("Permission denied: path: " + enable_path + "\n Please configure permissions or use the root user to run this.");
+	    if(time_count++ > 100) 
+            throw runtime_error("Permission denied: path: " + enable_path + "\n Please configure permissions or use the root user to run this.");
     }
 }
 
@@ -448,7 +425,7 @@ void _disable_pwm(const ChannelInfo& ch_info)
 
 void  _cleanup_one(const ChannelInfo& ch_info)
 {
-    Directions app_cfg = GlobalVariables._channel_configuration[ch_info.channel];
+    Directions app_cfg = global._channel_configuration[ch_info.channel];
     if (app_cfg == HARD_PWM)
     {
         _disable_pwm(ch_info);
@@ -459,19 +436,19 @@ void  _cleanup_one(const ChannelInfo& ch_info)
         // event.event_cleanup(ch_info.gpio)  // not implemented yet
         _unexport_gpio(ch_info.gpio);
     }
-    GlobalVariables._channel_configuration.erase(ch_info.channel);
+    global._channel_configuration.erase(ch_info.channel);
 }
 
 
 void _cleanup_all()
 {
-    for (const auto& _pair : GlobalVariables._channel_configuration)
+    for (const auto& _pair : global._channel_configuration)
     {
         const auto& channel = _pair.first;
         ChannelInfo ch_info = _channel_to_info(channel);
         _cleanup_one(ch_info);
     }
-    GlobalVariables._gpio_mode = NumberingModes::None;
+    global._gpio_mode = NumberingModes::None;
 }
 
 
@@ -480,14 +457,19 @@ void _cleanup_all()
 //==================================================================================
 // APIs
 
-extern const string GPIO::model = _get_model();
-extern const string GPIO::JETSON_INFO = _get_JETSON_INFO();
+// The reason that model and JETSON_INFO are not wrapped by GlobalVariableWrapper
+// is because they belong to API
+
+// GlobalVariableWrapper singleton object must be initialized before 
+// model and JETSON_INFO. 
+extern const string GPIO::model = GlobalVariableWrapper::get_model();
+extern const string GPIO::JETSON_INFO = GlobalVariableWrapper::get_JETSON_INFO();
 
 
 /* Function used to enable/disable warnings during setup and cleanup. */
 void GPIO::setwarnings(bool state)
 {
-    GlobalVariables._gpio_warnings = state;
+    global._gpio_warnings = state;
 }
 
 
@@ -504,11 +486,11 @@ void GPIO::setmode(NumberingModes mode)
                                 "GPIO::TEGRA_SOC or "
                                 "GPIO::CVM");
         // check if a different mode has been set
-        if(GlobalVariables._gpio_mode != NumberingModes::None && mode != GlobalVariables._gpio_mode)
+        if(global._gpio_mode != NumberingModes::None && mode != global._gpio_mode)
             throw runtime_error("A different mode has already been set!");
 
-        GlobalVariables._channel_data = GlobalVariables._channel_data_by_mode.at(mode);
-        GlobalVariables._gpio_mode = mode;
+        global._channel_data = global._channel_data_by_mode.at(mode);
+        global._gpio_mode = mode;
     }
     catch(exception& e)
     {
@@ -521,7 +503,7 @@ void GPIO::setmode(NumberingModes mode)
 // Function used to get the currently set pin numbering mode
 NumberingModes GPIO::getmode()
 {
-    return GlobalVariables._gpio_mode;
+    return global._gpio_mode;
 }
 
 
@@ -534,7 +516,7 @@ void GPIO::setup(const string& channel, Directions direction, int initial)
     {
         ChannelInfo ch_info = _channel_to_info(channel, true);
 
-        if (GlobalVariables._gpio_warnings)
+        if (global._gpio_warnings)
         {
             Directions sysfs_cfg = _sysfs_channel_configuration(ch_info);
             Directions app_cfg = _app_channel_configuration(ch_info);
@@ -579,7 +561,7 @@ void GPIO::cleanup(const string& channel)
     try
     {
         // warn if no channel is setup
-        if (GlobalVariables._gpio_mode == NumberingModes::None && GlobalVariables._gpio_warnings)
+        if (global._gpio_mode == NumberingModes::None && global._gpio_warnings)
         {
             cerr << "[WARNING] No channels have been set up yet - nothing to clean up! "
                     "Try cleaning up at the end of your program instead!";
@@ -594,7 +576,7 @@ void GPIO::cleanup(const string& channel)
         }
 
         ChannelInfo ch_info = _channel_to_info(channel);
-        if (GlobalVariables._channel_configuration.find(ch_info.channel) != GlobalVariables._channel_configuration.end())
+        if (global._channel_configuration.find(ch_info.channel) != global._channel_configuration.end())
         {
             _cleanup_one(ch_info);
         }
@@ -626,7 +608,7 @@ int GPIO::input(const string& channel)
             throw runtime_error("You must setup() the GPIO channel first");
 
         { // scope for value
-            ifstream value(string(_SYSFS_ROOT) + "/gpio" + to_string(ch_info.gpio) + "/value");
+            ifstream value(_SYSFS_ROOT + "/gpio"s + to_string(ch_info.gpio) + "/value"s);
             int value_read;
             value >> value_read;
             return value_read;
@@ -753,7 +735,7 @@ GPIO::PWM::PWM(int channel, int frequency_hz)
         */
         if(app_cfg == IN || app_cfg == OUT) cleanup(channel);
 
-        if (GlobalVariables._gpio_warnings)
+        if (global._gpio_warnings)
         {
             auto sysfs_cfg = _sysfs_channel_configuration(pImpl->_ch_info);
             app_cfg = _app_channel_configuration(pImpl->_ch_info);
@@ -769,7 +751,7 @@ GPIO::PWM::PWM(int channel, int frequency_hz)
         _export_pwm(pImpl->_ch_info);
         _set_pwm_duty_cycle(pImpl->_ch_info, 0);
         pImpl->_reconfigure(frequency_hz, 0.0);
-        GlobalVariables._channel_configuration[to_string(channel)] = HARD_PWM;
+        global._channel_configuration[to_string(channel)] = HARD_PWM;
     }
     catch (exception& e)
     {
@@ -783,8 +765,8 @@ GPIO::PWM::PWM(int channel, int frequency_hz)
 
 GPIO::PWM::~PWM()
 {
-    auto itr = GlobalVariables._channel_configuration.find(pImpl->_ch_info.channel);
-    if (itr == GlobalVariables._channel_configuration.end() || itr->second != HARD_PWM)
+    auto itr = global._channel_configuration.find(pImpl->_ch_info.channel);
+    if (itr == global._channel_configuration.end() || itr->second != HARD_PWM)
     {
         /* The user probably ran cleanup() on the channel already, so avoid
            attempts to repeat the cleanup operations. */
@@ -794,7 +776,7 @@ GPIO::PWM::~PWM()
     {
         stop();
         _unexport_pwm(pImpl->_ch_info);
-        GlobalVariables._channel_configuration.erase(pImpl->_ch_info.channel);
+        global._channel_configuration.erase(pImpl->_ch_info.channel);
     }
     catch(...)
     {
@@ -911,7 +893,7 @@ public:
 
 // AutoCleaner will be destructed at the end of the program, and call _cleanup_all().
 // It COULD cause a problem because at the end of the program,
-// GlobalVariables._channel_configuration and GlobalVariables._gpio_mode MUST NOT be destructed before AutoCleaner.
+// global._channel_configuration and global._gpio_mode MUST NOT be destructed before AutoCleaner.
 // But the static objects are destructed in the reverse order of construction,
 // and objects defined in the same compilation unit will be constructed in the order of definition.
 // So it's supposed to work properly.

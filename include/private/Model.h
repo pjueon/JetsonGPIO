@@ -23,24 +23,47 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #pragma once
-#ifndef PYTHON_FUNCTIONS_H
-#define PYTHON_FUNCTIONS_H
+#ifndef MODEL_H
+#define MODEL_H
 
 #include <string>
-#include <vector>
 
-bool startswith(const std::string &s, const std::string &prefix);
+// Jetson Models
+enum class Model
+{
+    CLARA_AGX_XAVIER,
+    JETSON_NX,
+    JETSON_XAVIER,
+    JETSON_TX2,
+    JETSON_TX1,
+    JETSON_NANO
+};
 
-std::vector<std::string> split(const std::string &s, const char d);
+// alias
+constexpr Model CLARA_AGX_XAVIER = Model::CLARA_AGX_XAVIER;
+constexpr Model JETSON_NX = Model::JETSON_NX;
+constexpr Model JETSON_XAVIER = Model::JETSON_XAVIER;
+constexpr Model JETSON_TX2 = Model::JETSON_TX2;
+constexpr Model JETSON_TX1 = Model::JETSON_TX1;
+constexpr Model JETSON_NANO = Model::JETSON_NANO;
 
-bool os_access(const std::string &path, int mode); // os.access
+static std::string ModelToString(Model m)
+{
+    if(m == Model::CLARA_AGX_XAVIER)
+        return "CLARA_AGX_XAVIER";
+    else if(m == Model::JETSON_NX) 
+        return "JETSON_NX";
+    else if(m == Model::JETSON_XAVIER) 
+        return "JETSON_XAVIER";
+    else if(m == Model::JETSON_TX1) 
+        return "JETSON_TX1";
+    else if(m == Model::JETSON_TX2) 
+        return "JETSON_TX2";
+    else if(m == Model::JETSON_NANO) 
+        return "JETSON_NANO";
+    else
+        return "None";
+}
 
-std::vector<std::string> os_listdir(const std::string &path); // os.listdir
 
-bool os_path_isdir(const std::string& path); // os.path.isdirs
-
-bool os_path_exists(const std::string &path); // os.path.exists
-
-std::string strip(const std::string &s);
-
-#endif // PYTHON_FUNCTIONS_H
+#endif

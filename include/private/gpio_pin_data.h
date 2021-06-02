@@ -31,17 +31,9 @@ DEALINGS IN THE SOFTWARE.
 #include <vector>
 
 #include "JetsonGPIO.h"
+#include "private/Model.h"
 
-enum class Model;
-
-extern const Model CLARA_AGX_XAVIER;
-extern const Model JETSON_NX;
-extern const Model JETSON_XAVIER;
-extern const Model JETSON_TX2;
-extern const Model JETSON_TX1;
-extern const Model JETSON_NANO;
-
-struct _GPIO_PIN_DEF
+struct PinDefinition
 {
     const int LinuxPin;            // Linux GPIO pin number
     const std::string SysfsDir;    // GPIO chip sysfs directory
@@ -51,9 +43,21 @@ struct _GPIO_PIN_DEF
     const std::string TEGRAPin;    // Pin name (TEGRA_SOC mode)
     const std::string PWMSysfsDir; // PWM chip sysfs directory
     const int PWMID;               // PWM ID within PWM chip
+
+    std::string PinName(GPIO::NumberingModes key) const
+    {
+        if (key == GPIO::BOARD)
+            return BoardPin;
+        else if (key == GPIO::BCM)
+            return BCMPin;
+        else if (key == GPIO::CVM)
+            return CVMPin;
+        else // TEGRA_SOC
+            return TEGRAPin;
+    }
 };
 
-struct _GPIO_PIN_INFO
+struct PinInfo
 {
     const int P1_REVISION;
     const std::string RAM;
@@ -65,6 +69,13 @@ struct _GPIO_PIN_INFO
 
 struct ChannelInfo
 {
+    const std::string channel;
+    const std::string gpio_chip_dir;
+    const int chip_gpio;
+    const int gpio;
+    const std::string pwm_chip_dir;
+    const int pwm_id;
+
     ChannelInfo(const std::string &channel, const std::string &gpio_chip_dir,
                 int chip_gpio, int gpio, const std::string &pwm_chip_dir,
                 int pwm_id)
@@ -74,22 +85,13 @@ struct ChannelInfo
           gpio(gpio),
           pwm_chip_dir(pwm_chip_dir),
           pwm_id(pwm_id)
-    {
-    }
-    ChannelInfo(const ChannelInfo &) = default;
-
-    const std::string channel;
-    const std::string gpio_chip_dir;
-    const int chip_gpio;
-    const int gpio;
-    const std::string pwm_chip_dir;
-    const int pwm_id;
+    {}
 };
 
 struct GPIO_data
 {
     Model model;
-    _GPIO_PIN_INFO pin_info;
+    PinInfo pin_info;
     std::map<GPIO::NumberingModes, std::map<std::string, ChannelInfo>> channel_data;
 };
 
