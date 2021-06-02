@@ -1,17 +1,10 @@
 # JetsonGPIO(C++)
-A C++ library that enables the use of Jetson's GPIOs  
-(Jetson Nano, TX1, TX2, AGX Xavier and NX)
+This is an unofficial port of the NVIDIA's Jetson.GPIO Python library to C++.    
+**NVIDIA's Jetson.GPIO Python library(official)**: https://github.com/NVIDIA/jetson-gpio
 
-It's an unofficial port of the NVIDIA's official Jetson GPIO Python library to C++.    
-**NVIDIA's official Jetson GPIO Python library**: https://github.com/NVIDIA/jetson-gpio
-
-The library provides almost same APIs as the the NVIDIA's Jetson GPIO Python library.
-
-**But it DOESN'T support all functionalites of the NVIDIA's original one.**  
-(The gpio_event module hasn't implemented yet, for example.)
-
-
-**(Tested on Jetson Nano and Jetson TX2)**
+Jetson TX1, TX2, AGX Xavier, and Nano development boards contain a 40 pin GPIO header, similar to the 40 pin header in the Raspberry Pi. These GPIOs can be controlled for digital input and output using this library. The library provides almost same APIs as the Jetson.GPIO Python library.  
+  
+**NOTE**: The gpio_event module of the Jetson.GPIO Python library is not supported yet.  
 
 # Installation
 Clone this repository, build it, and install it.
