@@ -88,13 +88,13 @@ struct ChannelInfo
     {}
 };
 
-struct GPIO_data
+struct PinData
 {
     Model model;
     PinInfo pin_info;
     std::map<GPIO::NumberingModes, std::map<std::string, ChannelInfo>> channel_data;
 };
 
-GPIO_data get_data();
+PinData get_data();
 
 #endif // GPIO_PIN_DATA_H

@@ -46,19 +46,19 @@ using namespace std::string_literals; // enables s-suffix for std::string litera
 
 // ========================================= Begin of "gpio_pin_data.py" =========================================
 
-/* These vectors contain all the relevant GPIO data for each Jetson
-   The values are use to generate dictionaries that map the corresponding pin
-   mode numbers to the Linux GPIO pin number and GPIO chip directory */
-bool ids_warned = false;
+
 
 // Global variables are wrapped in singleton pattern in order to avoid
 // initialization order of global variables in different compilation units problem
-class PIN_DATA
+class EntirePinData
 {
 private:
-    PIN_DATA();
+    EntirePinData();
 
 public:
+    /* These vectors contain all the relevant GPIO data for each Jetson Platform.
+    The values are use to generate dictionaries that map the corresponding pin
+    mode numbers to the Linux GPIO pin number and GPIO chip directory */
     const vector<PinDefinition> CLARA_AGX_XAVIER_PIN_DEFS;
     const vector<string> compats_clara_agx_xavier;
     const vector<PinDefinition> JETSON_NX_PIN_DEFS;
@@ -71,21 +71,22 @@ public:
     const vector<string> compats_tx1;
     const vector<PinDefinition> JETSON_NANO_PIN_DEFS;
     const vector<string> compats_nano;
+
     const map<Model, vector<PinDefinition>> PIN_DEFS_MAP;
     const map<Model, PinInfo> JETSON_INFO_MAP;
 
-    PIN_DATA(const PIN_DATA &) = delete;
-    PIN_DATA &operator=(const PIN_DATA &) = delete;
-    ~PIN_DATA() = default;
+    EntirePinData(const EntirePinData &) = delete;
+    EntirePinData &operator=(const EntirePinData &) = delete;
+    ~EntirePinData() = default;
 
-    static PIN_DATA &get_instance()
+    static EntirePinData &get_instance()
     {
-        static PIN_DATA singleton;
+        static EntirePinData singleton;
         return singleton;
     }
 };
 
-PIN_DATA::PIN_DATA()
+EntirePinData::EntirePinData()
     : 
     CLARA_AGX_XAVIER_PIN_DEFS
     {
@@ -318,12 +319,13 @@ PIN_DATA::PIN_DATA()
 
 
 
+static bool ids_warned = false;
 
-GPIO_data get_data()
+PinData get_data()
 {
     try
     {
-        PIN_DATA& _DATA = PIN_DATA::get_instance();
+        EntirePinData& _DATA = EntirePinData::get_instance();
 
         const string compatible_path = "/proc/device-tree/compatible";
         const string ids_path = "/proc/device-tree/chosen/plugin-manager/ids";
@@ -351,7 +353,7 @@ GPIO_data get_data()
             return false;
         };
 
-        auto find_pmgr_board = [&](const string& prefix)->string
+        auto find_pmgr_board = [&](const string& prefix) -> string
         {
             if (!os_path_exists(ids_path))
             {
@@ -359,14 +361,14 @@ GPIO_data get_data()
                     {
                         ids_warned = true;
                         string msg = "WARNING: Plugin manager information missing from device tree.\n"
-                                    "WARNING: Cannot determine whether the expected Jetson board is present." ;
+                                     "WARNING: Cannot determine whether the expected Jetson board is present.";
                         cerr << msg;
                     }
+
                     return "None";
             }
 
-            vector<string> files = os_listdir(ids_path);
-            for (const auto& file : files)
+            for (const auto& file : os_listdir(ids_path))
             {
                 if (startswith(file, prefix))
                     return file;

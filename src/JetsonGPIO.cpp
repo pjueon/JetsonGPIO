@@ -54,10 +54,6 @@ using namespace std;
 constexpr Directions UNKNOWN = Directions::UNKNOWN;
 constexpr Directions HARD_PWM = Directions::HARD_PWM;
 
-
-
-
-
 constexpr auto _SYSFS_ROOT = "/sys/class/gpio";
 
 
@@ -72,7 +68,7 @@ public:
     // NOTE: DON'T change the declaration order of fields.
     // declaration order == initialization order
 
-    GPIO_data _gpio_data;
+    PinData _pinData;
     const Model _model;
     const PinInfo _JETSON_INFO;
     const map<GPIO::NumberingModes, map<string, ChannelInfo>> _channel_data_by_mode;
@@ -121,10 +117,10 @@ public:
 
 private:
     GlobalVariableWrapper()
-    : _gpio_data(get_data()), // Get GPIO pin data
-      _model(_gpio_data.model),
-      _JETSON_INFO(_gpio_data.pin_info),
-      _channel_data_by_mode(_gpio_data.channel_data),
+    : _pinData(get_data()), // Get GPIO pin data
+      _model(_pinData.model),
+      _JETSON_INFO(_pinData.pin_info),
+      _channel_data_by_mode(_pinData.channel_data),
     _gpio_warnings(true), _gpio_mode(NumberingModes::None)
     {
         _CheckPermission();
