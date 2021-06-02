@@ -78,6 +78,22 @@ vector<string> os_listdir(const string& path)  // os.listdir
     }
 }
 
+
+bool os_path_isdir(const std::string& path) // os.path.isdir
+{
+    bool exists = false;
+
+    DIR *dir = opendir (path.c_str());
+    if (dir != nullptr)
+    {
+        exists = true;    
+        closedir (dir);
+    }
+
+    return exists;
+}
+
+
 bool os_path_exists(const string& path)  // os.path.exists
 {  
     return os_access(path, F_OK);

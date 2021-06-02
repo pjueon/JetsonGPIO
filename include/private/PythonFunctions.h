@@ -37,6 +37,8 @@ bool os_access(const std::string &path, int mode); // os.access
 
 std::vector<std::string> os_listdir(const std::string &path); // os.listdir
 
+bool os_path_isdir(const std::string& path); // os.path.isdirs
+
 bool os_path_exists(const std::string &path); // os.path.exists
 
 std::string strip(const std::string &s);
