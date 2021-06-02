@@ -39,6 +39,7 @@ DEALINGS IN THE SOFTWARE.
 #include "private/gpio_pin_data.h"
 #include "private/PythonFunctions.h"
 
+
 using namespace GPIO;
 using namespace std;
 using namespace std::string_literals; // enables s-suffix for std::string literals
@@ -58,20 +59,20 @@ private:
     PIN_DATA();
 
 public:
-    const vector<_GPIO_PIN_DEF> CLARA_AGX_XAVIER_PIN_DEFS;
+    const vector<PinDefinition> CLARA_AGX_XAVIER_PIN_DEFS;
     const vector<string> compats_clara_agx_xavier;
-    const vector<_GPIO_PIN_DEF> JETSON_NX_PIN_DEFS;
+    const vector<PinDefinition> JETSON_NX_PIN_DEFS;
     const vector<string> compats_nx;
-    const vector<_GPIO_PIN_DEF> JETSON_XAVIER_PIN_DEFS;
+    const vector<PinDefinition> JETSON_XAVIER_PIN_DEFS;
     const vector<string> compats_xavier;
-    const vector<_GPIO_PIN_DEF> JETSON_TX2_PIN_DEFS;
+    const vector<PinDefinition> JETSON_TX2_PIN_DEFS;
     const vector<string> compats_tx2;
-    const vector<_GPIO_PIN_DEF> JETSON_TX1_PIN_DEFS;
+    const vector<PinDefinition> JETSON_TX1_PIN_DEFS;
     const vector<string> compats_tx1;
-    const vector<_GPIO_PIN_DEF> JETSON_NANO_PIN_DEFS;
+    const vector<PinDefinition> JETSON_NANO_PIN_DEFS;
     const vector<string> compats_nano;
-    const map<Model, vector<_GPIO_PIN_DEF>> PIN_DEFS_MAP;
-    const map<Model, _GPIO_PIN_INFO> JETSON_INFO_MAP;
+    const map<Model, vector<PinDefinition>> PIN_DEFS_MAP;
+    const map<Model, PinInfo> JETSON_INFO_MAP;
 
     PIN_DATA(const PIN_DATA &) = delete;
     PIN_DATA &operator=(const PIN_DATA &) = delete;
@@ -313,8 +314,8 @@ PIN_DATA::PIN_DATA()
         { JETSON_TX1, {1, "4096M", "Unknown", "Jetson TX1", "NVIDIA", "ARM A57"} },
         { JETSON_NANO, {1, "4096M", "Unknown", "Jetson nano", "NVIDIA", "ARM A57"} }
     }
-{
-};
+{};
+
 
 
 
@@ -440,14 +441,14 @@ GPIO_data get_data()
             throw runtime_error("Could not determine Jetson model");
         }
 
-        vector<_GPIO_PIN_DEF> pin_defs = _DATA.PIN_DEFS_MAP.at(model);
-        _GPIO_PIN_INFO jetson_info = _DATA.JETSON_INFO_MAP.at(model);
+        vector<PinDefinition> pin_defs = _DATA.PIN_DEFS_MAP.at(model);
+        PinInfo jetson_info = _DATA.JETSON_INFO_MAP.at(model);
 
-        map<string, string> gpio_chip_dirs;
-        map<string, int> gpio_chip_base;
-        map<string, string> pwm_dirs;
+        map<string, string> gpio_chip_dirs{};
+        map<string, int> gpio_chip_base{};
+        map<string, string> pwm_dirs{};
 
-        vector<string> sysfs_prefixes = {"/sys/devices/", "/sys/devices/platform/"};
+        vector<string> sysfs_prefixes = { "/sys/devices/", "/sys/devices/platform/" };
 
         // Get the gpiochip offsets
         set<string> gpio_chip_names;
@@ -531,8 +532,7 @@ GPIO_data get_data()
             if (!os_path_exists(chip_pwm_dir))
                 continue;
 
-            auto files = os_listdir(chip_pwm_dir);
-            for (const auto& fn : files)
+            for (const auto& fn : os_listdir(chip_pwm_dir))
             {
                 if (!startswith(fn, "pwmchip"))
                     continue;
@@ -545,37 +545,21 @@ GPIO_data get_data()
 
 
         auto model_data = [&global_gpio_id, &pwm_dirs, &gpio_chip_dirs]
-                          (NumberingModes key, const vector<_GPIO_PIN_DEF>& pin_defs)
+                          (NumberingModes key, const auto& pin_defs)
         {
-            auto get = [](const auto& dictionary, const string& x, const string& defaultValue) -> string
+            auto get_or = [](const auto& dictionary, const string& x, const string& defaultValue) -> string
             {
                 auto itr = dictionary.find(x);
                 return itr == dictionary.end() ? defaultValue : itr->second;
             };
 
 
-            map<string, ChannelInfo> ret;
+            map<string, ChannelInfo> ret{};
 
             for (const auto& x : pin_defs)
             {
-                string pinName;
-                if(key == BOARD)
-                {
-                    pinName = x.BoardPin;
-                }
-                else if(key == BCM)
-                {
-                    pinName = x.BCMPin;
-                }
-                else if(key == CVM)
-                {
-                    pinName = x.CVMPin;
-                }
-                else // TEGRA_SOC   
-                { 
-                    pinName = x.TEGRAPin;
-                }
-		    
+                string pinName = x.PinName(key);
+                
                 ret.insert(
                     { 
                         pinName,
@@ -585,7 +569,7 @@ GPIO_data get_data()
                             gpio_chip_dirs.at(x.SysfsDir),
                             x.LinuxPin,
                             global_gpio_id(x.SysfsDir, x.LinuxPin),
-                            get(pwm_dirs, x.PWMSysfsDir, "None"),
+                            get_or(pwm_dirs, x.PWMSysfsDir, "None"),
                             x.PWMID 
                         }
                     }
