@@ -159,7 +159,8 @@ const char* _get_model()
     // is because it belongs to API
     GlobalVariableWrapper& GlobalVariables = GlobalVariableWrapper::get_instance();
 
-    if(GlobalVariables._model == Model::JETSON_NX) return "JETSON_NX";
+    if(GlobalVariables._model == Model::CLARA_AGX_XAVIER) return "CLARA_AGX_XAVIER";
+    else if(GlobalVariables._model == Model::JETSON_NX) return "JETSON_NX";
     else if(GlobalVariables._model == Model::JETSON_XAVIER) return "JETSON_XAVIER";
     else if(GlobalVariables._model == Model::JETSON_TX1) return "JETSON_TX1";
     else if(GlobalVariables._model == Model::JETSON_TX2) return "JETSON_TX2";
