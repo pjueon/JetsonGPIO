@@ -376,16 +376,16 @@ GPIO_data get_data()
 
         auto warn_if_not_carrier_board = [&find_pmgr_board](const vector<string>& carrier_boards)
         {
-            std::string found = "None";
+            auto found = false;
 
             for (auto&& b : carrier_boards)
             {
-                found = find_pmgr_board(b + "-"s);
-                if(found != "None")
+                found = find_pmgr_board(b + "-"s) != "None";
+                if (found)
                     break;
             }
 
-            if (found == "None")
+            if (found == false)
             {
                 string msg = "WARNING: Carrier board is not from a Jetson Developer Kit.\n"
                              "WARNNIG: Jetson.GPIO library has not been verified with this carrier board,\n"
