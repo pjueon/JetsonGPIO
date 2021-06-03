@@ -679,7 +679,6 @@ struct GPIO::PWM::Impl
     int _period_ns;
     double _duty_cycle_percent;
     int _duty_cycle_ns;
-    ~Impl() = default;
 
     void _reconfigure(int frequency_hz, double duty_cycle_percent, bool start = false);
 };
