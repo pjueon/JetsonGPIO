@@ -75,6 +75,7 @@ namespace GPIO
    enum class Edge
    {
       UNKNOWN,
+      NONE,
       RISING,
       FALLING,
       BOTH

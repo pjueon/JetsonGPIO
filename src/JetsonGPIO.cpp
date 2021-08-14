@@ -44,6 +44,7 @@ DEALINGS IN THE SOFTWARE.
 #include "private/gpio_pin_data.h"
 #include "private/PythonFunctions.h"
 #include "private/Model.h"
+#include "private/gpio_event.h"
 
 using namespace GPIO;
 using namespace std;
@@ -426,7 +427,7 @@ void  _cleanup_one(const ChannelInfo& ch_info)
     }
     else
     {
-        // event.event_cleanup(ch_info.gpio)  // not implemented yet
+        _event_cleanup(ch_info.gpio)  // not implemented yet
         _unexport_gpio(ch_info.gpio);
     }
     global._channel_configuration.erase(ch_info.channel);
