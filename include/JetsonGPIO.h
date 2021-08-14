@@ -32,6 +32,8 @@ DEALINGS IN THE SOFTWARE.
 namespace GPIO
 {
    constexpr auto VERSION = "0.1.3";
+   constexpr auto _SYSFS_ROOT = "/sys/class/gpio";
+
    extern const std::string JETSON_INFO;
    extern const std::string model;
 
@@ -67,6 +69,15 @@ namespace GPIO
       OUT,
       IN,
       HARD_PWM
+   };
+
+   // GPIO events
+   enum class Edge
+   {
+      UNKNOWN,
+      RISING,
+      FALLING,
+      BOTH
    };
 
    // GPIO::IN, GPIO::OUT
@@ -128,6 +139,21 @@ namespace GPIO
       struct Impl;
       std::unique_ptr<Impl> pImpl;
    };
+
+   //----------------------------------
+
+   /* Function used to perform a blocking wait until the specified edge
+      is detected for the param channel. Channel must be an integer and edge must
+      be either RISING, FALLING or BOTH.
+      @bouncetime in milliseconds (optional)
+      @timeout in milliseconds (optional) */
+   void wait_for_edge(int channel, Edge edge, unsigned long bounce_time = 0, unsigned long timeout = 0);
+   
+   // void add_edge_detect();
+   // void remove_edge_detect();
+   // void add_edge_callback();
+   // void remove_edge_callback();
+   // void blocking_wait_for_edge();
 }
 
 #endif // JETSON_GPIO_H

@@ -54,9 +54,6 @@ using namespace std;
 constexpr Directions UNKNOWN = Directions::UNKNOWN;
 constexpr Directions HARD_PWM = Directions::HARD_PWM;
 
-constexpr auto _SYSFS_ROOT = "/sys/class/gpio";
-
-
 //================================================================================
 // All global variables are wrapped in a singleton class except for public APIs,
 // in order to avoid initialization order problem among global variables in different compilation units.
