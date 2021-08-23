@@ -33,7 +33,13 @@ DEALINGS IN THE SOFTWARE.
 // #include "private/Model.h"
 
 namespace GPIO {
-  _event_cleanup(int channel);
+  void blocking_wait_for_edge();
+
+  int add_edge_detect(int channel, Edge edge, uint64_t bounce_time);
+  void remove_edge_detect(int channel);
+  void add_edge_callback(int channel, void (*callback)(int, Edge));
+  void remove_edge_callback(int channel, void (*callback)(int, Edge));
+  void _event_cleanup(int channel);
 }
 
 #endif // GPIO_EVENT_H
