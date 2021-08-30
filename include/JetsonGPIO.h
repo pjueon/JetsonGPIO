@@ -125,14 +125,14 @@ private:
 
   /* Function used to add a callback function to channel, after it has been
      registered for events using add_event_detect() */
-  void add_event_callback(int channel, void (*callback)(int, Edge));
+  void add_event_callback(int channel, void (*callback)(int channel));
 
   /* Function used to add threaded event detection for a specified gpio channel.
      @gpio must be an integer specifying the channel
      @edge must be a member of GPIO::Edge
      @callback may be a callback function to be called when the event is detected (or nullptr)
      @bouncetime a button-bounce signal ignore time (in milliseconds, default=none) */
-  void add_event_detect(int channel, Edge edge, void (*callback)(int, Edge), unsigned long bounce_time = 0);
+  void add_event_detect(int channel, Edge edge, void (*callback)(int channel), unsigned long bounce_time = 0);
 
   /* Function used to remove event detection for channel */
   void remove_event_detect(int channel);

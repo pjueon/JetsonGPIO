@@ -489,7 +489,7 @@ void GPIO::cleanup(const string &channel)
 
     // clean all channels if no channel param provided
     if (channel == "None") {
-        // TODO -- this doesn't work for me find a fix
+      // TODO -- this doesn't work for me find a fix
       _cleanup_all();
       return;
     }
@@ -616,7 +616,6 @@ GPIO::PWM::PWM(int channel, int frequency_hz)
           Impl{_channel_to_info(to_string(channel), false, true), false, 0, 0, 0.0, 0})) // temporary values
 {
   try {
-
     Directions app_cfg = _app_channel_configuration(pImpl->_ch_info);
     if (app_cfg == HARD_PWM)
       throw runtime_error("Can't create duplicate PWM objects");
@@ -625,8 +624,9 @@ GPIO::PWM::PWM(int channel, int frequency_hz)
     because RPi.GPIO does soft-PWM. We must undo the GPIO export to
     allow HW PWM to run on the pin.
     */
-    if (app_cfg == IN || app_cfg == OUT)
+    if (app_cfg == IN || app_cfg == OUT) {
       cleanup(channel);
+    }
 
     if (global._gpio_warnings) {
       auto sysfs_cfg = _sysfs_channel_configuration(pImpl->_ch_info);
@@ -739,7 +739,7 @@ void GPIO::PWM::stop()
 
 /* Function used to add a callback function to channel, after it has been
    registered for events using add_event_detect() */
-void GPIO::add_event_callback(int channel, void (*callback)(int, Edge))
+void GPIO::add_event_callback(int channel, void (*callback)(int))
 {
   // Argument Check
   if (callback == nullptr) {
@@ -770,7 +770,7 @@ void GPIO::add_event_callback(int channel, void (*callback)(int, Edge))
    @edge must be a member of GPIO::Edge
    @callback may be a callback function to be called when the event is detected (or nullptr)
    @bouncetime a button-bounce signal ignore time (in milliseconds, default=none) */
-void GPIO::add_event_detect(int channel, Edge edge, void (*callback)(int, Edge), unsigned long bounce_time)
+void GPIO::add_event_detect(int channel, Edge edge, void (*callback)(int), unsigned long bounce_time)
 {
   ChannelInfo ch_info = _channel_to_info(std::to_string(channel), true);
 
@@ -791,9 +791,9 @@ void GPIO::add_event_detect(int channel, Edge edge, void (*callback)(int, Edge),
   //                                                            elif bouncetime < 0
   // : raise ValueError("bouncetime must be an integer greater than 0")
 
-  printf("[DEBUG] ch_info.gpio=%i\n", ch_info.gpio);
+  printf("[DEBUG] add_event_detect(channel=%i, gpio=%i)\n", channel, ch_info.gpio);
 
-  int result = add_edge_detect(ch_info.gpio, edge, bounce_time);
+  int result = add_edge_detect(ch_info.gpio, channel, edge, bounce_time);
 
   // #result == 1 means a different edge was already added for the channel.
   // #result == 2 means error occurred while adding edge(thread or event poll)
