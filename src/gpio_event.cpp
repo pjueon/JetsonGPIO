@@ -55,12 +55,12 @@ namespace GPIO {
   //   };
   // } _gpioEventQueueRequest;
 
-  std::mutex _epmutex;
+  std::recursive_mutex _epmutex;
   std::thread *_epoll_fd_thread = nullptr;
   std::atomic_bool _epoll_run_loop;
 
   std::map<int, std::shared_ptr<_gpioEventObject>> _gpio_events;
-  int _auth_event_channel_count = 0;
+  std::atomic_int _auth_event_channel_count(0);
   std::map<int, int> _fd_to_gpio_map;
 
   // std::deque<_gpioEventQueueRequest> _gpio_event_queue;
@@ -122,7 +122,7 @@ namespace GPIO {
     int fd = open(buf, O_RDONLY);
 
     if (fd == -1) {
-      printf("[DEBUG] '%s' for given gpio '%i'\n", buf, gpio);
+      // printf("[DEBUG] '%s' for given gpio '%i'\n", buf, gpio);
       return -1;
     }
 
@@ -149,7 +149,7 @@ namespace GPIO {
       fprintf(stderr, "Failed to close file descriptor\n");
     }
 
-    printf("[DEBUG] fd(%i:%i) removed from epoll\n", geo->channel_id, geo->gpio);
+    // printf("[DEBUG] fd(%i:%i) removed from epoll\n", geo->channel_id, geo->gpio);
 
     // Erase from the map collection
     return _gpio_events.erase(geo_it);
@@ -168,7 +168,9 @@ namespace GPIO {
     while (_epoll_run_loop) {
       // Wait a small time for events
       event_count = epoll_wait(epoll_fd, events, MAX_EPOLL_EVENTS, 1);
-      _epmutex.lock();
+      std::lock_guard<std::recursive_mutex> mutex_lock(_epmutex);
+
+      // Handle Events
       if (event_count) {
         if (event_count < 0) {
           fprintf(stderr, "epoll_wait error\n");
@@ -188,7 +190,7 @@ namespace GPIO {
           // Obtain the event object for the event
           auto gpio_it = _fd_to_gpio_map.find(events[e].data.fd);
           if (gpio_it == _fd_to_gpio_map.end()) {
-            puts("[DEBUG] Couldn't find gpio for fd-event");
+            // puts("[DEBUG] Couldn't find gpio for fd-event");
             // Ignore it
             continue;
           }
@@ -272,17 +274,20 @@ namespace GPIO {
           } break;
         }
       }
-      _epmutex.unlock();
     }
 
+    puts("[DEBUG] EPOLL thread closing: GPIO-cleanup");
     // Thread is coming to an end
     // -- Cleanup
     // GPIO Event Objects
-    _epmutex.lock();
-    for (auto geo_it = _gpio_events.begin(); geo_it != _gpio_events.end();) {
-      geo_it = _epoll_thread_remove_event(epoll_fd, geo_it);
+    {
+      std::lock_guard<std::recursive_mutex> mutex_lock(_epmutex);
+      for (auto geo_it = _gpio_events.begin(); geo_it != _gpio_events.end();) {
+        geo_it = _epoll_thread_remove_event(epoll_fd, geo_it);
+      }
     }
-    _epmutex.unlock();
+
+    puts("[DEBUG] EPOLL thread closing: epoll_fd");
 
     // epoll
     if (close(epoll_fd) == -1) {
@@ -333,38 +338,28 @@ namespace GPIO {
 
   void _event_cleanup(int gpio)
   {
-    // DEBUG
-    bool removed = false;
-    // DEBUG
+    // // DEBUG
+    // bool removed = false;
+    // printf("[DEBUG]_event_cleanup(%i)\n", gpio);
+    // // DEBUG
 
-    // Enter Mutex
-    _epmutex.lock();
-    if (_gpio_events.find(gpio) != _gpio_events.end()) {
-      // DEBUG
-      removed = true;
-      // DEBUG
-      remove_edge_detect(gpio);
-    }
+    remove_edge_detect(gpio);
+    // {
+    //   // Enter Mutex
+    //   std::lock_guard<std::recursive_mutex> mutex_lock(_epmutex);
+    //   if (_gpio_events.find(gpio) != _gpio_events.end()) {
+    //     // DEBUG
+    //     removed = true;
+    //     // DEBUG
+    //     puts("ec-lock found");
+    //   }
+    // }
 
-    if (_auth_event_channel_count == 0) {
-      if (_epoll_fd_thread) {
-        // DEBUG
-        printf("[DEBUG]_epoll_fd_thread=%p shutting down\n", _epoll_fd_thread);
-        // DEBUG
-        _epoll_run_loop = false;
-        _epoll_fd_thread->join();
-        delete _epoll_fd_thread;
-        _epoll_fd_thread = nullptr;
-      }
-    }
-
-    // Leave Mutex
-    _epmutex.unlock();
-
-    // DEBUG
-    printf("[DEBUG]exited _event_cleanup(%i): %s, %i gpio-objects left\n", gpio,
-           removed ? " channel event removed" : " no event found for channel", _auth_event_channel_count);
-    // DEBUG
+    // // DEBUG
+    // int t = _auth_event_channel_count;
+    // printf("[DEBUG]exited _event_cleanup(%i): %s, %i gpio-objects left\n", gpio,
+    //        removed ? " channel event removed" : " no event found for channel", t);
+    // // DEBUG
   }
 
   //----------------------------------
@@ -376,7 +371,7 @@ namespace GPIO {
     int result;
 
     // Enter Mutex
-    _epmutex.lock();
+    std::lock_guard<std::recursive_mutex> mutex_lock(_epmutex);
 
     // auto geo;
     std::shared_ptr<_gpioEventObject> geo;
@@ -396,7 +391,6 @@ namespace GPIO {
           result = _write_sysfs_edge(gpio, edge);
           if (result) {
             fprintf(stderr, "Failed to write edge value to sys-fs (1)\n");
-            _epmutex.unlock();
             return result;
           }
         }
@@ -406,12 +400,10 @@ namespace GPIO {
       }
       else if (geo->edge != edge) {
         fprintf(stderr, "Cannot have conflicting event types for a single gpio\n");
-        _epmutex.unlock();
         return -1;
       }
       else if (!bounce_time && geo->bounce_time != bounce_time) {
         fprintf(stderr, "Cannot have multiple conflicting bounce_times for a single gpio\n");
-        _epmutex.unlock();
         return -2;
       }
     }
@@ -428,7 +420,6 @@ namespace GPIO {
       // Open the value fd
       geo->fd = _open_sysfd_value(gpio);
       if (geo->fd == -1) {
-        _epmutex.unlock();
         perror("Failed to open sys-file descriptor for gpio value");
         return -3;
       }
@@ -439,7 +430,6 @@ namespace GPIO {
       if (result) {
         fprintf(stderr, "Failed to write edge value to sys-fs (2)\n");
         close(geo->fd);
-        _epmutex.unlock();
         return result;
       }
 
@@ -451,15 +441,16 @@ namespace GPIO {
         _epoll_start_thread();
       }
     }
-    _epmutex.unlock();
 
     return 0;
   }
 
   void remove_edge_detect(int gpio)
   {
+    // printf("[DEBUG]remove_edge_detect(%i)\n", gpio);
+
     // Enter Mutex
-    _epmutex.lock();
+    std::unique_lock<std::recursive_mutex> mutex_lock(_epmutex);
 
     auto find_result = _gpio_events.find(gpio);
     if (find_result != _gpio_events.end()) {
@@ -471,46 +462,57 @@ namespace GPIO {
         _fd_to_gpio_map.erase(fg_it);
 
       --_auth_event_channel_count;
+      if (_auth_event_channel_count == 0 && _epoll_fd_thread) {
+        // // DEBUG
+        // printf("[DEBUG]_epoll_fd_thread=%p shutting down\n", _epoll_fd_thread);
+        // // DEBUG
 
-      // DEBUG
-      printf("[DEBUG]remove_edge_detect(%i) REMOVED-ITEM\n", gpio);
-      // DEBUG
+        // Signal shutdown of thread
+        _epoll_run_loop = false;
+        mutex_lock.unlock();
+
+        // Wait to join
+        _epoll_fd_thread->join();
+
+        // Resume lock and clear thread
+        mutex_lock.lock();
+        delete _epoll_fd_thread;
+        _epoll_fd_thread = nullptr;
+      }
+
+      // // DEBUG
+      // printf("[DEBUG]remove_edge_detect(%i) REMOVED-ITEM\n", gpio);
+      // // DEBUG
     }
-    // DEBUG
-    else
-      printf("[DEBUG]remove_edge_detect(%i) REDUNDANT-CALL\n", gpio);
-    // DEBUG
-
-    _epmutex.unlock();
+    // // DEBUG
+    // else
+    //   printf("[DEBUG]remove_edge_detect(%i) REDUNDANT-CALL\n", gpio);
+    // // DEBUG
   }
 
   void add_edge_callback(int gpio, void (*callback)(int))
   {
-    _epmutex.lock();
+    std::lock_guard<std::recursive_mutex> mutex_lock(_epmutex);
 
     auto find_result = _gpio_events.find(gpio);
     if (find_result == _gpio_events.end()) {
       // TODO Exception
       printf("ERROR TODO 1\n");
-      _epmutex.unlock();
       return;
     }
 
     auto geo = find_result->second;
     geo->callbacks.push_back(callback);
-
-    _epmutex.unlock();
   }
 
   void remove_edge_callback(int gpio, void (*callback)(int))
   {
-    _epmutex.lock();
+    std::lock_guard<std::recursive_mutex> mutex_lock(_epmutex);
 
     auto find_result = _gpio_events.find(gpio);
     if (find_result == _gpio_events.end()) {
       // TODO Exception
       printf("ERROR TODO 2\n");
-      _epmutex.unlock();
       return;
     }
 
@@ -523,8 +525,6 @@ namespace GPIO {
         geo_it++;
       }
     }
-
-    _epmutex.unlock();
   }
 
 } // namespace GPIO
