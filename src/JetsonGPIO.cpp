@@ -809,9 +809,54 @@ void GPIO::add_event_detect(int channel, Edge edge, void (*callback)(int), unsig
 }
 
 /* Function used to remove event detection for channel */
-void GPIO::remove_event_detect(int channel) {}
+void GPIO::remove_event_detect(int channel)
+{
+  ChannelInfo ch_info = _channel_to_info(std::to_string(channel), true);
 
-void GPIO::wait_for_edge(int channel, Edge edge, unsigned long bounce_time, unsigned long timeout) {}
+  remove_edge_detect(ch_info.gpio);
+}
+
+void GPIO::wait_for_edge(int channel, Edge edge, unsigned long bounce_time, unsigned long timeout)
+{
+  ChannelInfo ch_info = _channel_to_info(std::to_string(channel), true);
+
+  try {
+    // channel must be setup as input
+    Directions app_cfg = _app_channel_configuration(ch_info);
+    if (app_cfg != Directions::IN)
+      throw runtime_error("You must setup() the GPIO channel as an input first");
+
+    // edge provided must be rising, falling or both
+    if (edge != Edge::RISING || edge != Edge::FALLING || edge != Edge::BOTH)
+      throw std::range_error("The edge must be set to RISING, FALLING_EDGE or BOTH");
+
+      blocking_wait_for_edge(ch_info.gpio);
+  }
+  catch (exception &e) {
+    cerr << "[Exception] " << e.what() << " (catched from: PWM::PWM())" << endl;
+    _cleanup_all();
+    terminate();
+  }
+  // result = event.blocking_wait_for_edge(ch_info.gpio, ch_info.gpio_name,
+  //                                       edge - _EDGE_OFFSET, bouncetime,
+  //                                       timeout)
+
+  // # If not error, result == channel. If timeout occurs while waiting,
+  // # result == None. If error occurs, result == -1 means channel is
+  // # registered for conflicting edge detection, result == -2 means an error
+  // # occurred while registering event or polling
+  // if not result:
+  //     return None
+  // elif result == -1:
+  //     raise RuntimeError("Conflicting edge detection event already exists "
+  //                        "for this GPIO channel")
+
+  // elif result == -2:
+  //     raise RuntimeError("Error waiting for edge")
+
+  // else:
+  //     return channel
+}
 
 //=========================== Originally added ===========================
 struct _cleaner {

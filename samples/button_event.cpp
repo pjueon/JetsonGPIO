@@ -47,7 +47,7 @@ int main()
   signal(SIGINT, signalHandler);
 
   // Pin Definitions
-  int led_pin = 12; // BOARD pin 12, BCM pin 18
+  int led_pin = 12; // BOARD pin 12
   int but_pin = 18; // BOARD pin 18
 
   // Pin Setup.
@@ -55,7 +55,7 @@ int main()
 
   // set pin as an output pin with optional initial state of HIGH
   GPIO::setup(led_pin, GPIO::OUT, GPIO::LOW);
-  GPIO::setup(but_pin, GPIO::IN, GPIO::HIGH);
+  GPIO::setup(but_pin, GPIO::IN);
 
   cout << "Starting demo now! Press CTRL+C to exit" << endl;
 

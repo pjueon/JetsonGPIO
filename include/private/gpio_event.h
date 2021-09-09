@@ -33,7 +33,7 @@ DEALINGS IN THE SOFTWARE.
 // #include "private/Model.h"
 
 namespace GPIO {
-  void blocking_wait_for_edge();
+  void blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce_time, uint64_t timeout);
 
   int add_edge_detect(int gpio, int channel_id, Edge edge, uint64_t bounce_time);
   void remove_edge_detect(int gpio);
