@@ -22,9 +22,14 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
+#include "JetsonGPIO.h"
+
+#include <dirent.h>
+#include <unistd.h>
+
 #include <algorithm>
 #include <cctype>
-#include <dirent.h>
+#include <chrono>
 #include <fstream>
 #include <iostream>
 #include <map>
@@ -32,14 +37,10 @@ DEALINGS IN THE SOFTWARE.
 #include <sstream>
 #include <stdexcept>
 #include <string>
-#include <unistd.h>
-#include <vector>
-
-#include <chrono>
 #include <thread>
 #include <utility>
+#include <vector>
 
-#include "JetsonGPIO.h"
 #include "private/Model.h"
 #include "private/PythonFunctions.h"
 #include "private/gpio_event.h"
@@ -58,7 +59,7 @@ constexpr Directions HARD_PWM = Directions::HARD_PWM;
 // in order to avoid initialization order problem among global variables in different compilation units.
 
 class GlobalVariableWrapper {
-  public:
+ public:
   // -----Global Variables----
   // NOTE: DON'T change the declaration order of fields.
   // declaration order == initialization order
@@ -109,11 +110,14 @@ class GlobalVariableWrapper {
     return ss.str();
   }
 
-  private:
+ private:
   GlobalVariableWrapper()
-      : _pinData(get_data()), // Get GPIO pin data
-        _model(_pinData.model), _JETSON_INFO(_pinData.pin_info), _channel_data_by_mode(_pinData.channel_data),
-        _gpio_warnings(true), _gpio_mode(NumberingModes::None)
+      : _pinData(get_data()),  // Get GPIO pin data
+        _model(_pinData.model),
+        _JETSON_INFO(_pinData.pin_info),
+        _channel_data_by_mode(_pinData.channel_data),
+        _gpio_warnings(true),
+        _gpio_mode(NumberingModes::None)
   {
     _CheckPermission();
   }
@@ -140,10 +144,11 @@ auto &global = GlobalVariableWrapper::get_instance();
 void _validate_mode_set()
 {
   if (global._gpio_mode == NumberingModes::None)
-    throw runtime_error("Please set pin numbering mode using "
-                        "GPIO::setmode(GPIO::BOARD), GPIO::setmode(GPIO::BCM), "
-                        "GPIO::setmode(GPIO::TEGRA_SOC) or "
-                        "GPIO::setmode(GPIO::CVM)");
+    throw runtime_error(
+        "Please set pin numbering mode using "
+        "GPIO::setmode(GPIO::BOARD), GPIO::setmode(GPIO::BCM), "
+        "GPIO::setmode(GPIO::TEGRA_SOC) or "
+        "GPIO::setmode(GPIO::CVM)");
 }
 
 ChannelInfo _channel_to_info_lookup(const string &channel, bool need_gpio, bool need_pwm)
@@ -186,10 +191,10 @@ Directions _sysfs_channel_configuration(const ChannelInfo &ch_info)
 
   string gpio_dir = _SYSFS_ROOT + "/gpio"s + to_string(ch_info.gpio);
   if (!os_path_exists(gpio_dir))
-    return UNKNOWN; // Originally returns None in NVIDIA's GPIO Python Library
+    return UNKNOWN;  // Originally returns None in NVIDIA's GPIO Python Library
 
   string gpio_direction;
-  { // scope for f
+  {  // scope for f
     ifstream f_direction(gpio_dir + "/direction");
     stringstream buffer;
     buffer << f_direction.rdbuf();
@@ -198,14 +203,14 @@ Directions _sysfs_channel_configuration(const ChannelInfo &ch_info)
     // lower()
     transform(gpio_direction.begin(), gpio_direction.end(), gpio_direction.begin(),
               [](unsigned char c) { return tolower(c); });
-  } // scope ends
+  }  // scope ends
 
   if (gpio_direction == "in")
     return IN;
   else if (gpio_direction == "out")
     return OUT;
   else
-    return UNKNOWN; // Originally returns None in NVIDIA's GPIO Python Library
+    return UNKNOWN;  // Originally returns None in NVIDIA's GPIO Python Library
 }
 
 /* Return the current configuration of a channel as requested by this
@@ -213,7 +218,7 @@ Directions _sysfs_channel_configuration(const ChannelInfo &ch_info)
 Directions _app_channel_configuration(const ChannelInfo &ch_info)
 {
   if (global._channel_configuration.find(ch_info.channel) == global._channel_configuration.end())
-    return UNKNOWN; // Originally returns None in NVIDIA's GPIO Python Library
+    return UNKNOWN;  // Originally returns None in NVIDIA's GPIO Python Library
   return global._channel_configuration[ch_info.channel];
 }
 
@@ -221,10 +226,10 @@ void _export_gpio(const int gpio)
 {
   if (os_path_exists(_SYSFS_ROOT + "/gpio"s + to_string(gpio)))
     return;
-  { // scope for f_export
+  {  // scope for f_export
     ofstream f_export(_SYSFS_ROOT + "/export"s);
     f_export << gpio;
-  } // scope ends
+  }  // scope ends
 
   string value_path = _SYSFS_ROOT + "/gpio"s + to_string(gpio) + "/value"s;
 
@@ -259,10 +264,10 @@ void _setup_single_out(const ChannelInfo &ch_info, int initial = -1)
   _export_gpio(ch_info.gpio);
 
   string gpio_dir_path = _SYSFS_ROOT + "/gpio"s + to_string(ch_info.gpio) + "/direction"s;
-  { // scope for direction_file
+  {  // scope for direction_file
     ofstream direction_file(gpio_dir_path);
     direction_file << "out";
-  } // scope ends
+  }  // scope ends
 
   if (initial != -1)
     _output_one(ch_info.gpio, initial);
@@ -275,10 +280,10 @@ void _setup_single_in(const ChannelInfo &ch_info)
   _export_gpio(ch_info.gpio);
 
   string gpio_dir_path = _SYSFS_ROOT + "/gpio"s + to_string(ch_info.gpio) + "/direction"s;
-  { // scope for direction_file
+  {  // scope for direction_file
     ofstream direction_file(gpio_dir_path);
     direction_file << "in";
-  } // scope ends
+  }  // scope ends
 
   global._channel_configuration[ch_info.channel] = IN;
 }
@@ -300,7 +305,7 @@ void _export_pwm(const ChannelInfo &ch_info)
   if (os_path_exists(_pwm_path(ch_info)))
     return;
 
-  { // scope for f
+  {  // scope for f
     string path = _pwm_export_path(ch_info);
     ofstream f(path);
 
@@ -308,7 +313,7 @@ void _export_pwm(const ChannelInfo &ch_info)
       throw runtime_error("Can't open " + path);
 
     f << ch_info.pwm_id;
-  } // scope ends
+  }  // scope ends
 
   string enable_path = _pwm_enable_path(ch_info);
 
@@ -416,10 +421,11 @@ void GPIO::setmode(NumberingModes mode)
   try {
     // check if mode is valid
     if (mode == NumberingModes::None)
-      throw runtime_error("Pin numbering mode must be "
-                          "GPIO::BOARD, GPIO::BCM, "
-                          "GPIO::TEGRA_SOC or "
-                          "GPIO::CVM");
+      throw runtime_error(
+          "Pin numbering mode must be "
+          "GPIO::BOARD, GPIO::BCM, "
+          "GPIO::TEGRA_SOC or "
+          "GPIO::CVM");
     // check if a different mode has been set
     if (global._gpio_mode != NumberingModes::None && mode != global._gpio_mode)
       throw runtime_error("A different mode has already been set!");
@@ -460,7 +466,7 @@ void GPIO::setup(const string &channel, Directions direction, int initial)
     if (direction == OUT) {
       _setup_single_out(ch_info, initial);
     }
-    else // IN
+    else  // IN
     {
       if (initial != -1)
         throw runtime_error("initial parameter is not valid for inputs");
@@ -523,12 +529,12 @@ int GPIO::input(const string &channel)
     if (app_cfg != IN && app_cfg != OUT)
       throw runtime_error("You must setup() the GPIO channel first");
 
-    { // scope for value
+    {  // scope for value
       ifstream value(_SYSFS_ROOT + "/gpio"s + to_string(ch_info.gpio) + "/value"s);
       int value_read;
       value >> value_read;
       return value_read;
-    } // scope ends
+    }  // scope ends
   }
   catch (exception &e) {
     cerr << "[Exception] " << e.what() << " (catched from: input())" << endl;
@@ -587,7 +593,6 @@ struct GPIO::PWM::Impl {
 
 void GPIO::PWM::Impl::_reconfigure(int frequency_hz, double duty_cycle_percent, bool start)
 {
-
   if (duty_cycle_percent < 0.0 || duty_cycle_percent > 100.0)
     throw runtime_error("invalid duty_cycle_percent");
   bool restart = start || _started;
@@ -613,7 +618,7 @@ void GPIO::PWM::Impl::_reconfigure(int frequency_hz, double duty_cycle_percent, 
 
 GPIO::PWM::PWM(int channel, int frequency_hz)
     : pImpl(make_unique<Impl>(
-          Impl{_channel_to_info(to_string(channel), false, true), false, 0, 0, 0.0, 0})) // temporary values
+          Impl{_channel_to_info(to_string(channel), false, true), false, 0, 0, 0.0, 0}))  // temporary values
 {
   try {
     Directions app_cfg = _app_channel_configuration(pImpl->_ch_info);
@@ -735,7 +740,23 @@ void GPIO::PWM::stop()
 
 //=============================== Events =================================
 
-// void GPIO::event_detected() // TODO
+bool GPIO::event_detected(int channel)
+{
+  ChannelInfo ch_info = _channel_to_info(std::to_string(channel), true);
+  try {
+    // channel must be setup as input
+    Directions app_cfg = _app_channel_configuration(ch_info);
+    if (app_cfg != Directions::IN)
+      throw runtime_error("You must setup() the GPIO channel as an input first");
+
+    return edge_event_detected(ch_info.gpio);
+  }
+  catch (exception &e) {
+    cerr << "[Exception] " << e.what() << " (catched from: GPIO::wait_for_edge())" << endl;
+    _cleanup_all();
+    terminate();
+  }
+}
 
 /* Function used to add a callback function to channel, after it has been
    registered for events using add_event_detect() */
@@ -816,7 +837,7 @@ void GPIO::remove_event_detect(int channel)
   remove_edge_detect(ch_info.gpio);
 }
 
-void GPIO::wait_for_edge(int channel, Edge edge, unsigned long bounce_time, unsigned long timeout)
+void GPIO::wait_for_edge(int channel, Edge edge, unsigned long timeout)
 {
   ChannelInfo ch_info = _channel_to_info(std::to_string(channel), true);
 
@@ -828,12 +849,12 @@ void GPIO::wait_for_edge(int channel, Edge edge, unsigned long bounce_time, unsi
 
     // edge provided must be rising, falling or both
     if (edge != Edge::RISING || edge != Edge::FALLING || edge != Edge::BOTH)
-      throw std::range_error("The edge must be set to RISING, FALLING_EDGE or BOTH");
+      throw std::range_error("The edge must be set to RISING, FALLING or BOTH");
 
-      blocking_wait_for_edge(ch_info.gpio);
+    blocking_wait_for_edge(ch_info.gpio, channel, edge, bounce_time, timeout);
   }
   catch (exception &e) {
-    cerr << "[Exception] " << e.what() << " (catched from: PWM::PWM())" << endl;
+    cerr << "[Exception] " << e.what() << " (catched from: GPIO::wait_for_edge())" << endl;
     _cleanup_all();
     terminate();
   }
@@ -860,10 +881,10 @@ void GPIO::wait_for_edge(int channel, Edge edge, unsigned long bounce_time, unsi
 
 //=========================== Originally added ===========================
 struct _cleaner {
-  private:
+ private:
   _cleaner() = default;
 
-  public:
+ public:
   _cleaner(const _cleaner &) = delete;
   _cleaner &operator=(const _cleaner &) = delete;
 

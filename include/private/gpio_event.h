@@ -22,8 +22,8 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #pragma once
-#ifndef GPIO_EVENT_H
-#define GPIO_EVENT_H
+#ifndef GPIO_EVENT
+#define GPIO_EVENT
 
 // #include <string>
 // #include <map>
@@ -33,13 +33,19 @@ DEALINGS IN THE SOFTWARE.
 // #include "private/Model.h"
 
 namespace GPIO {
-  void blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce_time, uint64_t timeout);
+enum class EventErrorCode {
+  Unknown = 0,
 
-  int add_edge_detect(int gpio, int channel_id, Edge edge, uint64_t bounce_time);
-  void remove_edge_detect(int gpio);
-  void add_edge_callback(int gpio, void (*callback)(int));
-  void remove_edge_callback(int gpio, void (*callback)(int));
-  void _event_cleanup(int gpio);
-}
+};
 
-#endif // GPIO_EVENT_H
+int blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce_time, uint64_t timeout);
+
+bool edge_event_detected(int gpio);
+int add_edge_detect(int gpio, int channel_id, Edge edge, uint64_t bounce_time);
+void remove_edge_detect(int gpio);
+void add_edge_callback(int gpio, void (*callback)(int));
+void remove_edge_callback(int gpio, void (*callback)(int));
+void _event_cleanup(int gpio);
+}  // namespace GPIO
+
+#endif /* GPIO_EVENT */
