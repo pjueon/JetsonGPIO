@@ -1,5 +1,5 @@
 
-#include "gpio_event.h"
+#include "private/gpio_event.h"
 
 #include <fcntl.h>
 #include <stdio.h>
@@ -57,10 +57,9 @@ int _write_sysfs_edge(int gpio, Edge edge, bool allow_none = true)
   snprintf(buf, 256, "%s/gpio%i/edge", _SYSFS_ROOT, gpio);
   int edge_fd = open(buf, O_WRONLY);
   if (edge_fd == -1) {
-    // // I/O Error
+    // I/O Error
     // fprintf(stderr, "Error opening file '%s'\n", buf);
-    // perror("_write_sysfs_edge");
-    return GPIO::EventErrorCode::SYS_FD_EDGE_OPEN;
+    return (int)GPIO::EventErrorCode::SysFD_EdgeOpen;
   }
   switch (edge) {
     case Edge::RISING:
@@ -75,7 +74,7 @@ int _write_sysfs_edge(int gpio, Edge edge, bool allow_none = true)
     case Edge::NONE: {
       if (!allow_none) {
         close(edge_fd);
-        return -4;
+        return (int)GPIO::EventErrorCode::UnallowedEdgeNone;
       }
       result = write(edge_fd, "none", 7);
       break;
@@ -84,11 +83,12 @@ int _write_sysfs_edge(int gpio, Edge edge, bool allow_none = true)
     default:
       fprintf(stderr, "Bad argument, edge=%i\n", (int)edge);
       close(edge_fd);
-      return -5;
+      return (int)GPIO::EventErrorCode::IllegalEdgeArgument;
   }
 
   if (result == -1) {
-    perror("Error writing value to sysfs/edge file");
+    perror("sysfs/edge write");
+    return (int)GPIO::EventErrorCode::SysFD_EdgeWrite;
   }
   else {
     result = 0;
@@ -98,24 +98,26 @@ int _write_sysfs_edge(int gpio, Edge edge, bool allow_none = true)
   return result;
 }
 
-int _open_sysfd_value(int gpio)
+int _open_sysfd_value(int gpio, int& fd)
 {
   char buf[256];
   snprintf(buf, 256, "%s/gpio%i/value", _SYSFS_ROOT, gpio);
-  int fd = open(buf, O_RDONLY);
+  fd = open(buf, O_RDONLY);
 
   if (fd == -1) {
     // printf("[DEBUG] '%s' for given gpio '%i'\n", buf, gpio);
-    return -1;
+    return (int)GPIO::EventErrorCode::SysFD_ValueOpen;
   }
 
   // Set the file descriptor to a non-blocking usage
   int result = fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
   if (result == -1) {
-    perror("Failed to set the file descriptor to non-blocking");
+    perror("fcntl");
+    close(fd);
+    return (int)GPIO::EventErrorCode::SysFD_ValueNonBlocking;
   }
 
-  return fd;
+  return 0;
 }
 
 std::map<int, std::shared_ptr<_gpioEventObject>>::iterator _epoll_thread_remove_event(
@@ -325,8 +327,7 @@ int blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce_
 
       if (geo->blocking) {
         // Channel already being blocked (can only be by another thread call)
-        fprintf(stderr, "Channel is already being blocked by another call from another thread.");
-        return -1;
+        return (int)GPIO::EventErrorCode::ChannelAlreadyBlocked;
       }
 
       switch (geo->_epoll_change_flag) {
@@ -334,12 +335,10 @@ int blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce_
         case _gpioEventObject::ModifyEvent::ADD:
         case _gpioEventObject::ModifyEvent::MODIFY: {
           if (geo->edge != edge) {
-            fprintf(stderr, "Cannot have conflicting event types for a single gpio\n");
-            return -2;
+            return (int)GPIO::EventErrorCode::ConflictingEdgeType;
           }
           if (bounce_time && geo->bounce_time != bounce_time) {
-            fprintf(stderr, "Cannot have multiple conflicting bounce_times for a single gpio\n");
-            return -3;
+            return (int)GPIO::EventErrorCode::ConflictingBounceTime;
           }
         } break;
         case _gpioEventObject::ModifyEvent::REMOVE: {
@@ -354,7 +353,6 @@ int blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce_
             // Set Event
             result = _write_sysfs_edge(gpio, edge);
             if (result) {
-              fprintf(stderr, "Failed to write edge value to sys-fs (1)\n");
               return result;
             }
           }
@@ -369,8 +367,7 @@ int blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce_
         } break;
         default:
           // Shouldn't happen
-          fprintf(stderr, "GPIO Event: Internal tracking Error\n");
-          return -5;
+          return (int)GPIO::EventErrorCode::InternalTrackingError;
       }
     }
     else {
@@ -384,18 +381,16 @@ int blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce_
       geo->last_event = 0;
 
       // Open the value fd
-      geo->fd = _open_sysfd_value(gpio);
-      if (geo->fd == -1) {
-        perror("Failed to open sys-file descriptor for gpio value");
-        return -6;
+      result = _open_sysfd_value(gpio, geo->fd);
+      if (geo->fd < 0) {
+        return result;
       }
 
       // Set Event
       result = _write_sysfs_edge(gpio, edge);
       if (result) {
-        fprintf(stderr, "Failed to write edge value to sys-fs (2)\n");
         close(geo->fd);
-        return -7;
+        return result;
       }
 
       // Set
@@ -415,7 +410,7 @@ int blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce_
   {
     epoll_fd = epoll_create1(0);
     if (epoll_fd == -1) {
-      error = -8;
+      error = (int)GPIO::EventErrorCode::EpollFD_CreateError;
       goto cleanup;
       // fprintf(stderr, "Failed to create epoll file descriptor\n");
     }
@@ -425,9 +420,8 @@ int blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce_
     bevnt.data.fd = gpio_fd;
 
     if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, gpio_fd, &bevnt) == -1) {
-      fprintf(stderr, "Failed to add file descriptor to blocking epoll\n");
       close(epoll_fd);
-      error = -9;
+      error = (int)GPIO::EventErrorCode::EpollCTL_Add;
       goto cleanup;
     }
 
@@ -527,12 +521,10 @@ int add_edge_detect(int gpio, int channel_id, Edge edge, uint64_t bounce_time)
       case _gpioEventObject::ModifyEvent::ADD:
       case _gpioEventObject::ModifyEvent::MODIFY: {
         if (geo->edge != edge) {
-          fprintf(stderr, "Cannot have conflicting event types for a single gpio\n");
-          return -3;
+          return (int)GPIO::EventErrorCode::ConflictingEdgeType;
         }
         if (!bounce_time && geo->bounce_time != bounce_time) {
-          fprintf(stderr, "Cannot have multiple conflicting bounce_times for a single gpio\n");
-          return -4;
+          return (int)GPIO::EventErrorCode::ConflictingBounceTime;
         }
 
         // Otherwise, do nothing more
@@ -549,7 +541,6 @@ int add_edge_detect(int gpio, int channel_id, Edge edge, uint64_t bounce_time)
           // Set Event
           result = _write_sysfs_edge(gpio, edge);
           if (result) {
-            fprintf(stderr, "Failed to write edge value to sys-fs (1)\n");
             return result;
           }
         }
@@ -559,8 +550,7 @@ int add_edge_detect(int gpio, int channel_id, Edge edge, uint64_t bounce_time)
       } break;
       default:
         // Shouldn't happen
-        fprintf(stderr, "GPIO Event: Internal tracking Error\n");
-        return -5;
+        return (int)GPIO::EventErrorCode::InternalTrackingError;
     }
   }
   else {
@@ -576,17 +566,15 @@ int add_edge_detect(int gpio, int channel_id, Edge edge, uint64_t bounce_time)
     geo->event_occurred = false;
 
     // Open the value fd
-    geo->fd = _open_sysfd_value(gpio);
-    if (geo->fd == -1) {
-      perror("Failed to open sys-file descriptor for gpio value");
-      return -3;
+    result = _open_sysfd_value(gpio, geo->fd);
+    if (result) {
+      return result;
     }
     _fd_to_gpio_map[geo->fd] = gpio;
 
     // Set Event
     result = _write_sysfs_edge(gpio, edge);
     if (result) {
-      fprintf(stderr, "Failed to write edge value to sys-fs (2)\n");
       close(geo->fd);
       return result;
     }
@@ -650,21 +638,21 @@ int add_edge_callback(int gpio, void (*callback)(int))
 
   auto find_result = _gpio_events.find(gpio);
   if (find_result == _gpio_events.end()) {
-    return -1;
+    return (int)GPIO::EventErrorCode::GPIO_Event_Not_Found;
   }
 
   auto geo = find_result->second;
   geo->callbacks.push_back(callback);
 }
 
-int remove_edge_callback(int gpio, void (*callback)(int))
+void remove_edge_callback(int gpio, void (*callback)(int))
 {
   std::lock_guard<std::recursive_mutex> mutex_lock(_epmutex);
 
   auto find_result = _gpio_events.find(gpio);
   if (find_result == _gpio_events.end()) {
-    // TODO Exception
-    return -1;
+    // Couldn't find it, Doesn't matter.
+    return;
   }
 
   auto geo = find_result->second;

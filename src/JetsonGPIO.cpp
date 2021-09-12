@@ -837,7 +837,7 @@ void GPIO::remove_event_detect(int channel)
   remove_edge_detect(ch_info.gpio);
 }
 
-void GPIO::wait_for_edge(int channel, Edge edge, unsigned long timeout)
+void GPIO::wait_for_edge(int channel, Edge edge, uint64_t bounce_time, uint64_t timeout)
 {
   ChannelInfo ch_info = _channel_to_info(std::to_string(channel), true);
 
@@ -849,9 +849,17 @@ void GPIO::wait_for_edge(int channel, Edge edge, unsigned long timeout)
 
     // edge provided must be rising, falling or both
     if (edge != Edge::RISING || edge != Edge::FALLING || edge != Edge::BOTH)
-      throw std::range_error("The edge must be set to RISING, FALLING or BOTH");
+      throw range_error("The edge must be set to RISING, FALLING or BOTH");
 
-    blocking_wait_for_edge(ch_info.gpio, channel, edge, bounce_time, timeout);
+    EventErrorCode result = (EventErrorCode)blocking_wait_for_edge(ch_info.gpio, channel, edge, bounce_time, timeout);
+    switch (result) {
+      case EventErrorCode::None:
+        // All went well
+        return;
+      case EventErrorCode::ChannelAlreadyBlocked:
+        throw runtime_error(event_error_msg[result]);
+        break;
+    }
   }
   catch (exception &e) {
     cerr << "[Exception] " << e.what() << " (catched from: GPIO::wait_for_edge())" << endl;
