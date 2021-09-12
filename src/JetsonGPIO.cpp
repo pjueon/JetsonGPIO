@@ -375,7 +375,8 @@ void _disable_pwm(const ChannelInfo &ch_info)
   f << 0;
 }
 
-void _cleanup_one(const ChannelInfo &ch_info)
+
+void _cleanup_one(const ChannelInfo& ch_info)
 {
   Directions app_cfg = global._channel_configuration[ch_info.channel];
   if (app_cfg == HARD_PWM) {
@@ -391,13 +392,14 @@ void _cleanup_one(const ChannelInfo &ch_info)
 
 void _cleanup_all()
 {
-  for (const auto &_pair : global._channel_configuration) {
-    cout << "[DEBUG] _cleanup_all() pair: channel=" << _pair.first << endl;
-    const auto &channel = _pair.first;
-    ChannelInfo ch_info = _channel_to_info(channel);
-    _cleanup_one(ch_info);
-  }
-  global._gpio_mode = NumberingModes::None;
+    auto copied = global._channel_configuration;
+    for (const auto& _pair : copied)
+    {
+        const auto& channel = _pair.first;
+        ChannelInfo ch_info = _channel_to_info(channel);
+        _cleanup_one(ch_info);
+    }
+    global._gpio_mode = NumberingModes::None;
 }
 
 //==================================================================================
