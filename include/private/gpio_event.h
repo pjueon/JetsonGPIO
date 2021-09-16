@@ -1,6 +1,7 @@
 /*
 Copyright (c) 2019, NVIDIA CORPORATION.
 Copyright (c) 2019 Jueon Park(pjueon) bluegbg@gmail.com.
+Copyright (c) 2021 Adam Rasburn blackforestcheesecake@protonmail.ch
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -33,7 +34,7 @@ DEALINGS IN THE SOFTWARE.
 // #include "private/Model.h"
 
 namespace GPIO {
-enum class EventErrorCode {
+enum class EventResultCode {
   SysFD_EdgeOpen = -100,
   UnallowedEdgeNone = -101,
   IllegalEdgeArgument = -102,
@@ -46,28 +47,13 @@ enum class EventErrorCode {
   InternalTrackingError = -109,
   EpollFD_CreateError = -110,
   EpollCTL_Add = -111,
-  GPIO_Event_Not_Found = -112,
+  EpollWait = -112,
+  GPIO_Event_Not_Found = -113,
   None = 0,
+  EdgeDetected = 1,
 };
 
-std::map<EventErrorCode, const char *> event_error_msg = {
-    {EventErrorCode::SysFD_EdgeOpen, "Failure to open the /sys/class/gpio/gpio{$ch}/edge file"},
-    {EventErrorCode::UnallowedEdgeNone, "Specifying Edge as 'none' was not allowed"},
-    {EventErrorCode::IllegalEdgeArgument, "Illegal Edge argument"},
-    {EventErrorCode::SysFD_EdgeWrite, "Failure to write to the /sys/class/gpio/gpio{$ch}/edge file"},
-    {EventErrorCode::SysFD_ValueOpen, "Failure to open the channels System value file descriptor"},
-    {EventErrorCode::SysFD_ValueNonBlocking,
-     "Failure to set to non-blocking the channels System value file descriptor"},
-    {EventErrorCode::ChannelAlreadyBlocked,
-     "This channel is already being blocked (Probably by a concurrent wait_for_edge call)"},
-    {EventErrorCode::ConflictingEdgeType, "Already opened channel is currently detecting a different edge type"},
-    {EventErrorCode::ConflictingBounceTime, "Already opened channel is currently employing a different bounce time"},
-    {EventErrorCode::InternalTrackingError, "Internal Event Tracking Error"},
-    {EventErrorCode::EpollFD_CreateError, "Failed to create the EPOLL file descriptor"},
-    {EventErrorCode::EpollCTL_Add, "Failure to add an event to the EPOLL file descriptor"},
-    {EventErrorCode::GPIO_Event_Not_Found,
-     "A channel event was not added to add a callback to. Call add_event_detect() first"},
-};
+extern std::map<EventResultCode, const char *> event_error_msg;
 
 int blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce_time, uint64_t timeout);
 

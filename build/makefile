@@ -66,8 +66,8 @@ uninstall :
 	rm -rf $(PREFIX)/lib/$(LIB_FULL_NAME)
 	rm -rf $(PREFIX)/include/$(LIB_NAME).h
 
-Test : $(SRC_DIR)/$(TEST_SRC)
-	g++ -o $@ $(SRC_DIR)/$(TEST_SRC) $(LIBS_FLAG)
+test : $(SRC_DIR)/$(TEST_SRC)
+	g++ -o $@ $(SRC_DIR)/$(TEST_SRC) $(LIBS_FLAG) -lpthread
 
 clean :
 	rm -rf  *.o
