@@ -2,6 +2,7 @@
 Copyright (c) 2012-2017 Ben Croston ben@croston.org.
 Copyright (c) 2019, NVIDIA CORPORATION.
 Copyright (c) 2019 Jueon Park(pjueon) bluegbg@gmail.com.
+Copyright (c) 2021 Adam Rasburn blackforestcheesecake@protonmail.ch
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -57,12 +58,17 @@ namespace GPIO {
   // An exception will occur
   enum class Directions { UNKNOWN, OUT, IN, HARD_PWM };
 
-  // GPIO events
-  enum class Edge { UNKNOWN, NONE, RISING, FALLING, BOTH };
-
   // GPIO::IN, GPIO::OUT
   constexpr Directions IN = Directions::IN;
   constexpr Directions OUT = Directions::OUT;
+
+  // GPIO events
+  enum class Edge { UNKNOWN, NONE, RISING, FALLING, BOTH };
+
+  constexpr Edge NO_EDGE = Edge::NONE;
+  constexpr Edge RISING = Edge::RISING;
+  constexpr Edge FALLING = Edge::FALLING;
+  constexpr Edge BOTH = Edge::BOTH;
 
   // Function used to enable/disable warnings during setup and cleanup.
   void setwarnings(bool state);
@@ -110,6 +116,9 @@ namespace GPIO {
      registered for events using add_event_detect() */
   void add_event_callback(int channel, void (*callback)(int channel));
 
+  /* Function used to remove a callback function previously added to detect a channel event */
+  void remove_event_callback(int channel, void (*callback)(int channel));
+
   /* Function used to add threaded event detection for a specified gpio channel.
      @gpio must be an integer specifying the channel
      @edge must be a member of GPIO::Edge
@@ -121,11 +130,12 @@ namespace GPIO {
   void remove_event_detect(int channel);
 
   /* Function used to perform a blocking wait until the specified edge event is detected within the specified
-     timeout period. Returns the channel if the edge was detected, or 0 if timeout occurred.
+     timeout period. Returns the channel if an event is detected or 0 if a timeout has occurred.
      @channel is an integer specifying the channel
      @edge must be a member of GPIO::Edge
      @bouncetime in milliseconds (optional)
-     @timeout in milliseconds (optional) */
+     @timeout in milliseconds (optional)
+     @returns channel for an event, 0 for a timeout */
   int wait_for_edge(int channel, Edge edge, unsigned long bounce_time = 0, unsigned long timeout = 0);
 
   //----------------------------------

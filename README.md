@@ -205,7 +205,7 @@ This function can be used to periodically check if an event occurred since the l
 
 ```cpp
 // set rising edge detection on the channel
-GPIO.add_event_detect(channel, GPIO::RISING);
+GPIO::add_event_detect(channel, GPIO::RISING);
 run_other_code();
 if(GPIO::event_detected(channel))
     do_something();

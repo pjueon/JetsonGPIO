@@ -2,6 +2,7 @@
 Copyright (c) 2012-2017 Ben Croston ben@croston.org.
 Copyright (c) 2019, NVIDIA CORPORATION.
 Copyright (c) 2019 Jueon Park(pjueon) bluegbg@gmail.com.
+Copyright (c) 2021 Adam Rasburn blackforestcheesecake@protonmail.ch
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -781,6 +782,12 @@ void GPIO::add_event_callback(int channel, void (*callback)(int))
   add_edge_callback(ch_info.gpio, callback);
 }
 
+void GPIO::remove_event_callback(int channel, void (*callback)(int channel))
+{
+  ChannelInfo ch_info = _channel_to_info(std::to_string(channel), true);
+  remove_edge_callback(ch_info.gpio, callback);
+}
+
 /* Function used to add threaded event detection for a specified gpio channel.
    @gpio must be an integer specifying the channel
    @edge must be a member of GPIO::Edge
@@ -800,12 +807,6 @@ void GPIO::add_event_detect(int channel, Edge edge, void (*callback)(int), unsig
   //               edge != FALLING and
   //               edge !=
   //                   BOTH : raise ValueError("The edge must be set to RISING, FALLING, or BOTH")
-
-  // #if bouncetime is provided, it must be int and greater than 0
-  //                              if bouncetime is not None : if type (bouncetime) !=
-  //                                                          int : raise TypeError("bouncetime must be an integer")
-  //                                                            elif bouncetime < 0
-  // : raise ValueError("bouncetime must be an integer greater than 0")
 
   printf("[DEBUG] add_event_detect(channel=%i, gpio=%i)\n", channel, ch_info.gpio);
 
@@ -839,8 +840,10 @@ int GPIO::wait_for_edge(int channel, Edge edge, uint64_t bounce_time, uint64_t t
   try {
     // channel must be setup as input
     Directions app_cfg = _app_channel_configuration(ch_info);
-    if (app_cfg != Directions::IN)
+    if (app_cfg != Directions::IN) {
+      printf("app_cfg=%i\n", (int)app_cfg);
       throw runtime_error("You must setup() the GPIO channel as an input first");
+    }
 
     // edge provided must be rising, falling or both
     if (edge != Edge::RISING && edge != Edge::FALLING && edge != Edge::BOTH)
@@ -849,9 +852,10 @@ int GPIO::wait_for_edge(int channel, Edge edge, uint64_t bounce_time, uint64_t t
     EventResultCode result = (EventResultCode)blocking_wait_for_edge(ch_info.gpio, channel, edge, bounce_time, timeout);
     switch (result) {
       case EventResultCode::None:
-        // All went well
+        // Timeout
         return 0;
       case EventResultCode::EdgeDetected:
+        // Event Detected
         return channel;
       default: {
         const char *error_msg = event_error_msg[result];
@@ -865,25 +869,6 @@ int GPIO::wait_for_edge(int channel, Edge edge, uint64_t bounce_time, uint64_t t
     _cleanup_all();
     terminate();
   }
-  // result = event.blocking_wait_for_edge(ch_info.gpio, ch_info.gpio_name,
-  //                                       edge - _EDGE_OFFSET, bouncetime,
-  //                                       timeout)
-
-  // # If not error, result == channel. If timeout occurs while waiting,
-  // # result == None. If error occurs, result == -1 means channel is
-  // # registered for conflicting edge detection, result == -2 means an error
-  // # occurred while registering event or polling
-  // if not result:
-  //     return None
-  // elif result == -1:
-  //     raise RuntimeError("Conflicting edge detection event already exists "
-  //                        "for this GPIO channel")
-
-  // elif result == -2:
-  //     raise RuntimeError("Error waiting for edge")
-
-  // else:
-  //     return channel
 }
 
 //=========================== Originally added ===========================
