@@ -23,9 +23,10 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
+#include <signal.h>
+
 #include <chrono>
 #include <iostream>
-#include <signal.h>
 #include <thread>
 
 #include "JetsonGPIO.h"
@@ -48,11 +49,23 @@ inline void delay(int ms)
 
 void signalHandler(int s) { end_this_program = true; }
 
-void callback_fn(int button_pin) { std::cout << "Callback called from button_pin " << button_pin << std::endl; }
+void callback_fn(int button_pin)
+{
+  cout << "Callback called from button_pin " << button_pin << endl;
+  ++cb;
+}
 
-void callback_one(int button_pin) { std::cout << "First Callback" << std::endl; }
+void callback_one(int button_pin)
+{
+  cout << "First Callback" << endl;
+  cb1 = true;
+}
 
-void callback_two(int button_pin) { std::cout << "Second Callback" << std::endl; }
+void callback_two(int button_pin)
+{
+  cout << "Second Callback" << endl;
+  cb2 = true;
+}
 
 int testEvents()
 {
@@ -60,7 +73,7 @@ int testEvents()
   signal(SIGINT, signalHandler);
 
   // Pin Definitions
-  const int button_pin = 11; // BOARD pin 11
+  const int button_pin = 11;  // BOARD pin 11
 
   // Pin Setup.
   GPIO::setmode(GPIO::BOARD);
