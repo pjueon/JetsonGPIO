@@ -69,7 +69,7 @@ namespace GPIO {
   void remove_edge_detect(int gpio);
 
   typedef struct __gpioEventObject {
-    enum ModifyEvent { NONE, ADD, REMOVE, MODIFY } _epoll_change_flag;
+    enum ModifyEvent { NONE, ADD, INITIAL_ABSCOND, REMOVE, MODIFY } _epoll_change_flag;
     struct epoll_event _epoll_event;
 
     int channel_id;
@@ -251,12 +251,10 @@ namespace GPIO {
           // Check event filter conditions
           if (geo->bounce_time) {
             if (tick - geo->last_event < geo->bounce_time) {
-              printf("[DEBUG] tick(%lu) - geo->last_event(%lu), < geo->bounce_time(%lu)\n", tick, geo->last_event,
-                     geo->bounce_time);
               continue;
             }
 
-            geo->last_event = geo->bounce_time;
+            geo->last_event = tick;
           }
 
           // Fire event
@@ -274,6 +272,9 @@ namespace GPIO {
           case _gpioEventObject::ModifyEvent::NONE: {
             // No change
           } break;
+          case _gpioEventObject::ModifyEvent::INITIAL_ABSCOND: {
+            geo->_epoll_change_flag = _gpioEventObject::ModifyEvent::NONE;
+          } break;
           case _gpioEventObject::ModifyEvent::MODIFY: {
             // For now this just means modification of the edge type, which is done on the calling thread
             // Just set back to NONE and continue
@@ -289,7 +290,8 @@ namespace GPIO {
               goto cleanup;
             }
 
-            geo->_epoll_change_flag = _gpioEventObject::ModifyEvent::NONE;
+            // Avoid the initial event (that would have occurred before this unit has been added)
+            geo->_epoll_change_flag = _gpioEventObject::ModifyEvent::INITIAL_ABSCOND;
           } break;
           case _gpioEventObject::ModifyEvent::REMOVE: {
             geo_it = _epoll_thread_remove_event(epoll_fd, geo_it);
@@ -461,6 +463,8 @@ namespace GPIO {
       int e, event_count;
       epoll_event events[1];
       bool initial_edge = true;
+
+      // Remove Initial Event
       while (1) {
         if (timeout) {
           clock_gettime(CLOCK_REALTIME, &current_time);
@@ -477,6 +481,12 @@ namespace GPIO {
         event_count = epoll_wait(epoll_fd, events, 1, 1);
         // printf("event_count=%i\n", event_count);
 
+        // First trigger is with current state so ignore
+        if (initial_edge) {
+          initial_edge = false;
+          continue;
+        }
+
         // Handle Events
         if (event_count) {
           if (event_count == -1) {
@@ -485,12 +495,6 @@ namespace GPIO {
               error = (int)EventResultCode::EpollWait;
             }
             goto cleanup;
-          }
-
-          // First trigger is with current state so ignore
-          if (initial_edge) {
-            initial_edge = false;
-            continue;
           }
 
           // printf("events:%u\n", events[0].events);
@@ -553,7 +557,6 @@ namespace GPIO {
     if (find_result != _gpio_events.end()) {
       geo = find_result->second;
       result = geo->event_occurred;
-      // printf("result=%s && geo[%i]->event_occurred=false;\n", result ? "true" : "false", geo->gpio);
       geo->event_occurred = false;
     }
 

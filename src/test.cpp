@@ -52,41 +52,36 @@ void signalHandler(int s) { end_this_program = true; }
 
 void callback_fn(int button_pin)
 {
-<<<<<<< HEAD
-  std::cout << "Callback called from button_pin " << button_pin << std::endl;
-=======
-  cout << "Callback called from button_pin " << button_pin << endl;
->>>>>>> d109ed8f0258a7fc35b6566e733fab80195179f0
+  cout << "--Callback called from button_pin " << button_pin << endl;
   ++cb;
 }
 
 void callback_one(int button_pin)
 {
-<<<<<<< HEAD
-  std::cout << "First Callback" << std::endl;
-=======
-  cout << "First Callback" << endl;
->>>>>>> d109ed8f0258a7fc35b6566e733fab80195179f0
+  cout << "--First Additional Callback" << endl;
   cb1 = true;
 }
 
 void callback_two(int button_pin)
 {
-<<<<<<< HEAD
-  std::cout << "Second Callback" << std::endl;
-=======
-  cout << "Second Callback" << endl;
->>>>>>> d109ed8f0258a7fc35b6566e733fab80195179f0
+  cout << "--Second Additional Callback" << endl;
   cb2 = true;
 }
 
+/*  Test Events part of the library.
+    Tested with a Jetson Nano and the following circuit:
+    The button pin connected to a button and a 220pf ceramic capacitor (the other side of this capacitor
+    connected to ground) and a 1K resistor (the other end of the resistor is connected to 5V). When the
+    button is pressed the the circuit is closed with a direct connection to ground.
+    ie. the RISING edge occurs when the button is released.
+*/
 int testEvents()
 {
   // When CTRL+C pressed, signalHandler will be called
   signal(SIGINT, signalHandler);
 
   // Pin Definitions
-  const int button_pin = 11;  // BOARD pin 11
+  const int button_pin = 11; // BOARD pin 11
 
   // Pin Setup.
   GPIO::setmode(GPIO::BOARD);
@@ -100,8 +95,8 @@ int testEvents()
   delay(1000);
   cout << endl << "#Demo - GPIO::wait_for_edge" << endl;
   cout << endl << "Waiting for rising edge:" << endl;
-  GPIO::wait_for_edge(button_pin, GPIO::RISING);
-  cout << "--Rising Edge Detected!" << endl;
+  if (GPIO::wait_for_edge(button_pin, GPIO::RISING))
+    cout << "--Rising Edge Detected!" << endl;
 
   for (int i = 0; i < 3; ++i) {
     delay(1000);
@@ -143,7 +138,7 @@ int testEvents()
   delay(1);
   cb = cb1 = cb2 = false;
   GPIO::remove_event_callback(button_pin, callback_one);
-  cout << endl << "Removed callback 1!" << endl << "Waiting for rising edge:" << endl;
+  cout << endl << "Removed the first additional callback." << endl << "Waiting for rising edge:" << endl;
   while (!cb && !cb2) {
     delay(100);
   }
@@ -153,34 +148,36 @@ int testEvents()
   GPIO::remove_event_detect(button_pin);
   cb = 0;
   GPIO::add_event_detect(button_pin, GPIO::RISING, callback_fn, 3000);
-  cout << "-- Press Button 3 times to exit the application!" << endl;
+  cout << "-- Press Button 3 times to finish events test!" << endl;
   while (cb < 3) {
     delay(100);
   }
+
+  GPIO::cleanup();
 
   return 0;
 }
 
 int main()
 {
-  // cout << "model: " << GPIO::model << endl;
-  // cout << "lib version: " << GPIO::VERSION << endl;
-  // cout << GPIO::JETSON_INFO << endl;
+  cout << "model: " << GPIO::model << endl;
+  cout << "lib version: " << GPIO::VERSION << endl;
+  cout << GPIO::JETSON_INFO << endl;
 
-  // int output_pin = 18;
-  // GPIO::setmode(GPIO::BCM);
-  // GPIO::setup(output_pin, GPIO::OUT, GPIO::HIGH);
+  int output_pin = 7;
+  GPIO::setmode(GPIO::BOARD);
+  GPIO::setup(output_pin, GPIO::OUT, GPIO::HIGH);
 
-  // cout << "BCM " << output_pin << "pin, set to OUTPUT, HIGH" << endl;
-  // cout << "Press Enter to Continue";
-  // cin.ignore();
+  cout << "BOARD " << output_pin << "pin, set to OUTPUT, HIGH" << endl;
+  cout << "Press Enter to Continue";
+  cin.ignore();
 
-  // GPIO::output(output_pin, GPIO::LOW);
-  // cout << output_pin << "pin, set to LOW now" << endl;
-  // cout << "Press Enter to Continue";
-  // cin.ignore();
+  GPIO::output(output_pin, GPIO::LOW);
+  cout << output_pin << "pin, set to LOW now" << endl;
+  cout << "Press Enter to Continue";
+  cin.ignore();
 
-  // GPIO::cleanup();
+  GPIO::cleanup(output_pin);
 
   testEvents();
 
