@@ -572,6 +572,179 @@ Directions GPIO::gpio_function(const string &channel)
 
 Directions GPIO::gpio_function(int channel) { gpio_function(to_string(channel)); }
 
+//=============================== Events =================================
+
+bool GPIO::event_detected(const std::string &channel)
+{
+  ChannelInfo ch_info = _channel_to_info(channel, true);
+  try {
+    // channel must be setup as input
+    Directions app_cfg = _app_channel_configuration(ch_info);
+    if (app_cfg != Directions::IN)
+      throw runtime_error("You must setup() the GPIO channel as an input first");
+
+    return _edge_event_detected(ch_info.gpio);
+  }
+  catch (exception &e) {
+    cerr << "[Exception] " << e.what() << " (catched from: GPIO::event_detected())" << endl;
+    _cleanup_all();
+    terminate();
+  }
+}
+
+bool GPIO::event_detected(int channel) { return event_detected(std::to_string(channel)); }
+
+void GPIO::add_event_callback(const std::string &channel, void (*callback)(int))
+{
+  try {
+    // Argument Check
+    if (callback == nullptr) {
+      throw invalid_argument("callback cannot be null");
+    }
+
+    ChannelInfo ch_info = _channel_to_info(channel, true);
+
+    // channel must be setup as input
+    Directions app_cfg = _app_channel_configuration(ch_info);
+    if (app_cfg != Directions::IN) {
+      throw runtime_error("You must setup() the GPIO channel as an input first");
+    }
+
+    // edge event must already exist
+    if (_edge_event_exists(ch_info.gpio))
+      throw runtime_error("The edge event must have been set via add_event_detect()");
+
+    // Execute
+    EventResultCode result = (EventResultCode)_add_edge_callback(ch_info.gpio, callback);
+    switch (result) {
+      case EventResultCode::None:
+        break;
+      default: {
+        const char *error_msg = event_error_code_to_message[result];
+        throw runtime_error(error_msg ? error_msg : "Unknown Error");
+      }
+    }
+  }
+  catch (exception &e) {
+    cerr << "[Exception] " << e.what() << " (catched from: GPIO::add_event_callback())" << endl;
+    _cleanup_all();
+    terminate();
+  }
+}
+
+void GPIO::add_event_callback(int channel, void (*callback)(int))
+{
+  add_event_callback(std::to_string(channel), callback);
+}
+
+void GPIO::remove_event_callback(const std::string &channel, void (*callback)(int channel))
+{
+  ChannelInfo ch_info = _channel_to_info(channel, true);
+
+  _remove_edge_callback(ch_info.gpio, callback);
+}
+
+void GPIO::remove_event_callback(int channel, void (*callback)(int channel))
+{
+  remove_event_callback(std::to_string(channel), callback);
+}
+
+void GPIO::add_event_detect(const std::string &channel, Edge edge, void (*callback)(int), unsigned long bounce_time)
+{
+  add_event_detect(std::atoi(channel.data()), edge, callback, bounce_time);
+}
+
+void GPIO::add_event_detect(int channel, Edge edge, void (*callback)(int), unsigned long bounce_time)
+{
+  try {
+    ChannelInfo ch_info = _channel_to_info(std::to_string(channel), true);
+
+    // channel must be setup as input
+    Directions app_cfg = _app_channel_configuration(ch_info);
+    if (app_cfg != Directions::IN) {
+      throw runtime_error("You must setup() the GPIO channel as an input first");
+    }
+
+    // edge provided must be rising, falling or both
+    if (edge != Edge::RISING && edge != Edge::FALLING && edge != Edge::BOTH)
+      throw invalid_argument("argument 'edge' must be set to RISING, FALLING or BOTH");
+
+    // Execute
+    EventResultCode result = (EventResultCode)_add_edge_detect(ch_info.gpio, channel, edge, bounce_time);
+    switch (result) {
+      case EventResultCode::None:
+        break;
+      default: {
+        const char *error_msg = event_error_code_to_message[result];
+        throw runtime_error(error_msg ? error_msg : "Unknown Error");
+      }
+    }
+
+    if (callback != nullptr) {
+      if (_add_edge_callback(ch_info.gpio, callback))
+        // Shouldn't happen (--it was just added successfully)
+        throw runtime_error("Couldn't add callback due to unknown error with just added event");
+    }
+  }
+  catch (exception &e) {
+    cerr << "[Exception] " << e.what() << " (catched from: GPIO::add_event_detect())" << endl;
+    _cleanup_all();
+    terminate();
+  }
+}
+
+void GPIO::remove_event_detect(const std::string &channel)
+{
+  ChannelInfo ch_info = _channel_to_info(channel, true);
+
+  _remove_edge_detect(ch_info.gpio);
+}
+
+void GPIO::remove_event_detect(int channel) { remove_event_detect(std::to_string(channel)); }
+
+int GPIO::wait_for_edge(const std::string &channel, Edge edge, uint64_t bounce_time, uint64_t timeout)
+{
+  return wait_for_edge(std::atoi(channel.data()), edge, bounce_time, timeout);
+}
+
+int GPIO::wait_for_edge(int channel, Edge edge, uint64_t bounce_time, uint64_t timeout)
+{
+  try {
+    ChannelInfo ch_info = _channel_to_info(std::to_string(channel), true);
+
+    // channel must be setup as input
+    Directions app_cfg = _app_channel_configuration(ch_info);
+    if (app_cfg != Directions::IN) {
+      throw runtime_error("You must setup() the GPIO channel as an input first");
+    }
+
+    // edge provided must be rising, falling or both
+    if (edge != Edge::RISING && edge != Edge::FALLING && edge != Edge::BOTH)
+      throw invalid_argument("argument 'edge' must be set to RISING, FALLING or BOTH");
+
+    // Execute
+    EventResultCode result =
+        (EventResultCode)_blocking_wait_for_edge(ch_info.gpio, channel, edge, bounce_time, timeout);
+    switch (result) {
+      case EventResultCode::None:
+        // Timeout
+        return 0;
+      case EventResultCode::EdgeDetected:
+        // Event Detected
+        return channel;
+      default: {
+        const char *error_msg = event_error_code_to_message[result];
+        throw runtime_error(error_msg ? error_msg : "Unknown Error");
+      }
+    }
+  }
+  catch (exception &e) {
+    cerr << "[Exception] " << e.what() << " (catched from: GPIO::wait_for_edge())" << endl;
+    _cleanup_all();
+    terminate();
+  }
+}
+
 // PWM class ==========================================================
 struct GPIO::PWM::Impl {
   ChannelInfo _ch_info;
@@ -729,162 +902,6 @@ void GPIO::PWM::stop()
   catch (exception &e) {
     cerr << "[Exception] " << e.what() << " (catched from: PWM::stop())" << endl;
     throw runtime_error("Exeception from GPIO::PWM::stop");
-  }
-}
-
-//=============================== Events =================================
-
-bool GPIO::event_detected(int channel)
-{
-  ChannelInfo ch_info = _channel_to_info(std::to_string(channel), true);
-  try {
-    // channel must be setup as input
-    Directions app_cfg = _app_channel_configuration(ch_info);
-    if (app_cfg != Directions::IN)
-      throw runtime_error("You must setup() the GPIO channel as an input first");
-
-    return edge_event_detected(ch_info.gpio);
-  }
-  catch (exception &e) {
-    cerr << "[Exception] " << e.what() << " (catched from: GPIO::wait_for_edge())" << endl;
-    _cleanup_all();
-    terminate();
-  }
-}
-
-/* Function used to add a callback function to channel, after it has been
-   registered for events using add_event_detect() */
-void GPIO::add_event_callback(int channel, void (*callback)(int))
-{
-  try {
-    // Argument Check
-    if (callback == nullptr) {
-      throw invalid_argument("callback cannot be null");
-    }
-
-    ChannelInfo ch_info = _channel_to_info(std::to_string(channel), true);
-
-    // channel must be setup as input
-    Directions app_cfg = _app_channel_configuration(ch_info);
-    if (app_cfg != Directions::IN) {
-      throw runtime_error("You must setup() the GPIO channel as an input first");
-    }
-
-    // edge provided must be rising, falling or both
-    if (edge_event_exists(ch_info.gpio))
-      throw range_error("The edge must be set to RISING, FALLING or BOTH");
-
-    EventResultCode result = (EventResultCode)add_edge_callback(ch_info.gpio, callback);
-    switch (result) {
-      case EventResultCode::None:
-        break;
-      default: {
-        const char *error_msg = event_error_msg[result];
-        printf("error_msg: '%s'\n", error_msg);
-        throw runtime_error(error_msg ? error_msg : "CATCHERROR");
-      }
-    }
-  }
-  catch (exception &e) {
-    cerr << "[Exception] " << e.what() << " (catched from: GPIO::wait_for_edge())" << endl;
-    _cleanup_all();
-    terminate();
-  }
-}
-
-void GPIO::remove_event_callback(int channel, void (*callback)(int channel))
-{
-  ChannelInfo ch_info = _channel_to_info(std::to_string(channel), true);
-
-  remove_edge_callback(ch_info.gpio, callback);
-}
-
-/* Function used to add threaded event detection for a specified gpio channel.
-   @gpio must be an integer specifying the channel
-   @edge must be a member of GPIO::Edge
-   @callback may be a callback function to be called when the event is detected (or nullptr)
-   @bouncetime a button-bounce signal ignore time (in milliseconds, default=none) */
-void GPIO::add_event_detect(int channel, Edge edge, void (*callback)(int), unsigned long bounce_time)
-{
-  try {
-    ChannelInfo ch_info = _channel_to_info(std::to_string(channel), true);
-
-    // channel must be setup as input
-    Directions app_cfg = _app_channel_configuration(ch_info);
-    if (app_cfg != Directions::IN) {
-      throw runtime_error("You must setup() the GPIO channel as an input first");
-    }
-
-    // edge provided must be rising, falling or both
-    if (edge != Edge::RISING && edge != Edge::FALLING && edge != Edge::BOTH)
-      throw range_error("The edge must be set to RISING, FALLING or BOTH");
-
-    EventResultCode result = (EventResultCode)add_edge_detect(ch_info.gpio, channel, edge, bounce_time);
-    switch (result) {
-      case EventResultCode::None:
-        break;
-      default: {
-        const char *error_msg = event_error_msg[result];
-        printf("error_msg: '%s'\n", error_msg);
-        throw runtime_error(error_msg ? error_msg : "CATCHERROR");
-      }
-    }
-
-    if (callback != nullptr) {
-      if (add_edge_callback(ch_info.gpio, callback))
-        // Shouldn't happen (--it was just added successfully)
-        throw runtime_error("Couldn't add callback due to unknown error with just added event");
-    }
-  }
-  catch (exception &e) {
-    cerr << "[Exception] " << e.what() << " (catched from: GPIO::wait_for_edge())" << endl;
-    _cleanup_all();
-    terminate();
-  }
-}
-
-/* Function used to remove event detection for channel */
-void GPIO::remove_event_detect(int channel)
-{
-  ChannelInfo ch_info = _channel_to_info(std::to_string(channel), true);
-
-  remove_edge_detect(ch_info.gpio);
-}
-
-int GPIO::wait_for_edge(int channel, Edge edge, uint64_t bounce_time, uint64_t timeout)
-{
-  try {
-    ChannelInfo ch_info = _channel_to_info(std::to_string(channel), true);
-
-    // channel must be setup as input
-    Directions app_cfg = _app_channel_configuration(ch_info);
-    if (app_cfg != Directions::IN) {
-      throw runtime_error("You must setup() the GPIO channel as an input first");
-    }
-
-    // edge provided must be rising, falling or both
-    if (edge != Edge::RISING && edge != Edge::FALLING && edge != Edge::BOTH)
-      throw range_error("The edge must be set to RISING, FALLING or BOTH");
-
-    EventResultCode result = (EventResultCode)blocking_wait_for_edge(ch_info.gpio, channel, edge, bounce_time, timeout);
-    switch (result) {
-      case EventResultCode::None:
-        // Timeout
-        return 0;
-      case EventResultCode::EdgeDetected:
-        // Event Detected
-        return channel;
-      default: {
-        const char *error_msg = event_error_msg[result];
-        printf("error_msg: '%s'\n", error_msg);
-        throw runtime_error(error_msg ? error_msg : "CATCHERROR");
-      }
-    }
-  }
-  catch (exception &e) {
-    cerr << "[Exception] " << e.what() << " (catched from: GPIO::wait_for_edge())" << endl;
-    _cleanup_all();
-    terminate();
   }
 }
 

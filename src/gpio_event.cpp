@@ -44,9 +44,13 @@ DEALINGS IN THE SOFTWARE.
 #define MAX_EPOLL_EVENTS 20
 #define READ_SIZE 10
 
+TODO -- check I'm using the blocking flag in geos properly
+TODO -- continue cleaning up code and appropriate documenting from here
+TODO -- clangformat
+
 namespace GPIO {
 
-  std::map<EventResultCode, const char *> event_error_msg = {
+  std::map<EventResultCode, const char *> event_error_code_to_message = {
       {EventResultCode::SysFD_EdgeOpen, "Failure to open the /sys/class/gpio/gpio{$ch}/edge file"},
       {EventResultCode::UnallowedEdgeNone, "Specifying Edge as 'none' was not allowed"},
       {EventResultCode::IllegalEdgeArgument, "Illegal Edge argument"},
@@ -65,8 +69,6 @@ namespace GPIO {
       {EventResultCode::GPIO_Event_Not_Found,
        "A channel event was not added to add a callback to. Call add_event_detect() first"},
   };
-
-  void remove_edge_detect(int gpio);
 
   typedef struct __gpioEventObject {
     enum ModifyEvent { NONE, ADD, INITIAL_ABSCOND, REMOVE, MODIFY } _epoll_change_flag;
@@ -329,12 +331,9 @@ namespace GPIO {
     _epoll_fd_thread = new std::thread(_epoll_thread_loop);
   }
 
-  void _event_cleanup(int gpio) { remove_edge_detect(gpio); }
+  //-------------- Operations -------------------- //
 
-  //----------------------------------
-  /* TODO error codes
-   */
-  int blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce_time, uint64_t timeout)
+  int _blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce_time, uint64_t timeout)
   {
     struct timespec timeout_time, current_time;
     if (timeout) {
@@ -536,7 +535,7 @@ namespace GPIO {
       }
       else {
         // Set for removal from the concurrent epoll-thread
-        remove_edge_detect(gpio);
+        _remove_edge_detect(gpio);
       }
     }
 
@@ -545,7 +544,7 @@ namespace GPIO {
     return result;
   }
 
-  bool edge_event_detected(int gpio)
+  bool _edge_event_detected(int gpio)
   {
     bool result = false;
 
@@ -563,7 +562,18 @@ namespace GPIO {
     return result;
   }
 
-  int add_edge_detect(int gpio, int channel_id, Edge edge, uint64_t bounce_time)
+  bool _edge_event_exists(int gpio)
+  {
+    std::lock_guard<std::recursive_mutex> mutex_lock(_epmutex);
+
+    auto find_result = _gpio_events.find(gpio);
+    if (find_result == _gpio_events.end()) {
+      return true;
+    }
+    return false;
+  }
+
+  int _add_edge_detect(int gpio, int channel_id, Edge edge, uint64_t bounce_time)
   {
     int result;
 
@@ -651,7 +661,7 @@ namespace GPIO {
     return 0;
   }
 
-  void remove_edge_detect(int gpio)
+  void _remove_edge_detect(int gpio)
   {
     // Enter Mutex
     std::unique_lock<std::recursive_mutex> mutex_lock(_epmutex);
@@ -680,29 +690,16 @@ namespace GPIO {
       }
 
       // // DEBUG
-      // printf("[DEBUG]remove_edge_detect(%i) REMOVED-ITEM\n", gpio);
+      // printf("[DEBUG]_remove_edge_detect(%i) REMOVED-ITEM\n", gpio);
       // // DEBUG
     }
     // // DEBUG
     // else
-    //   printf("[DEBUG]remove_edge_detect(%i) REDUNDANT-CALL\n", gpio);
+    //   printf("[DEBUG]_remove_edge_detect(%i) REDUNDANT-CALL\n", gpio);
     // // DEBUG
   }
 
-  // TODO change recursive_mutex to mutex
-
-  bool edge_event_exists(int gpio)
-  {
-    std::lock_guard<std::recursive_mutex> mutex_lock(_epmutex);
-
-    auto find_result = _gpio_events.find(gpio);
-    if (find_result == _gpio_events.end()) {
-      return true;
-    }
-    return false;
-  }
-
-  int add_edge_callback(int gpio, void (*callback)(int))
+  int _add_edge_callback(int gpio, void (*callback)(int))
   {
     std::lock_guard<std::recursive_mutex> mutex_lock(_epmutex);
 
@@ -717,7 +714,7 @@ namespace GPIO {
     return 0;
   }
 
-  void remove_edge_callback(int gpio, void (*callback)(int))
+  void _remove_edge_callback(int gpio, void (*callback)(int))
   {
     std::lock_guard<std::recursive_mutex> mutex_lock(_epmutex);
 
@@ -737,5 +734,7 @@ namespace GPIO {
       }
     }
   }
+
+  void _event_cleanup(int gpio) { _remove_edge_detect(gpio); }
 
 } // namespace GPIO

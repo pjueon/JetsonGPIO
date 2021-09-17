@@ -26,12 +26,9 @@ DEALINGS IN THE SOFTWARE.
 #ifndef GPIO_EVENT
 #define GPIO_EVENT
 
-// #include <string>
 #include <map>
-// #include <vector>
 
 #include "JetsonGPIO.h"
-// #include "private/Model.h"
 
 namespace GPIO {
   enum class EventResultCode {
@@ -53,16 +50,19 @@ namespace GPIO {
     EdgeDetected = 1,
   };
 
-  extern std::map<EventResultCode, const char *> event_error_msg;
+  extern std::map<EventResultCode, const char *> event_error_code_to_message;
 
-  int blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce_time, uint64_t timeout);
+  int _blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce_time, uint64_t timeout);
 
-  bool edge_event_detected(int gpio);
-  int add_edge_detect(int gpio, int channel_id, Edge edge, uint64_t bounce_time);
-  void remove_edge_detect(int gpio);
-  bool edge_event_exists(int gpio);
-  int add_edge_callback(int gpio, void (*callback)(int));
-  void remove_edge_callback(int gpio, void (*callback)(int));
+  bool _edge_event_detected(int gpio);
+  bool _edge_event_exists(int gpio);
+
+  int _add_edge_detect(int gpio, int channel_id, Edge edge, uint64_t bounce_time);
+  void _remove_edge_detect(int gpio);
+
+  int _add_edge_callback(int gpio, void (*callback)(int));
+  void _remove_edge_callback(int gpio, void (*callback)(int));
+
   void _event_cleanup(int gpio);
 } // namespace GPIO
 

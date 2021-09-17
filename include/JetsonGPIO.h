@@ -62,7 +62,7 @@ namespace GPIO {
   constexpr Directions IN = Directions::IN;
   constexpr Directions OUT = Directions::OUT;
 
-  // GPIO events
+  // GPIO Event Types
   enum class Edge { UNKNOWN, NONE, RISING, FALLING, BOTH };
 
   constexpr Edge NO_EDGE = Edge::NONE;
@@ -110,13 +110,16 @@ namespace GPIO {
   /* Function used to check if an event occurred on the specified channel.
      Param channel must be an integer.
      This function return True or False */
+  bool event_detected(const std::string &channel);
   bool event_detected(int channel);
 
   /* Function used to add a callback function to channel, after it has been
      registered for events using add_event_detect() */
+  void add_event_callback(const std::string &channel, void (*callback)(int channel));
   void add_event_callback(int channel, void (*callback)(int channel));
 
   /* Function used to remove a callback function previously added to detect a channel event */
+  void remove_event_callback(const std::string &channel, void (*callback)(int channel));
   void remove_event_callback(int channel, void (*callback)(int channel));
 
   /* Function used to add threaded event detection for a specified gpio channel.
@@ -124,9 +127,12 @@ namespace GPIO {
      @edge must be a member of GPIO::Edge
      @callback (optional) may be a callback function to be called when the event is detected (or nullptr)
      @bouncetime (optional) a button-bounce signal ignore time (in milliseconds, default=none) */
+  void add_event_detect(const std::string &channel, Edge edge, void (*callback)(int channel) = nullptr,
+                        unsigned long bounce_time = 0);
   void add_event_detect(int channel, Edge edge, void (*callback)(int channel) = nullptr, unsigned long bounce_time = 0);
 
   /* Function used to remove event detection for channel */
+  void remove_event_detect(const std::string &channel);
   void remove_event_detect(int channel);
 
   /* Function used to perform a blocking wait until the specified edge event is detected within the specified
@@ -136,6 +142,7 @@ namespace GPIO {
      @bouncetime in milliseconds (optional)
      @timeout in milliseconds (optional)
      @returns channel for an event, 0 for a timeout */
+  int wait_for_edge(const std::string &channel, Edge edge, unsigned long bounce_time = 0, unsigned long timeout = 0);
   int wait_for_edge(int channel, Edge edge, unsigned long bounce_time = 0, unsigned long timeout = 0);
 
   //----------------------------------
