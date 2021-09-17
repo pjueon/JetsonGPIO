@@ -34,35 +34,36 @@ DEALINGS IN THE SOFTWARE.
 // #include "private/Model.h"
 
 namespace GPIO {
-enum class EventResultCode {
-  SysFD_EdgeOpen = -100,
-  UnallowedEdgeNone = -101,
-  IllegalEdgeArgument = -102,
-  SysFD_EdgeWrite = -103,
-  SysFD_ValueOpen = -104,
-  SysFD_ValueNonBlocking = -105,
-  ChannelAlreadyBlocked = -106,
-  ConflictingEdgeType = -107,
-  ConflictingBounceTime = -108,
-  InternalTrackingError = -109,
-  EpollFD_CreateError = -110,
-  EpollCTL_Add = -111,
-  EpollWait = -112,
-  GPIO_Event_Not_Found = -113,
-  None = 0,
-  EdgeDetected = 1,
-};
+  enum class EventResultCode {
+    SysFD_EdgeOpen = -100,
+    UnallowedEdgeNone = -101,
+    IllegalEdgeArgument = -102,
+    SysFD_EdgeWrite = -103,
+    SysFD_ValueOpen = -104,
+    SysFD_ValueNonBlocking = -105,
+    ChannelAlreadyBlocked = -106,
+    ConflictingEdgeType = -107,
+    ConflictingBounceTime = -108,
+    InternalTrackingError = -109,
+    EpollFD_CreateError = -110,
+    EpollCTL_Add = -111,
+    EpollWait = -112,
+    GPIO_Event_Not_Found = -113,
+    None = 0,
+    EdgeDetected = 1,
+  };
 
-extern std::map<EventResultCode, const char *> event_error_msg;
+  extern std::map<EventResultCode, const char *> event_error_msg;
 
-int blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce_time, uint64_t timeout);
+  int blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce_time, uint64_t timeout);
 
-bool edge_event_detected(int gpio);
-int add_edge_detect(int gpio, int channel_id, Edge edge, uint64_t bounce_time);
-void remove_edge_detect(int gpio);
-int add_edge_callback(int gpio, void (*callback)(int));
-void remove_edge_callback(int gpio, void (*callback)(int));
-void _event_cleanup(int gpio);
-}  // namespace GPIO
+  bool edge_event_detected(int gpio);
+  int add_edge_detect(int gpio, int channel_id, Edge edge, uint64_t bounce_time);
+  void remove_edge_detect(int gpio);
+  bool edge_event_exists(int gpio);
+  int add_edge_callback(int gpio, void (*callback)(int));
+  void remove_edge_callback(int gpio, void (*callback)(int));
+  void _event_cleanup(int gpio);
+} // namespace GPIO
 
 #endif /* GPIO_EVENT */

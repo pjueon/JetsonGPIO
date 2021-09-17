@@ -37,22 +37,35 @@ int cb = 0;
 
 inline void delay(int ms)
 {
-  if (end_this_program)
-    exit(0);
-  this_thread::sleep_for(chrono::milliseconds(ms));
-  if (end_this_program)
-    exit(0);
+  if (!end_this_program)
+    this_thread::sleep_for(chrono::milliseconds(ms));
+  if (!end_this_program)
+    return;
 
-  GPIO::cleanup(11);
+  // Cleanup and abort
+  GPIO::cleanup();
+  exit(0);
 }
 
 void signalHandler(int s) { end_this_program = true; }
 
-void callback_fn(int button_pin) { std::cout << "Callback called from button_pin " << button_pin << std::endl; }
+void callback_fn(int button_pin)
+{
+  std::cout << "Callback called from button_pin " << button_pin << std::endl;
+  ++cb;
+}
 
-void callback_one(int button_pin) { std::cout << "First Callback" << std::endl; }
+void callback_one(int button_pin)
+{
+  std::cout << "First Callback" << std::endl;
+  cb1 = true;
+}
 
-void callback_two(int button_pin) { std::cout << "Second Callback" << std::endl; }
+void callback_two(int button_pin)
+{
+  std::cout << "Second Callback" << std::endl;
+  cb2 = true;
+}
 
 int testEvents()
 {
@@ -69,8 +82,6 @@ int testEvents()
   //   GPIO::setup(led_pin, GPIO::OUT, GPIO::LOW);
   GPIO::setup(button_pin, GPIO::IN);
 
-  cout << "Pin:" << GPIO::input(button_pin) << endl;
-
   cout << "Starting Events Test now! Press CTRL+C to exit" << endl;
 
   delay(1000);
@@ -79,13 +90,16 @@ int testEvents()
   GPIO::wait_for_edge(button_pin, GPIO::RISING);
   cout << "--Rising Edge Detected!" << endl;
 
-  delay(1000);
-  cout << endl << "Waiting for falling edge with a timeout of 1000ms (1 second):" << endl;
-  if (GPIO::wait_for_edge(button_pin, GPIO::FALLING, 10, 1000)) {
-    cout << "--Rising Edge Detected! (maybe wait for timeout next time?!)" << endl;
-  }
-  else {
-    cout << "--Timeout Occurred!" << endl;
+  for (int i = 0; i < 3; ++i) {
+    delay(1000);
+    cout << endl << "Waiting for falling edge with a timeout of 2000ms (2 seconds):" << endl;
+    if (GPIO::wait_for_edge(button_pin, GPIO::FALLING, 10, 2000)) {
+      cout << "--Rising Edge Detected! (try again and wait for timeout)" << endl;
+    }
+    else {
+      cout << "--Timeout Occurred!" << endl;
+      break;
+    }
   }
 
   delay(1000);

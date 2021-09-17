@@ -252,7 +252,7 @@ In order to prevent multiple calls to the callback functions by collapsing multi
 GPIO::add_event_detect(channel, GPIO::RISING, callback_fn, 200);
 ```
 
-If one of the callbacks are no longer required it may then be removed
+If one of the callbacks are no longer required it may then be removed:
 
 ```cpp
 GPIO::remove_event_callback(channel, callback_two);
