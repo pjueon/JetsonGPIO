@@ -23,8 +23,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#include "JetsonGPIO.h"
-
 #include <dirent.h>
 #include <unistd.h>
 
@@ -41,6 +39,8 @@ DEALINGS IN THE SOFTWARE.
 #include <thread>
 #include <utility>
 #include <vector>
+
+#include "JetsonGPIO.h"
 
 #include "private/Model.h"
 #include "private/PythonFunctions.h"
@@ -62,7 +62,7 @@ constexpr Directions HARD_PWM = Directions::HARD_PWM;
 
 class GlobalVariableWrapper
 {
-  public:
+public:
     // -----Global Variables----
     // NOTE: DON'T change the declaration order of fields.
     // declaration order == initialization order
@@ -113,11 +113,14 @@ class GlobalVariableWrapper
         return ss.str();
     }
 
-  private:
+private:
     GlobalVariableWrapper()
-        : _pinData(get_data()), // Get GPIO pin data
-          _model(_pinData.model), _JETSON_INFO(_pinData.pin_info), _channel_data_by_mode(_pinData.channel_data),
-          _gpio_warnings(true), _gpio_mode(NumberingModes::None)
+    : _pinData(get_data()), // Get GPIO pin data
+      _model(_pinData.model),
+      _JETSON_INFO(_pinData.pin_info),
+      _channel_data_by_mode(_pinData.channel_data),
+      _gpio_warnings(true),
+      _gpio_mode(NumberingModes::None)
     {
         _CheckPermission();
     }
@@ -127,9 +130,8 @@ class GlobalVariableWrapper
         string path1 = _SYSFS_ROOT + "/export"s;
         string path2 = _SYSFS_ROOT + "/unexport"s;
         if (!os_access(path1, W_OK) || !os_access(path2, W_OK)) {
-            cerr << "[ERROR] The current user does not have permissions set to "
-                    "access the library functionalites. Please configure "
-                    "permissions or use the root user to run this."
+            cerr << "[ERROR] The current user does not have permissions set to access the library functionalites. "
+                    "Please configure permissions or use the root user to run this."
                  << endl;
             throw runtime_error("Permission Denied.");
         }
@@ -145,8 +147,7 @@ void _validate_mode_set()
 {
     if (global._gpio_mode == NumberingModes::None)
         throw runtime_error("Please set pin numbering mode using "
-                            "GPIO::setmode(GPIO::BOARD), GPIO::setmode(GPIO::BCM), "
-                            "GPIO::setmode(GPIO::TEGRA_SOC) or "
+                            "GPIO::setmode(GPIO::BOARD), GPIO::setmode(GPIO::BCM), GPIO::setmode(GPIO::TEGRA_SOC) or "
                             "GPIO::setmode(GPIO::CVM)");
 }
 
@@ -190,8 +191,7 @@ Directions _sysfs_channel_configuration(const ChannelInfo& ch_info)
 
     string gpio_dir = _SYSFS_ROOT + "/gpio"s + to_string(ch_info.gpio);
     if (!os_path_exists(gpio_dir))
-        return UNKNOWN; // Originally returns None in NVIDIA's GPIO Python
-                        // Library
+        return UNKNOWN; // Originally returns None in NVIDIA's GPIO Python Library
 
     string gpio_direction;
     { // scope for f
@@ -210,8 +210,7 @@ Directions _sysfs_channel_configuration(const ChannelInfo& ch_info)
     else if (gpio_direction == "out")
         return OUT;
     else
-        return UNKNOWN; // Originally returns None in NVIDIA's GPIO Python
-                        // Library
+        return UNKNOWN; // Originally returns None in NVIDIA's GPIO Python Library
 }
 
 /* Return the current configuration of a channel as requested by this
@@ -219,8 +218,7 @@ Directions _sysfs_channel_configuration(const ChannelInfo& ch_info)
 Directions _app_channel_configuration(const ChannelInfo& ch_info)
 {
     if (global._channel_configuration.find(ch_info.channel) == global._channel_configuration.end())
-        return UNKNOWN; // Originally returns None in NVIDIA's GPIO Python
-                        // Library
+        return UNKNOWN; // Originally returns None in NVIDIA's GPIO Python Library
     return global._channel_configuration[ch_info.channel];
 }
 
@@ -240,8 +238,7 @@ void _export_gpio(const int gpio)
         this_thread::sleep_for(chrono::milliseconds(10));
         if (time_count++ > 100)
             throw runtime_error("Permission denied: path: " + value_path +
-                                "\n Please configure permissions or use the "
-                                "root user to run this.");
+                                "\n Please configure permissions or use the root user to run this.");
     }
 }
 
@@ -325,8 +322,7 @@ void _export_pwm(const ChannelInfo& ch_info)
         this_thread::sleep_for(chrono::milliseconds(10));
         if (time_count++ > 100)
             throw runtime_error("Permission denied: path: " + enable_path +
-                                "\n Please configure permissions or use the "
-                                "root user to run this.");
+                                "\n Please configure permissions or use the root user to run this.");
     }
 }
 
@@ -424,10 +420,7 @@ void GPIO::setmode(NumberingModes mode)
     try {
         // check if mode is valid
         if (mode == NumberingModes::None)
-            throw runtime_error("Pin numbering mode must be "
-                                "GPIO::BOARD, GPIO::BCM, "
-                                "GPIO::TEGRA_SOC or "
-                                "GPIO::CVM");
+            throw runtime_error("Pin numbering mode must be GPIO::BOARD, GPIO::BCM, GPIO::TEGRA_SOC or GPIO::CVM");
         // check if a different mode has been set
         if (global._gpio_mode != NumberingModes::None && mode != global._gpio_mode)
             throw runtime_error("A different mode has already been set!");
@@ -456,9 +449,8 @@ void GPIO::setup(const string& channel, Directions direction, int initial)
             Directions app_cfg = _app_channel_configuration(ch_info);
 
             if (app_cfg == UNKNOWN && sysfs_cfg != UNKNOWN) {
-                cerr << "[WARNING] This channel is already in use, continuing "
-                        "anyway. Use GPIO::setwarnings(false) to disable "
-                        "warnings.\n";
+                cerr << "[WARNING] This channel is already in use, continuing anyway. Use GPIO::setwarnings(false) to "
+                        "disable warnings.\n";
             }
         }
 
@@ -485,15 +477,13 @@ void GPIO::cleanup(const string& channel)
     try {
         // warn if no channel is setup
         if (global._gpio_mode == NumberingModes::None && global._gpio_warnings) {
-            cerr << "[WARNING] No channels have been set up yet - nothing to "
-                    "clean up! "
+            cerr << "[WARNING] No channels have been set up yet - nothing to clean up! "
                     "Try cleaning up at the end of your program instead!";
             return;
         }
 
         // clean all channels if no channel param provided
         if (channel == "None") {
-            // TODO -- this doesn't work for me find a fix
             _cleanup_all();
             return;
         }
@@ -682,8 +672,7 @@ void GPIO::add_event_detect(int channel, Edge edge, void (*callback)(int), unsig
         if (callback != nullptr) {
             if (_add_edge_callback(ch_info.gpio, callback))
                 // Shouldn't happen (--it was just added successfully)
-                throw runtime_error("Couldn't add callback due to unknown "
-                                    "error with just added event");
+                throw runtime_error("Couldn't add callback due to unknown   error with just added event");
         }
     } catch (exception& e) {
         cerr << "[Exception] " << e.what() << " (catched from: GPIO::add_event_detect())" << endl;
@@ -782,8 +771,8 @@ void GPIO::PWM::Impl::_reconfigure(int frequency_hz, double duty_cycle_percent, 
 }
 
 GPIO::PWM::PWM(int channel, int frequency_hz)
-    : pImpl(make_unique<Impl>(
-          Impl{_channel_to_info(to_string(channel), false, true), false, 0, 0, 0.0, 0})) // temporary values
+: pImpl(make_unique<Impl>(
+      Impl{_channel_to_info(to_string(channel), false, true), false, 0, 0, 0.0, 0})) // temporary values
 {
     try {
         Directions app_cfg = _app_channel_configuration(pImpl->_ch_info);
@@ -900,10 +889,10 @@ void GPIO::PWM::stop()
 
 //=========================== Originally added ===========================
 struct _cleaner {
-  private:
+private:
     _cleaner() = default;
 
-  public:
+public:
     _cleaner(const _cleaner&) = delete;
     _cleaner& operator=(const _cleaner&) = delete;
 

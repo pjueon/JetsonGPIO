@@ -38,149 +38,148 @@ int cb = 0;
 
 inline void delay(int ms)
 {
-  if (!end_this_program)
-    this_thread::sleep_for(chrono::milliseconds(ms));
-  if (!end_this_program)
-    return;
+    if (!end_this_program)
+        this_thread::sleep_for(chrono::milliseconds(ms));
+    if (!end_this_program)
+        return;
 
-  // Cleanup and abort
-  GPIO::cleanup();
-  exit(0);
+    // Cleanup and abort
+    GPIO::cleanup();
+    exit(0);
 }
 
 void signalHandler(int s) { end_this_program = true; }
 
 void callback_fn(int button_pin)
 {
-  cout << "--Callback called from button_pin " << button_pin << endl;
-  ++cb;
+    cout << "--Callback called from button_pin " << button_pin << endl;
+    ++cb;
 }
 
 void callback_one(int button_pin)
 {
-  cout << "--First Additional Callback" << endl;
-  cb1 = true;
+    cout << "--First Additional Callback" << endl;
+    cb1 = true;
 }
 
 void callback_two(int button_pin)
 {
-  cout << "--Second Additional Callback" << endl;
-  cb2 = true;
+    cout << "--Second Additional Callback" << endl;
+    cb2 = true;
 }
 
 /*  Test Events part of the library.
     Tested with a Jetson Nano and the following circuit:
     The button pin connected to a button and a 220pf ceramic capacitor (the other side of this capacitor
     connected to ground) and a 1K resistor (the other end of the resistor is connected to 5V). When the
-    button is pressed the the circuit is closed with a direct connection to ground.
+    button is pressed then the circuit is closed with a direct connection to ground.
     ie. the RISING edge occurs when the button is released.
 */
 int testEvents()
 {
-  // When CTRL+C pressed, signalHandler will be called
-  signal(SIGINT, signalHandler);
+    // When CTRL+C pressed, signalHandler will be called
+    signal(SIGINT, signalHandler);
 
-  // Pin Definitions
-  const int button_pin = 11; // BOARD pin 11
+    // Pin Definitions
+    const int button_pin = 11; // BOARD pin 11
 
-  // Pin Setup.
-  GPIO::setmode(GPIO::BOARD);
+    // Pin Setup.
+    GPIO::setmode(GPIO::BOARD);
 
-  // set pin as an output pin with optional initial state of HIGH
-  //   GPIO::setup(led_pin, GPIO::OUT, GPIO::LOW);
-  GPIO::setup(button_pin, GPIO::IN);
+    // set pin as an output pin with optional initial state of HIGH
+    //   GPIO::setup(led_pin, GPIO::OUT, GPIO::LOW);
+    GPIO::setup(button_pin, GPIO::IN);
 
-  cout << "Starting Events Test now! Press CTRL+C to exit" << endl;
+    cout << "Starting Events Test now! Press CTRL+C to exit" << endl;
 
-  delay(1000);
-  cout << endl << "#Demo - GPIO::wait_for_edge" << endl;
-  cout << endl << "Waiting for rising edge:" << endl;
-  if (GPIO::wait_for_edge(button_pin, GPIO::RISING))
+    delay(1000);
+    cout << endl << "#Demo - GPIO::wait_for_edge" << endl;
+    cout << endl << "Waiting for rising edge:" << endl;
+    if (GPIO::wait_for_edge(button_pin, GPIO::RISING))
+        cout << "--Rising Edge Detected!" << endl;
+
+    for (int i = 0; i < 3; ++i) {
+        delay(1000);
+        cout << endl << "Waiting for falling edge with a timeout of 2000ms (2 seconds):" << endl;
+        if (GPIO::wait_for_edge(button_pin, GPIO::FALLING, 10, 2000)) {
+            cout << "--Rising Edge Detected! (try again and wait for timeout)" << endl;
+        } else {
+            cout << "--Timeout Occurred!" << endl;
+            break;
+        }
+    }
+
+    delay(1000);
+    cout << endl << "#Demo - GPIO::add_event_detect" << endl;
+    cout << endl << "Waiting for rising edge:" << endl;
+    GPIO::add_event_detect(button_pin, GPIO::RISING);
+    while (!GPIO::event_detected(button_pin)) {
+        delay(100);
+    }
     cout << "--Rising Edge Detected!" << endl;
 
-  for (int i = 0; i < 3; ++i) {
     delay(1000);
-    cout << endl << "Waiting for falling edge with a timeout of 2000ms (2 seconds):" << endl;
-    if (GPIO::wait_for_edge(button_pin, GPIO::FALLING, 10, 2000)) {
-      cout << "--Rising Edge Detected! (try again and wait for timeout)" << endl;
+    cout << endl << "Waiting for rising edge (using callback this time):" << endl;
+    GPIO::add_event_detect(button_pin, GPIO::RISING, callback_fn);
+    while (!cb) {
+        delay(100);
     }
-    else {
-      cout << "--Timeout Occurred!" << endl;
-      break;
+
+    delay(1000);
+    cb = 0;
+    GPIO::add_event_callback(button_pin, callback_one);
+    GPIO::add_event_callback(button_pin, callback_two);
+    cout << endl << "Added 2 more callbacks!" << endl << "Waiting for rising edge:" << endl;
+    while (!cb && !cb1 && !cb2) {
+        delay(100);
     }
-  }
 
-  delay(1000);
-  cout << endl << "#Demo - GPIO::add_event_detect" << endl;
-  cout << endl << "Waiting for rising edge:" << endl;
-  GPIO::add_event_detect(button_pin, GPIO::RISING);
-  while (!GPIO::event_detected(button_pin)) {
-    delay(100);
-  }
-  cout << "--Rising Edge Detected!" << endl;
+    delay(1);
+    cb = cb1 = cb2 = false;
+    GPIO::remove_event_callback(button_pin, callback_one);
+    cout << endl << "Removed the first additional callback." << endl << "Waiting for rising edge:" << endl;
+    while (!cb && !cb2) {
+        delay(100);
+    }
 
-  delay(1000);
-  cout << endl << "Waiting for rising edge (using callback this time):" << endl;
-  GPIO::add_event_detect(button_pin, GPIO::RISING, callback_fn);
-  while (!cb) {
-    delay(100);
-  }
+    delay(1000);
+    cout << endl << "Removing event and then readding with one callback function and a bouncetime of 3000 ms" << endl;
+    GPIO::remove_event_detect(button_pin);
+    cb = 0;
+    GPIO::add_event_detect(button_pin, GPIO::RISING, callback_fn, 3000);
+    cout << "-- Press Button 3 times to finish events test!" << endl;
+    while (cb < 3) {
+        delay(100);
+    }
 
-  delay(1000);
-  cb = 0;
-  GPIO::add_event_callback(button_pin, callback_one);
-  GPIO::add_event_callback(button_pin, callback_two);
-  cout << endl << "Added 2 more callbacks!" << endl << "Waiting for rising edge:" << endl;
-  while (!cb && !cb1 && !cb2) {
-    delay(100);
-  }
+    GPIO::cleanup();
 
-  delay(1);
-  cb = cb1 = cb2 = false;
-  GPIO::remove_event_callback(button_pin, callback_one);
-  cout << endl << "Removed the first additional callback." << endl << "Waiting for rising edge:" << endl;
-  while (!cb && !cb2) {
-    delay(100);
-  }
-
-  delay(1000);
-  cout << endl << "Removing event and then readding with one callback function and a bouncetime of 3000 ms" << endl;
-  GPIO::remove_event_detect(button_pin);
-  cb = 0;
-  GPIO::add_event_detect(button_pin, GPIO::RISING, callback_fn, 3000);
-  cout << "-- Press Button 3 times to finish events test!" << endl;
-  while (cb < 3) {
-    delay(100);
-  }
-
-  GPIO::cleanup();
-
-  return 0;
+    return 0;
 }
 
 int main()
 {
-  cout << "model: " << GPIO::model << endl;
-  cout << "lib version: " << GPIO::VERSION << endl;
-  cout << GPIO::JETSON_INFO << endl;
+    cout << "model: " << GPIO::model << endl;
+    cout << "lib version: " << GPIO::VERSION << endl;
+    cout << GPIO::JETSON_INFO << endl;
 
-  int output_pin = 7;
-  GPIO::setmode(GPIO::BOARD);
-  GPIO::setup(output_pin, GPIO::OUT, GPIO::HIGH);
+    int output_pin = 7;
+    GPIO::setmode(GPIO::BOARD);
+    GPIO::setup(output_pin, GPIO::OUT, GPIO::HIGH);
 
-  cout << "BOARD " << output_pin << "pin, set to OUTPUT, HIGH" << endl;
-  cout << "Press Enter to Continue";
-  cin.ignore();
+    cout << "BOARD " << output_pin << "pin, set to OUTPUT, HIGH" << endl;
+    cout << "Press Enter to Continue";
+    cin.ignore();
 
-  GPIO::output(output_pin, GPIO::LOW);
-  cout << output_pin << "pin, set to LOW now" << endl;
-  cout << "Press Enter to Continue";
-  cin.ignore();
+    GPIO::output(output_pin, GPIO::LOW);
+    cout << output_pin << "pin, set to LOW now" << endl;
+    cout << "Press Enter to Continue";
+    cin.ignore();
 
-  GPIO::cleanup(output_pin);
+    GPIO::cleanup(output_pin);
 
-  testEvents();
+    testEvents();
 
-  cout << "end" << endl;
-  return 0;
+    cout << "end" << endl;
+    return 0;
 }
