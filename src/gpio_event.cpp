@@ -44,12 +44,9 @@ DEALINGS IN THE SOFTWARE.
 #define MAX_EPOLL_EVENTS 20
 #define READ_SIZE 10
 
-TODO -- check I'm using the blocking flag in geos properly
-TODO -- continue cleaning up code and appropriate documenting from here
-TODO -- clangformat
-
 namespace GPIO {
 
+  // Error messages for all errors produced by this module
   std::map<EventResultCode, const char *> event_error_code_to_message = {
       {EventResultCode::SysFD_EdgeOpen, "Failure to open the /sys/class/gpio/gpio{$ch}/edge file"},
       {EventResultCode::UnallowedEdgeNone, "Specifying Edge as 'none' was not allowed"},
@@ -105,7 +102,6 @@ namespace GPIO {
     int edge_fd = open(buf, O_WRONLY);
     if (edge_fd == -1) {
       // I/O Error
-      // fprintf(stderr, "Error opening file '%s'\n", buf);
       return (int)GPIO::EventResultCode::SysFD_EdgeOpen;
     }
     switch (edge) {
@@ -152,7 +148,6 @@ namespace GPIO {
     fd = open(buf, O_RDONLY);
 
     if (fd == -1) {
-      // printf("[DEBUG] '%s' for given gpio '%i'\n", buf, gpio);
       return (int)GPIO::EventResultCode::SysFD_ValueOpen;
     }
 
@@ -173,7 +168,7 @@ namespace GPIO {
     auto geo = geo_it->second;
 
     if (epoll_ctl(epoll_fd, EPOLL_CTL_DEL, geo->fd, 0) == -1) {
-      fprintf(stderr, "Failed to delete file descriptor to epoll\n");
+      // Okay to ignore I believe. File will be closed just below anyways.
     }
 
     auto fg_it = _fd_to_gpio_map.find(geo->fd);
@@ -182,10 +177,8 @@ namespace GPIO {
 
     // Close the fd
     if (close(geo->fd) == -1) {
-      fprintf(stderr, "Failed to close file descriptor\n");
+      fprintf(stderr, "[WARNING] Failed to close Epoll_Thread file descriptor\n");
     }
-
-    // printf("[DEBUG] fd(%i:%i) removed from epoll\n", geo->channel_id, geo->gpio);
 
     // Erase from the map collection
     return _gpio_events.erase(geo_it);
@@ -195,11 +188,9 @@ namespace GPIO {
   {
     int epoll_fd = epoll_create1(0);
     if (epoll_fd == -1) {
-      fprintf(stderr, "Failed to create epoll file descriptor\n");
+      perror("[Fatal Error] Failed to create epoll file descriptor for concurrent Epoll Thread\n");
       return;
     }
-
-    // printf("[DEBUG] _epoll_thread_loop begun\n--_fd_to_gpio_map.size()=%zu\n", _fd_to_gpio_map.size());
 
     int e, event_count, result;
     epoll_event events[MAX_EPOLL_EVENTS];
@@ -212,12 +203,11 @@ namespace GPIO {
       if (event_count) {
         if (event_count < 0) {
           if (errno != EINTR) {
-            perror("epoll_wait");
+            perror("[Fatal Error] epoll_wait");
+            goto cleanup;
           }
           break;
         }
-
-        // printf("[DEBUG] event_count=%i\n", event_count);
 
         // Handle event modifications
         auto tick = (uint64_t)std::chrono::duration_cast<std::chrono::milliseconds>(
@@ -229,16 +219,18 @@ namespace GPIO {
           // Obtain the event object for the event
           auto gpio_it = _fd_to_gpio_map.find(events[e].data.fd);
           if (gpio_it == _fd_to_gpio_map.end()) {
-            // Shouldn't happen - ignore it
-            // puts("[DEBUG] Couldn't find gpio for fd-event");
+            // Shouldn't happen - ignore it if it does
             continue;
           }
 
           auto geo_it = _gpio_events.find(gpio_it->second);
           if (geo_it == _gpio_events.end()) {
-            // Shouldn't happen - ignore it
-            // printf("[DEBUG] Couldn't find gpio object with gpio %i (OK if gpio edge was removed)\n",
-            // gpio_it->second);
+            // Shouldn't happen
+            // If it does -- ensure the fd is deleted & ignore any errors
+            epoll_ctl(epoll_fd, EPOLL_CTL_DEL, events[e].data.fd, 0);
+
+            // Remove the item from the map
+            _fd_to_gpio_map.erase(gpio_it);
             continue;
           }
 
@@ -296,6 +288,11 @@ namespace GPIO {
             geo->_epoll_change_flag = _gpioEventObject::ModifyEvent::INITIAL_ABSCOND;
           } break;
           case _gpioEventObject::ModifyEvent::REMOVE: {
+            if (geo->blocking) {
+              // Do not remove it during a concurrent blocking usage
+              break;
+            }
+
             geo_it = _epoll_thread_remove_event(epoll_fd, geo_it);
 
             // Skip past the iteration so as to not iterate past the returned element
@@ -321,7 +318,7 @@ namespace GPIO {
 
     // epoll
     if (close(epoll_fd) == -1) {
-      fprintf(stderr, "Failed to close epoll file descriptor\n");
+      perror("[WARNING] Failed to close epoll file descriptor during closure of concurrent Epoll_Thread\n");
     }
   }
 
@@ -329,6 +326,21 @@ namespace GPIO {
   {
     _epoll_run_loop = true;
     _epoll_fd_thread = new std::thread(_epoll_thread_loop);
+  }
+
+  void _epoll_end_thread()
+  {
+    _epoll_run_loop = false;
+
+    // Wait to join
+    _epoll_fd_thread->join();
+
+    {
+      // Enter Mutex and clear thread
+      std::lock_guard<std::recursive_mutex> mutex_lock(_epmutex);
+      delete _epoll_fd_thread;
+      _epoll_fd_thread = nullptr;
+    }
   }
 
   //-------------- Operations -------------------- //
@@ -445,7 +457,7 @@ namespace GPIO {
       epoll_fd = epoll_create1(0);
       if (epoll_fd == -1) {
         error = (int)GPIO::EventResultCode::EpollFD_CreateError;
-        perror("epoll_create1(0):");
+        perror("epoll_create1(0)");
         goto cleanup;
       }
 
@@ -470,15 +482,12 @@ namespace GPIO {
           if (current_time.tv_sec > timeout_time.tv_sec ||
               (current_time.tv_sec == timeout_time.tv_sec && current_time.tv_nsec >= timeout_time.tv_nsec)) {
             // Time-out
-            // printf("[DEBUG] BREAK current_time=%li;%li", current_time.tv_sec, current_time.tv_nsec);
-            // printf("  timeout_time==%li;%li\n", timeout_time.tv_sec, timeout_time.tv_nsec);
             break;
           }
         }
 
         // Wait a small time for events
         event_count = epoll_wait(epoll_fd, events, 1, 1);
-        // printf("event_count=%i\n", event_count);
 
         // First trigger is with current state so ignore
         if (initial_edge) {
@@ -496,16 +505,12 @@ namespace GPIO {
             goto cleanup;
           }
 
-          // printf("events:%u\n", events[0].events);
-
           if (events[0].data.fd == geo->fd) {
             auto tick = (uint64_t)std::chrono::duration_cast<std::chrono::milliseconds>(
                             std::chrono::system_clock::now().time_since_epoch())
                             .count();
 
             if (!geo->bounce_time || tick - geo->last_event > geo->bounce_time) {
-              // TODO -- debug this ? with another concurrent event to make sure that fires too?
-              //  gpio_obj.lastcall = time
               result = (int)EventResultCode::EdgeDetected;
               break;
             }
@@ -517,7 +522,15 @@ namespace GPIO {
   cleanup:
     if (epoll_fd >= 0)
       close(epoll_fd);
-    geo->blocking = false;
+
+    // Set flag unblocking
+    {
+      // Enter Mutex
+      std::lock_guard<std::recursive_mutex> mutex_lock(_epmutex);
+      geo->blocking = false;
+    }
+
+    // Remove Geo if it was created
     if (remove_geo) {
       // Enter Mutex
       std::lock_guard<std::recursive_mutex> mutex_lock(_epmutex);
@@ -536,6 +549,17 @@ namespace GPIO {
       else {
         // Set for removal from the concurrent epoll-thread
         _remove_edge_detect(gpio);
+      }
+    }
+
+    // Close the thread if a concurrent action has removed all other events
+    {
+      std::unique_lock<std::recursive_mutex> mutex_lock(_epmutex);
+      if (_auth_event_channel_count == 0 && _epoll_fd_thread) {
+        // Signal shutdown of thread
+        // -- Doesn't need to run if there are no events
+        mutex_lock.unlock();
+        _epoll_end_thread();
       }
     }
 
@@ -671,32 +695,21 @@ namespace GPIO {
       auto geo = find_result->second;
 
       geo->_epoll_change_flag = _gpioEventObject::ModifyEvent::REMOVE;
-
       --_auth_event_channel_count;
-      if (_auth_event_channel_count == 0 && _epoll_fd_thread) {
-
-        // Signal shutdown of thread
-        // -- Doesn't need to run if there are no events
-        _epoll_run_loop = false;
-        mutex_lock.unlock();
-
-        // Wait to join
-        _epoll_fd_thread->join();
-
-        // Resume lock and clear thread
-        mutex_lock.lock();
-        delete _epoll_fd_thread;
-        _epoll_fd_thread = nullptr;
+      if (geo->blocking) {
+        // Channel is currently in a blocking usage on a concurrent thread
+        // -- At least remove all callbacks now
+        geo->callbacks.clear();
+        return;
       }
 
-      // // DEBUG
-      // printf("[DEBUG]_remove_edge_detect(%i) REMOVED-ITEM\n", gpio);
-      // // DEBUG
+      if (_auth_event_channel_count == 0 && _epoll_fd_thread) {
+        // Signal shutdown of thread
+        // -- Doesn't need to run if there are no events
+        mutex_lock.unlock();
+        _epoll_end_thread();
+      }
     }
-    // // DEBUG
-    // else
-    //   printf("[DEBUG]_remove_edge_detect(%i) REDUNDANT-CALL\n", gpio);
-    // // DEBUG
   }
 
   int _add_edge_callback(int gpio, void (*callback)(int))
