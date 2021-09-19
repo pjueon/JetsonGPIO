@@ -41,36 +41,35 @@ inline void delay(int s) { this_thread::sleep_for(chrono::seconds(s)); }
 
 void signalHandler(int s) { end_this_program = true; }
 
-int main()
-{
-  // When CTRL+C pressed, signalHandler will be called
-  signal(SIGINT, signalHandler);
+int main() {
+       // When CTRL+C pressed, signalHandler will be called
+       signal(SIGINT, signalHandler);
 
-  // Pin Definitions
-  int led_pin = 12; // BOARD pin 12
-  int but_pin = 18; // BOARD pin 18
+       // Pin Definitions
+       int led_pin = 12; // BOARD pin 12
+       int but_pin = 18; // BOARD pin 18
 
-  // Pin Setup.
-  GPIO::setmode(GPIO::BOARD);
+       // Pin Setup.
+       GPIO::setmode(GPIO::BOARD);
 
-  // set pin as an output pin with optional initial state of HIGH
-  GPIO::setup(led_pin, GPIO::OUT, GPIO::LOW);
-  GPIO::setup(but_pin, GPIO::IN);
+       // set pin as an output pin with optional initial state of HIGH
+       GPIO::setup(led_pin, GPIO::OUT, GPIO::LOW);
+       GPIO::setup(but_pin, GPIO::IN);
 
-  cout << "Starting demo now! Press CTRL+C to exit" << endl;
+       cout << "Starting demo now! Press CTRL+C to exit" << endl;
 
-  while (!end_this_program) {
-    cout << "Waiting for button event" << endl;
-    GPIO::wait_for_edge(but_pin, GPIO::Edge::FALLING);
+       while (!end_this_program) {
+              cout << "Waiting for button event" << endl;
+              GPIO::wait_for_edge(but_pin, GPIO::Edge::FALLING);
 
-    // event received when button pressed
-    cout << "Button Pressed!" << endl;
-    GPIO::output(led_pin, GPIO::HIGH);
-    delay(1);
-    GPIO::output(led_pin, GPIO::LOW);
-  }
+              // event received when button pressed
+              cout << "Button Pressed!" << endl;
+              GPIO::output(led_pin, GPIO::HIGH);
+              delay(1);
+              GPIO::output(led_pin, GPIO::LOW);
+       }
 
-  GPIO::cleanup();
+       GPIO::cleanup();
 
-  return 0;
+       return 0;
 }
