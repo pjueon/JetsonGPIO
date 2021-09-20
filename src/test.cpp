@@ -25,6 +25,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <signal.h>
 
+#include <atomic>
 #include <chrono>
 #include <iostream>
 #include <thread>
@@ -33,8 +34,12 @@ DEALINGS IN THE SOFTWARE.
 
 using namespace std;
 
+// Pin Definitions
+const int button_pin = 11; // BOARD pin 11
+
 bool end_this_program = false, cb1 = false, cb2 = false;
-int cb = 0;
+atomic_int cb, wb;
+thread* wthr = nullptr;
 
 inline void delay(int ms)
 {
@@ -44,6 +49,12 @@ inline void delay(int ms)
         return;
 
     // Cleanup and abort
+    if (wthr) {
+        wb = -5;
+        cout << "closing wait-event-thread" << endl;
+        wthr->join();
+        delete wthr;
+    }
     GPIO::cleanup();
     exit(0);
 }
@@ -77,17 +88,6 @@ void callback_two(int button_pin)
 */
 int testEvents()
 {
-    // When CTRL+C pressed, signalHandler will be called
-    signal(SIGINT, signalHandler);
-
-    // Pin Definitions
-    const int button_pin = 11; // BOARD pin 11
-
-    // Pin Setup.
-    GPIO::setmode(GPIO::BOARD);
-
-    // set pin as an output pin with optional initial state of HIGH
-    //   GPIO::setup(led_pin, GPIO::OUT, GPIO::LOW);
     GPIO::setup(button_pin, GPIO::IN);
 
     cout << "Starting Events Test now! Press CTRL+C to exit" << endl;
@@ -157,6 +157,119 @@ int testEvents()
     return 0;
 }
 
+void wait_thread(void)
+{
+    cout << "- blocking_wait-thread begun" << endl;
+    for (; wb != -5;) {
+        // Theres a microsecond or too where this won't be up, but chance of that happenning is very very rare
+        // This way allows proper closing of thread easily
+        if (GPIO::wait_for_edge(button_pin, GPIO::RISING, 200, 1000)) {
+            cout << "- blocking_wait-thread: Edge Event" << endl;
+            ++wb;
+        }
+    }
+
+    cout << "blocking_wait-thread finished" << endl;
+}
+
+void testEventsConcurrency()
+{
+    GPIO::setup(button_pin, GPIO::IN);
+
+    cout << endl << "### Concurrent Test Begun ###" << endl;
+
+    wthr = new thread(wait_thread);
+    delay(50);
+    cout << "Press button (expects only wait-thread-event):" << endl;
+
+    wb = 0;
+    while (wb < 1)
+        delay(50);
+
+    cout << endl;
+    delay(500);
+
+    cout << "...Adding event detect with callback on main thread " << endl;
+    GPIO::add_event_detect(button_pin, GPIO::RISING, callback_fn, 200);
+    cout << "Press button (expects wait-thread-event && callback-event):" << endl;
+    cb = 0;
+    wb = 0;
+    while (cb < 1 && wb < 1)
+        delay(50);
+
+    cout << endl;
+    delay(500);
+
+    GPIO::event_detected(button_pin);
+    GPIO::remove_event_callback(button_pin, callback_fn);
+    cout << "# removed callback" << endl;
+    cout << "event_detected() (expects 0):" << GPIO::event_detected(button_pin) << endl;
+    cout << "-! Press button (expects only wait-thread-event):" << endl;
+
+    wb = 0;
+    while (wb < 1)
+        delay(50);
+
+    delay(200);
+    cout << "event_detected() (expects 1):" << GPIO::event_detected(button_pin) << endl;
+
+    cout << endl;
+    delay(500);
+
+    cout << "removed event" << endl;
+    GPIO::remove_event_detect(button_pin);
+    cout << "-! Press button (expects only wait-thread-event):" << endl;
+
+    wb = 0;
+    while (wb < 1)
+        delay(50);
+
+    cout << endl;
+    delay(500);
+
+    wb = -5;
+    cout << "joining wait-event-thread" << endl;
+    wthr->join();
+    delete wthr;
+
+    // GPIO::add_event_detect(button_pin, GPIO::RISING, callback_fn);
+    // cout << "added event:" << endl;
+    // while (!cb)
+    //   delay(50);
+    // cb = 0;
+    // cout << "press now:" << endl;
+    // if (GPIO::wait_for_edge(button_pin, GPIO::RISING))
+    //   cout << "waited_edge" << endl;
+    // else
+    //   cout << "timeout/error" << endl;
+    // cb = 0;
+
+    // cout << "press now:" << endl;
+    // while (!cb)
+    //   delay(50);
+    // cb = 0;
+
+    // delay(1000);
+    // cout << endl << "Waiting for falling edge with a timeout of 1000ms (1 second):" << endl;
+    // if (GPIO::wait_for_edge(button_pin, GPIO::FALLING, 10, 1000)) {
+    //   cout << "--Rising Edge Detected! (maybe wait for timeout next time?!)" << endl;
+    // }
+    // else {
+    //   cout << "--Timeout Occurred!" << endl;
+    // }
+
+    // delay(1000);
+    // cout << endl << "#Demo - GPIO::add_event_detect" << endl;
+    // cout << endl << "Waiting for rising edge:" << endl;
+    // GPIO::add_event_detect(button_pin, GPIO::RISING);
+    // while (!GPIO::event_detected(button_pin)) {
+    //   delay(100);
+    // }
+    // cout << "--Rising Edge Detected!" << endl;
+
+    GPIO::cleanup();
+}
+
 int main()
 {
     cout << "model: " << GPIO::model << endl;
@@ -178,7 +291,11 @@ int main()
 
     GPIO::cleanup(output_pin);
 
-    testEvents();
+    // When CTRL+C pressed, signalHandler will be called
+    signal(SIGINT, signalHandler);
+
+    // testEvents();
+    testEventsConcurrency();
 
     cout << "end" << endl;
     return 0;

@@ -81,7 +81,7 @@ typedef struct __gpioEventObject {
 
     bool event_occurred;
 
-    bool blocking;
+    bool blocking_usage, concurrent_usage;
     std::vector<void (*)(int)> callbacks;
 } _gpioEventObject;
 
@@ -288,7 +288,7 @@ void _epoll_thread_loop()
                 geo->_epoll_change_flag = _gpioEventObject::ModifyEvent::INITIAL_ABSCOND;
             } break;
             case _gpioEventObject::ModifyEvent::REMOVE: {
-                if (geo->blocking) {
+                if (geo->blocking_usage) {
                     // Do not remove it during a concurrent blocking usage
                     break;
                 }
@@ -360,7 +360,6 @@ int _blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce
 
     int result;
     std::shared_ptr<_gpioEventObject> geo;
-    int remove_geo = false;
     uint64_t gpio_last_event = 0;
     {
         // Enter Mutex
@@ -371,7 +370,7 @@ int _blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce
         if (find_result != _gpio_events.end()) {
             geo = find_result->second;
 
-            if (geo->blocking) {
+            if (geo->blocking_usage) {
                 // Channel already being blocked (can only be by another thread call)
                 return (int)GPIO::EventResultCode::ChannelAlreadyBlocked;
             }
@@ -405,10 +404,9 @@ int _blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce
 
                 // Reset GPIO
                 geo->event_occurred = false;
-                geo->bounce_time = 0;
+                geo->bounce_time = bounce_time;
                 geo->last_event = 0;
 
-                remove_geo = true;
                 ++_auth_event_channel_count;
             } break;
             default:
@@ -422,7 +420,7 @@ int _blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce
             geo->gpio = gpio;
             geo->channel_id = channel_id;
             geo->edge = edge;
-            geo->bounce_time = 0;
+            geo->bounce_time = bounce_time;
             geo->last_event = 0;
 
             // Open the value fd
@@ -442,11 +440,10 @@ int _blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce
             _fd_to_gpio_map[geo->fd] = gpio;
             _gpio_events[gpio] = geo;
 
-            remove_geo = true;
             ++_auth_event_channel_count;
         }
 
-        geo->blocking = true;
+        geo->blocking_usage = true;
     }
 
     // Execute the epoll awaiting the event
@@ -522,42 +519,33 @@ cleanup:
     if (epoll_fd >= 0)
         close(epoll_fd);
 
-    // Set flag unblocking
+    // GPIO Event Object Tidy-up
     {
         // Enter Mutex
-        std::lock_guard<std::recursive_mutex> mutex_lock(_epmutex);
-        geo->blocking = false;
-    }
-
-    // Remove Geo if it was created
-    if (remove_geo) {
-        // Enter Mutex
-        std::lock_guard<std::recursive_mutex> mutex_lock(_epmutex);
-
-        if (geo->_epoll_change_flag == _gpioEventObject::ModifyEvent::ADD) {
-            // It hasn't been added to the concurrent epoll-thread yet (if there even is one)
-            auto ftg_it = _fd_to_gpio_map.find(geo->fd);
-            if (ftg_it != _fd_to_gpio_map.end())
-                _fd_to_gpio_map.erase(ftg_it);
-            auto geo_it = _gpio_events.find(gpio);
-            if (geo_it != _gpio_events.end())
-                _gpio_events.erase(geo_it);
-
-            --_auth_event_channel_count;
-        } else {
-            // Set for removal from the concurrent epoll-thread
-            _remove_edge_detect(gpio);
-        }
-    }
-
-    // Close the thread if a concurrent action has removed all other events
-    {
         std::unique_lock<std::recursive_mutex> mutex_lock(_epmutex);
-        if (_auth_event_channel_count == 0 && _epoll_fd_thread) {
-            // Signal shutdown of thread
-            // -- Doesn't need to run if there are no events
-            mutex_lock.unlock();
-            _epoll_end_thread();
+        geo->blocking_usage = false;
+        if (!geo->concurrent_usage) {
+            // Remove it
+            if (geo->_epoll_change_flag == _gpioEventObject::ModifyEvent::ADD) {
+                // It hasn't been added to the concurrent epoll-thread yet (if there even is one)
+                auto ftg_it = _fd_to_gpio_map.find(geo->fd);
+                if (ftg_it != _fd_to_gpio_map.end())
+                    _fd_to_gpio_map.erase(ftg_it);
+                auto geo_it = _gpio_events.find(gpio);
+                if (geo_it != _gpio_events.end())
+                    _gpio_events.erase(geo_it);
+
+                --_auth_event_channel_count;
+                if (_auth_event_channel_count == 0 && _epoll_fd_thread) {
+                    // Signal shutdown of thread
+                    // -- Doesn't need to run if there are no events
+                    mutex_lock.unlock();
+                    _epoll_end_thread();
+                }
+            } else {
+                // Set for removal from the concurrent epoll-thread
+                _remove_edge_detect(gpio);
+            }
         }
     }
 
@@ -590,7 +578,7 @@ bool _edge_event_exists(int gpio)
 
     auto find_result = _gpio_events.find(gpio);
     if (find_result == _gpio_events.end()) {
-        return true;
+        return find_result->second->_epoll_change_flag != _gpioEventObject::ModifyEvent::REMOVE;
     }
     return false;
 }
@@ -615,7 +603,7 @@ int _add_edge_detect(int gpio, int channel_id, Edge edge, uint64_t bounce_time)
             if (geo->edge != edge) {
                 return (int)GPIO::EventResultCode::ConflictingEdgeType;
             }
-            if (!bounce_time && geo->bounce_time != bounce_time) {
+            if (bounce_time && geo->bounce_time != bounce_time) {
                 return (int)GPIO::EventResultCode::ConflictingBounceTime;
             }
 
@@ -651,9 +639,8 @@ int _add_edge_detect(int gpio, int channel_id, Edge edge, uint64_t bounce_time)
         geo->gpio = gpio;
         geo->channel_id = channel_id;
         geo->edge = edge;
-        geo->bounce_time = bounce_time;
         geo->last_event = 0;
-        geo->blocking = false;
+        geo->blocking_usage = false;
         geo->event_occurred = false;
 
         // Open the value fd
@@ -675,6 +662,9 @@ int _add_edge_detect(int gpio, int channel_id, Edge edge, uint64_t bounce_time)
         ++_auth_event_channel_count;
     }
 
+    geo->bounce_time = bounce_time;
+    geo->concurrent_usage = true;
+
     if (!_epoll_fd_thread) {
         _epoll_start_thread();
     }
@@ -693,9 +683,10 @@ void _remove_edge_detect(int gpio)
 
         geo->_epoll_change_flag = _gpioEventObject::ModifyEvent::REMOVE;
         --_auth_event_channel_count;
-        if (geo->blocking) {
+        geo->concurrent_usage = false;
+        if (geo->blocking_usage) {
             // Channel is currently in a blocking usage on a concurrent thread
-            // -- At least remove all callbacks now
+            // -- At least remove all callbacks right now
             geo->callbacks.clear();
             return;
         }
