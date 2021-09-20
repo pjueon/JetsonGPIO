@@ -672,7 +672,7 @@ void GPIO::add_event_detect(int channel, Edge edge, void (*callback)(int), unsig
         if (callback != nullptr) {
             if (_add_edge_callback(ch_info.gpio, callback))
                 // Shouldn't happen (--it was just added successfully)
-                throw runtime_error("Couldn't add callback due to unknown   error with just added event");
+                throw runtime_error("Couldn't add callback due to unknown error with just added event");
         }
     } catch (exception& e) {
         cerr << "[Exception] " << e.what() << " (catched from: GPIO::add_event_detect())" << endl;
