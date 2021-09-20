@@ -45,8 +45,8 @@ int main()
     signal(SIGINT, signalHandler);
 
     // Pin Definitions
-    int led_pin = 12; // BOARD pin 12
-    int but_pin = 18; // BOARD pin 18
+    int led_pin = 7;  // BOARD pin 7
+    int but_pin = 11; // BOARD pin 11
 
     // Pin Setup.
     GPIO::setmode(GPIO::BOARD);
