@@ -29,9 +29,9 @@ LIB_FULL_NAME = lib$(LIB_NAME).a
 SRC_DIR = ../src
 INCLUDE_DIR = ../include
 
-LIB_SRCS = JetsonGPIO.cpp PythonFunctions.cpp gpio_pin_data.cpp
-LIB_HEADERS = $(INCLUDE_DIR)/$(LIB_NAME).h $(INCLUDE_DIR)/private/PythonFunctions.h $(INCLUDE_DIR)/private/gpio_pin_data.h
-LIB_OBJS = $(LIB_NAME).o PythonFunctions.o gpio_pin_data.o
+LIB_SRCS = JetsonGPIO.cpp PythonFunctions.cpp gpio_pin_data.cpp gpio_event.cpp
+LIB_HEADERS = $(INCLUDE_DIR)/$(LIB_NAME).h $(INCLUDE_DIR)/private/PythonFunctions.h $(INCLUDE_DIR)/private/gpio_pin_data.h  $(INCLUDE_DIR)/private/gpio_event.h
+LIB_OBJS = $(LIB_NAME).o PythonFunctions.o gpio_pin_data.o gpio_event.o
 
 TEST_SRC = test.cpp
 
@@ -55,6 +55,8 @@ PythonFunctions.o :  $(SRC_DIR)/PythonFunctions.cpp $(INCLUDE_DIR)/private/Pytho
 gpio_pin_data.o : $(SRC_DIR)/gpio_pin_data.cpp $(LIB_HEADERS)
 	g++ $(INCLUDE_FLAG) -c -o $@ $(SRC_DIR)/gpio_pin_data.cpp
 
+gpio_event.o : $(SRC_DIR)/gpio_event.cpp $(LIB_HEADERS)
+	g++ $(INCLUDE_FLAG) -I -lpthread -c -o $@ $(SRC_DIR)/gpio_event.cpp
 
 install : $(LIB_FULL_NAME)
 	install -m 644 $(LIB_FULL_NAME) $(PREFIX)/lib/
@@ -64,8 +66,8 @@ uninstall :
 	rm -rf $(PREFIX)/lib/$(LIB_FULL_NAME)
 	rm -rf $(PREFIX)/include/$(LIB_NAME).h
 
-Test : $(SRC_DIR)/$(TEST_SRC)
-	g++ -o $@ $(SRC_DIR)/$(TEST_SRC) $(LIBS_FLAG)
+test : $(SRC_DIR)/$(TEST_SRC)
+	g++ -o $@ $(SRC_DIR)/$(TEST_SRC) $(LIBS_FLAG) -lpthread
 
 clean :
 	rm -rf  *.o

@@ -45,6 +45,17 @@
         "stdexcept": "cpp",
         "streambuf": "cpp",
         "thread": "cpp",
-        "typeinfo": "cpp"
-    }
+        "typeinfo": "cpp",
+        "functional": "cpp",
+        "condition_variable": "cpp",
+        "cstring": "cpp",
+        "strstream": "cpp",
+        "bitset": "cpp",
+        "complex": "cpp",
+        "iomanip": "cpp",
+        "mutex": "cpp",
+        "cfenv": "cpp",
+        "cinttypes": "cpp"
+    },
+    "C_Cpp.clang_format_style": "file"
 }
