@@ -84,7 +84,7 @@ public:
 
     static GlobalVariableWrapper& get_instance()
     {
-        static GlobalVariableWrapper singleton;
+        static GlobalVariableWrapper singleton{};
         return singleton;
     }
 
@@ -102,7 +102,7 @@ public:
     {
         auto& instance = GlobalVariableWrapper::get_instance();
 
-        stringstream ss;
+        stringstream ss{};
         ss << "[JETSON_INFO]\n";
         ss << "P1_REVISION: " << instance._JETSON_INFO.P1_REVISION << endl;
         ss << "RAM: " << instance._JETSON_INFO.RAM << endl;
@@ -172,7 +172,7 @@ ChannelInfo _channel_to_info(const string& channel, bool need_gpio = false, bool
 vector<ChannelInfo> _channels_to_infos(const vector<string>& channels, bool need_gpio = false, bool need_pwm = false)
 {
     _validate_mode_set();
-    vector<ChannelInfo> ch_infos;
+    vector<ChannelInfo> ch_infos{};
     for (const auto& c : channels) {
         ch_infos.push_back(_channel_to_info_lookup(c, need_gpio, need_pwm));
     }
@@ -196,7 +196,7 @@ Directions _sysfs_channel_configuration(const ChannelInfo& ch_info)
     string gpio_direction;
     { // scope for f
         ifstream f_direction(gpio_dir + "/direction");
-        stringstream buffer;
+        stringstream buffer{};
         buffer << f_direction.rdbuf();
         gpio_direction = buffer.str();
         gpio_direction = strip(gpio_direction);

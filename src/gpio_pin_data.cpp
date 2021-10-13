@@ -81,7 +81,7 @@ public:
 
     static EntirePinData &get_instance()
     {
-        static EntirePinData singleton;
+        static EntirePinData singleton{};
         return singleton;
     }
 };
@@ -330,11 +330,11 @@ PinData get_data()
         const string compatible_path = "/proc/device-tree/compatible";
         const string ids_path = "/proc/device-tree/chosen/plugin-manager/ids";
 
-        set<string> compatibles;
+        set<string> compatibles{};
 
         { // scope for f:
             ifstream f(compatible_path);
-            stringstream buffer;
+            stringstream buffer{};
 
             buffer << f.rdbuf();
             string tmp_str = buffer.str();
@@ -397,7 +397,7 @@ PinData get_data()
             }
         };
 
-        Model model;
+        Model model{};
 
         if (matches(_DATA.compats_tx1))
         {
@@ -453,7 +453,7 @@ PinData get_data()
         vector<string> sysfs_prefixes = { "/sys/devices/", "/sys/devices/platform/" };
 
         // Get the gpiochip offsets
-        set<string> gpio_chip_names;
+        set<string> gpio_chip_names{};
         for (const auto& pin_def : pin_defs)
         {
             if(pin_def.SysfsDir != "None")
