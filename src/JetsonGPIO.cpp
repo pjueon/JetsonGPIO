@@ -92,7 +92,7 @@ public:
     {
         auto& instance = get_instance();
         auto ret = ModelToString(instance._model);
-        if (ret == "None")
+        if (is_None(ret))
             throw runtime_error("get_model error");
 
         return ret;
@@ -153,12 +153,12 @@ void _validate_mode_set()
 
 ChannelInfo _channel_to_info_lookup(const string& channel, bool need_gpio, bool need_pwm)
 {
-    if (global._channel_data.find(channel) == global._channel_data.end())
+    if (!is_in(channel, global._channel_data))
         throw runtime_error("Channel " + channel + " is invalid");
     ChannelInfo ch_info = global._channel_data.at(channel);
-    if (need_gpio && ch_info.gpio_chip_dir == "None")
+    if (need_gpio && is_None(ch_info.gpio_chip_dir))
         throw runtime_error("Channel " + channel + " is not a GPIO");
-    if (need_pwm && ch_info.pwm_chip_dir == "None")
+    if (need_pwm && is_None(ch_info.pwm_chip_dir))
         throw runtime_error("Channel " + channel + " is not a PWM");
     return ch_info;
 }
@@ -183,7 +183,7 @@ vector<ChannelInfo> _channels_to_infos(const vector<string>& channels, bool need
    Any of IN, OUT, HARD_PWM, or UNKNOWN may be returned. */
 Directions _sysfs_channel_configuration(const ChannelInfo& ch_info)
 {
-    if (ch_info.pwm_chip_dir != "None") {
+    if (!is_None(ch_info.pwm_chip_dir)) {
         string pwm_dir = ch_info.pwm_chip_dir + "/pwm" + to_string(ch_info.pwm_id);
         if (os_path_exists(pwm_dir))
             return HARD_PWM;
@@ -217,7 +217,7 @@ Directions _sysfs_channel_configuration(const ChannelInfo& ch_info)
    module in this process. Any of IN, OUT, or UNKNOWN may be returned. */
 Directions _app_channel_configuration(const ChannelInfo& ch_info)
 {
-    if (global._channel_configuration.find(ch_info.channel) == global._channel_configuration.end())
+    if (!is_in(ch_info.channel, global._channel_configuration))
         return UNKNOWN; // Originally returns None in NVIDIA's GPIO Python Library
     return global._channel_configuration[ch_info.channel];
 }
@@ -483,13 +483,13 @@ void GPIO::cleanup(const string& channel)
         }
 
         // clean all channels if no channel param provided
-        if (channel == "None") {
+        if (is_None(channel)) {
             _cleanup_all();
             return;
         }
 
         ChannelInfo ch_info = _channel_to_info(channel);
-        if (global._channel_configuration.find(ch_info.channel) != global._channel_configuration.end()) {
+        if (is_in(ch_info.channel, global._channel_configuration)) {
             _cleanup_one(ch_info);
         }
     } catch (exception& e) {
@@ -813,8 +813,8 @@ GPIO::PWM::PWM(int channel, int frequency_hz)
 
 GPIO::PWM::~PWM()
 {
-    auto itr = global._channel_configuration.find(pImpl->_ch_info.channel);
-    if (itr == global._channel_configuration.end() || itr->second != HARD_PWM) {
+    if (!is_in(pImpl->_ch_info.channel, global._channel_configuration) || 
+        global._channel_configuration.at(pImpl->_ch_info.channel) != HARD_PWM) {
         /* The user probably ran cleanup() on the channel already, so avoid
            attempts to repeat the cleanup operations. */
         return;

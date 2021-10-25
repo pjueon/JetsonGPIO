@@ -118,3 +118,10 @@ string strip(const string& s)
     }
     return s.substr(start_idx, end_idx - start_idx + 1);
 }
+
+
+bool is_None(const std::string& s)
+{
+    return s == "None";
+}
+
