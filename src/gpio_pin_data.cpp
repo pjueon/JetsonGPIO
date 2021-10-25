@@ -347,7 +347,7 @@ PinData get_data()
         {
             for(const auto& v : vals)
             {
-                if(compatibles.find(v) != compatibles.end()) 
+                if(is_in(v, compatibles)) 
                     return true;
             }
             return false;
@@ -383,7 +383,7 @@ PinData get_data()
 
             for (auto&& b : carrier_boards)
             {
-                found = find_pmgr_board(b + "-"s) != "None";
+                found = !is_None(find_pmgr_board(b + "-"s));
                 if (found)
                     break;
             }
@@ -424,7 +424,7 @@ PinData get_data()
             model = JETSON_NANO;
             string module_id = find_pmgr_board("3448");
 
-            if (module_id == "None")
+            if (is_None(module_id))
                 throw runtime_error("Could not determine Jetson Nano module revision");
             string revision = split(module_id, '-').back();
             // Revision is an ordered string, not a decimal integer
@@ -456,7 +456,7 @@ PinData get_data()
         set<string> gpio_chip_names{};
         for (const auto& pin_def : pin_defs)
         {
-            if(pin_def.SysfsDir != "None")
+            if(!is_None(pin_def.SysfsDir))
                 gpio_chip_names.insert(pin_def.SysfsDir);
         }
 
@@ -473,7 +473,7 @@ PinData get_data()
                 }
             }
 
-            if (gpio_chip_dir == "None")
+            if (is_None(gpio_chip_dir))
                 throw runtime_error("Cannot find GPIO chip " + gpio_chip_name);
 
             gpio_chip_dirs[gpio_chip_name] = gpio_chip_dir;
@@ -498,7 +498,7 @@ PinData get_data()
 
         auto global_gpio_id = [&gpio_chip_base](string gpio_chip_name, int chip_relative_id) -> int
         {
-            if (gpio_chip_name == "None" || chip_relative_id == -1)
+            if (is_None(gpio_chip_name) || chip_relative_id == -1)
                 return -1;
             return gpio_chip_base[gpio_chip_name] + chip_relative_id;
         };
@@ -507,7 +507,7 @@ PinData get_data()
         set<string> pwm_chip_names{};
         for(const auto& x : pin_defs)
         {
-            if(x.PWMSysfsDir != "None")
+            if(!is_None(x.PWMSysfsDir))
                 pwm_chip_names.insert(x.PWMSysfsDir);
         }
 
@@ -527,7 +527,7 @@ PinData get_data()
             /* Some PWM controllers aren't enabled in all versions of the DT. In
             this case, just hide the PWM function on this pin, but let all other
             aspects of the library continue to work. */
-            if (pwm_chip_dir == "None")
+            if (is_None(pwm_chip_dir))
                 continue;
 
             auto chip_pwm_dir = pwm_chip_dir + "/pwm";
@@ -551,8 +551,7 @@ PinData get_data()
         {
             auto get_or = [](const auto& dictionary, const string& x, const string& defaultValue) -> string
             {
-                auto itr = dictionary.find(x);
-                return itr == dictionary.end() ? defaultValue : itr->second;
+                return is_in(x, dictionary) ? dictionary.at(x) : defaultValue;
             };
 
 
