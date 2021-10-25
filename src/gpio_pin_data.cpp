@@ -498,7 +498,9 @@ PinData get_data()
 
         auto global_gpio_id = [&gpio_chip_base](string gpio_chip_name, int chip_relative_id) -> int
         {
-            if (is_None(gpio_chip_name) || chip_relative_id == -1)
+            if (is_None(gpio_chip_name) ||
+                !is_in(gpio_chip_name, gpio_chip_base) || 
+                chip_relative_id == -1)
                 return -1;
             return gpio_chip_base[gpio_chip_name] + chip_relative_id;
         };
@@ -561,6 +563,9 @@ PinData get_data()
             {
                 string pinName = x.PinName(key);
                 
+                if(!is_in(x.SysfsDir, gpio_chip_dirs))
+                    throw std::runtime_error("[model_data]"s + x.SysfsDir + " is not in gpio_chip_dirs"s);
+
                 ret.insert(
                     { 
                         pinName,
