@@ -32,7 +32,7 @@ DEALINGS IN THE SOFTWARE.
 
 namespace GPIO
 {
-constexpr auto VERSION = "0.1.3";
+constexpr auto VERSION = "1.0.0";
 constexpr auto _SYSFS_ROOT = "/sys/class/gpio";
 
 extern const std::string JETSON_INFO;
