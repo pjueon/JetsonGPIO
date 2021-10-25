@@ -43,8 +43,8 @@ vector<string> split(const string& s, const char d)
 {
     stringstream buffer(s);
 
-    string tmp;
-    vector<string> outputVector;
+    string tmp{};
+    vector<string> outputVector{};
 
     while (getline(buffer, tmp, d))
         outputVector.push_back(tmp);
@@ -59,9 +59,9 @@ bool os_access(const string& path, int mode)  // os.access
 
 vector<string> os_listdir(const string& path)  // os.listdir
 {  
-    DIR *dir;
-    struct dirent *ent;
-    vector<string> outputVector;
+    DIR *dir{};
+    struct dirent *ent{};
+    vector<string> outputVector{};
 
     if ((dir = opendir(path.c_str())) != nullptr)
     {
@@ -118,3 +118,10 @@ string strip(const string& s)
     }
     return s.substr(start_idx, end_idx - start_idx + 1);
 }
+
+
+bool is_None(const std::string& s)
+{
+    return s == "None";
+}
+

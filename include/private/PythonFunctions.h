@@ -28,19 +28,37 @@ DEALINGS IN THE SOFTWARE.
 
 #include <string>
 #include <vector>
+#include <map>
+#include <set>
 
-bool startswith(const std::string &s, const std::string &prefix);
 
-std::vector<std::string> split(const std::string &s, const char d);
+bool startswith(const std::string& s, const std::string& prefix);
 
-bool os_access(const std::string &path, int mode); // os.access
+std::vector<std::string> split(const std::string& s, const char d);
 
-std::vector<std::string> os_listdir(const std::string &path); // os.listdir
+bool os_access(const std::string& path, int mode); // os.access
+
+std::vector<std::string> os_listdir(const std::string& path); // os.listdir
 
 bool os_path_isdir(const std::string& path); // os.path.isdirs
 
-bool os_path_exists(const std::string &path); // os.path.exists
+bool os_path_exists(const std::string& path); // os.path.exists
 
-std::string strip(const std::string &s);
+std::string strip(const std::string& s);
+
+bool is_None(const std::string& s);
+
+template<class key_t, class element_t>
+bool is_in(const key_t& key, const std::map<key_t, element_t>& dictionary)
+{
+    return dictionary.find(key) != dictionary.end();
+}
+
+
+template<class key_t>
+bool is_in(const key_t& key, const std::set<key_t>& set)
+{
+    return set.find(key) != set.end();
+}
 
 #endif // PYTHON_FUNCTIONS_H
