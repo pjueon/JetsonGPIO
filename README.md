@@ -56,7 +56,7 @@ using namespace GPIO; // optional
 
 To compile your program use:
 ```
-g++ -o your_program_name your_source_code.cpp -lJetsonGPIO
+g++ -o your_program_name your_source_code.cpp -lpthread -lJetsonGPIO
 ```
 
 
