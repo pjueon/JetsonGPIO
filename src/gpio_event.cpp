@@ -68,7 +68,7 @@ std::map<EventResultCode, const char*> event_error_code_to_message = {
      "A channel event was not added to add a callback to. Call add_event_detect() first"},
 };
 
-typedef struct __gpioEventObject {
+struct _gpioEventObject {
     enum ModifyEvent { NONE, ADD, INITIAL_ABSCOND, REMOVE, MODIFY } _epoll_change_flag;
     struct epoll_event _epoll_event;
 
@@ -83,7 +83,7 @@ typedef struct __gpioEventObject {
 
     bool blocking_usage, concurrent_usage;
     std::vector<void (*)(int)> callbacks;
-} _gpioEventObject;
+};
 
 std::recursive_mutex _epmutex;
 std::thread* _epoll_fd_thread = nullptr;
