@@ -30,6 +30,7 @@ DEALINGS IN THE SOFTWARE.
 #include <memory> // for pImpl
 #include <string>
 #include <type_traits>
+#include <functional>
 
 #if (__cplusplus < 201703L) 
 // if C++17 is not supported,
@@ -132,8 +133,58 @@ namespace GPIO
    
    template<class T>
    constexpr bool is_equality_comparable_v = is_equality_comparable<T>::value;
-   //----------------------------------
 
+   // Callback definition
+   class Callback;
+   bool operator==(const Callback& A, const Callback& B);
+   bool operator!=(const Callback& A, const Callback& B);
+
+   class Callback
+   {
+   private:
+      using func_t = std::function<void(int)>;
+
+      template <class T> 
+      static bool comparer_impl(const func_t& A, const func_t& B)
+      {
+         static_assert(is_equality_comparable_v<const T&>,
+                       "Callback function MUST be equality comparable. ex> f0 == f1");
+
+         if(A == nullptr && B == nullptr)
+            return true;
+
+         const T* targetA = A.target<T>();
+         const T* targetB = B.target<T>();
+
+         return targetA != nullptr && targetB != nullptr && *targetA == *targetB;
+      }
+
+
+   public:
+      template <class T, class = std::enable_if_t<!std::is_same<std::decay_t<T>, Callback>::value>>
+      Callback(T&& function)
+      : function(std::forward<T>(function)),
+        comparer([](const func_t& A, const func_t& B) { return comparer_impl<std::decay_t<T>>(A, B); })
+      {
+         static_assert(std::is_constructible<func_t, T&&>::value, "Callback return type: void, argument type: int");
+      }
+
+      Callback(Callback&&) = default;
+      Callback& operator=(Callback&&) = default;
+      Callback(const Callback&) = default;
+      Callback& operator=(const Callback&) = default;
+
+      void operator()(int input);
+
+      friend bool operator==(const Callback& A, const Callback& B);
+      friend bool operator!=(const Callback& A, const Callback& B);
+
+   private:
+      func_t function;
+      std::function<bool(const func_t&, const func_t&)> comparer;
+   };
+
+   //----------------------------------
 
    /* Function used to check if an event occurred on the specified channel.
       Param channel must be an integer.
@@ -194,5 +245,6 @@ namespace GPIO
       std::unique_ptr<Impl> pImpl;
    };
 } // namespace GPIO
+
 
 #endif // JETSON_GPIO_H

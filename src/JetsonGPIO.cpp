@@ -887,7 +887,30 @@ void GPIO::PWM::stop()
     }
 }
 
-//=========================== Originally added ===========================
+
+//=======================================
+// Callback
+void GPIO::Callback::operator()(int input)
+{
+	if (function != nullptr)
+		function(input);
+}
+
+
+bool GPIO::operator==(const GPIO::Callback& A, const GPIO::Callback& B)
+{
+	return A.comparer(A.function, B.function);
+}
+
+
+bool GPIO::operator!=(const GPIO::Callback& A, const GPIO::Callback& B)
+{
+	return !(A == B);
+}
+//=======================================
+
+
+//=======================================
 struct _cleaner {
 private:
     _cleaner() = default;
