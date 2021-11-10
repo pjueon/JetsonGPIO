@@ -61,8 +61,8 @@ bool _edge_event_exists(int gpio);
 int _add_edge_detect(int gpio, int channel_id, Edge edge, uint64_t bounce_time);
 void _remove_edge_detect(int gpio);
 
-int _add_edge_callback(int gpio, void (*callback)(int));
-void _remove_edge_callback(int gpio, void (*callback)(int));
+int _add_edge_callback(int gpio, const Callback& callback);
+void _remove_edge_callback(int gpio, const Callback& callback);
 
 void _event_cleanup(int gpio);
 } // namespace GPIO

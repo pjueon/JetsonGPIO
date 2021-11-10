@@ -82,7 +82,7 @@ struct _gpioEventObject {
     bool event_occurred;
 
     bool blocking_usage, concurrent_usage;
-    std::vector<void (*)(int)> callbacks;
+    std::vector<Callback> callbacks;
 };
 
 std::recursive_mutex _epmutex;
@@ -700,7 +700,7 @@ void _remove_edge_detect(int gpio)
     }
 }
 
-int _add_edge_callback(int gpio, void (*callback)(int))
+int _add_edge_callback(int gpio, const Callback& callback)
 {
     std::lock_guard<std::recursive_mutex> mutex_lock(_epmutex);
 
@@ -715,7 +715,7 @@ int _add_edge_callback(int gpio, void (*callback)(int))
     return 0;
 }
 
-void _remove_edge_callback(int gpio, void (*callback)(int))
+void _remove_edge_callback(int gpio, const Callback& callback)
 {
     std::lock_guard<std::recursive_mutex> mutex_lock(_epmutex);
 

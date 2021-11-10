@@ -194,21 +194,21 @@ namespace GPIO
 
    /* Function used to add a callback function to channel, after it has been
       registered for events using add_event_detect() */
-   void add_event_callback(const std::string& channel, void (*callback)(int channel));
-   void add_event_callback(int channel, void (*callback)(int channel));
+   void add_event_callback(const std::string& channel, const Callback& callback);
+   void add_event_callback(int channel, const Callback& callback);
 
    /* Function used to remove a callback function previously added to detect a channel event */
-   void remove_event_callback(const std::string& channel, void (*callback)(int channel));
-   void remove_event_callback(int channel, void (*callback)(int channel));
+   void remove_event_callback(const std::string& channel, const Callback& callback);
+   void remove_event_callback(int channel, const Callback& callback);
 
    /* Function used to add threaded event detection for a specified gpio channel.
       @gpio must be an integer specifying the channel
       @edge must be a member of GPIO::Edge
       @callback (optional) may be a callback function to be called when the event is detected (or nullptr)
       @bouncetime (optional) a button-bounce signal ignore time (in milliseconds, default=none) */
-   void add_event_detect(const std::string& channel, Edge edge, void (*callback)(int channel) = nullptr,
+   void add_event_detect(const std::string& channel, Edge edge, const Callback& callback = nullptr,
                         unsigned long bounce_time = 0);
-   void add_event_detect(int channel, Edge edge, void (*callback)(int channel) = nullptr, unsigned long bounce_time = 0);
+   void add_event_detect(int channel, Edge edge, const Callback& callback = nullptr, unsigned long bounce_time = 0);
 
    /* Function used to remove event detection for channel */
    void remove_event_detect(const std::string& channel);
