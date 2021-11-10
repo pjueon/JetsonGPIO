@@ -56,7 +56,7 @@ using namespace GPIO; // optional
 
 To compile your program use:
 ```
-g++ -o your_program_name your_source_code.cpp -lJetsonGPIO
+g++ -o your_program_name your_source_code.cpp -lpthread -lJetsonGPIO
 ```
 
 
@@ -226,6 +226,44 @@ void callback_fn(int channel) {
 // add rising edge detection
 GPIO::add_event_detect(channel, GPIO::RISING, callback_fn);
 ```
+
+Any object that satisfies the following requirements can be used as callback functions. 
+
+- Callable (argument type: int, return type: void)
+- Copy-constructible 
+- Equality-comparable with same type (ex> func0 == func1)  
+
+Here is a user-defined type callback example:
+
+```cpp
+// define callback object
+class MyCallback
+{
+public:
+    MyCallback(const std::string& name) : name(name) {}
+    MyCallback(const MyCallback&) = default; // Copy-constructible
+
+    void operator()(int channel) // Callable
+    {
+        std::cout << "A callback named " << name;
+        std::cout << " called from channel " << channel << std::endl;
+    }
+
+    bool operator==(const MyCallback& other) const // Equality-comparable
+    {
+        return name == other.name;
+    }
+
+private:
+    std::string name;
+};
+
+// create callback object
+MyCallback my_callback("foo");
+// add rising edge detection
+GPIO::add_event_detect(channel, GPIO::RISING, my_callback);
+```
+
 
 More than one callback can also be added if required as follows:
 
