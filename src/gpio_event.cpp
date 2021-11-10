@@ -68,7 +68,7 @@ std::map<EventResultCode, const char*> event_error_code_to_message = {
      "A channel event was not added to add a callback to. Call add_event_detect() first"},
 };
 
-typedef struct __gpioEventObject {
+struct _gpioEventObject {
     enum ModifyEvent { NONE, ADD, INITIAL_ABSCOND, REMOVE, MODIFY } _epoll_change_flag;
     struct epoll_event _epoll_event;
 
@@ -82,8 +82,8 @@ typedef struct __gpioEventObject {
     bool event_occurred;
 
     bool blocking_usage, concurrent_usage;
-    std::vector<void (*)(int)> callbacks;
-} _gpioEventObject;
+    std::vector<Callback> callbacks;
+};
 
 std::recursive_mutex _epmutex;
 std::thread* _epoll_fd_thread = nullptr;
@@ -700,7 +700,7 @@ void _remove_edge_detect(int gpio)
     }
 }
 
-int _add_edge_callback(int gpio, void (*callback)(int))
+int _add_edge_callback(int gpio, const Callback& callback)
 {
     std::lock_guard<std::recursive_mutex> mutex_lock(_epmutex);
 
@@ -715,7 +715,7 @@ int _add_edge_callback(int gpio, void (*callback)(int))
     return 0;
 }
 
-void _remove_edge_callback(int gpio, void (*callback)(int))
+void _remove_edge_callback(int gpio, const Callback& callback)
 {
     std::lock_guard<std::recursive_mutex> mutex_lock(_epmutex);
 

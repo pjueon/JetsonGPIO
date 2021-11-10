@@ -584,7 +584,7 @@ bool GPIO::event_detected(const std::string& channel)
 
 bool GPIO::event_detected(int channel) { return event_detected(std::to_string(channel)); }
 
-void GPIO::add_event_callback(const std::string& channel, void (*callback)(int))
+void GPIO::add_event_callback(const std::string& channel, const Callback& callback)
 {
     try {
         // Argument Check
@@ -621,29 +621,29 @@ void GPIO::add_event_callback(const std::string& channel, void (*callback)(int))
     }
 }
 
-void GPIO::add_event_callback(int channel, void (*callback)(int))
+void GPIO::add_event_callback(int channel, const Callback& callback)
 {
     add_event_callback(std::to_string(channel), callback);
 }
 
-void GPIO::remove_event_callback(const std::string& channel, void (*callback)(int channel))
+void GPIO::remove_event_callback(const std::string& channel, const Callback& callback)
 {
     ChannelInfo ch_info = _channel_to_info(channel, true);
 
     _remove_edge_callback(ch_info.gpio, callback);
 }
 
-void GPIO::remove_event_callback(int channel, void (*callback)(int channel))
+void GPIO::remove_event_callback(int channel, const Callback& callback)
 {
     remove_event_callback(std::to_string(channel), callback);
 }
 
-void GPIO::add_event_detect(const std::string& channel, Edge edge, void (*callback)(int), unsigned long bounce_time)
+void GPIO::add_event_detect(const std::string& channel, Edge edge, const Callback& callback, unsigned long bounce_time)
 {
     add_event_detect(std::atoi(channel.data()), edge, callback, bounce_time);
 }
 
-void GPIO::add_event_detect(int channel, Edge edge, void (*callback)(int), unsigned long bounce_time)
+void GPIO::add_event_detect(int channel, Edge edge, const Callback& callback, unsigned long bounce_time)
 {
     try {
         ChannelInfo ch_info = _channel_to_info(std::to_string(channel), true);
@@ -887,7 +887,30 @@ void GPIO::PWM::stop()
     }
 }
 
-//=========================== Originally added ===========================
+
+//=======================================
+// Callback
+void GPIO::Callback::operator()(int input) const
+{
+	if (function != nullptr)
+		function(input);
+}
+
+
+bool GPIO::operator==(const GPIO::Callback& A, const GPIO::Callback& B)
+{
+	return A.comparer(A.function, B.function);
+}
+
+
+bool GPIO::operator!=(const GPIO::Callback& A, const GPIO::Callback& B)
+{
+	return !(A == B);
+}
+//=======================================
+
+
+//=======================================
 struct _cleaner {
 private:
     _cleaner() = default;
