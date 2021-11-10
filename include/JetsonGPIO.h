@@ -174,7 +174,7 @@ namespace GPIO
       Callback(const Callback&) = default;
       Callback& operator=(const Callback&) = default;
 
-      void operator()(int input);
+      void operator()(int input) const;
 
       friend bool operator==(const Callback& A, const Callback& B);
       friend bool operator!=(const Callback& A, const Callback& B);

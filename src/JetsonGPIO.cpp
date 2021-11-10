@@ -890,7 +890,7 @@ void GPIO::PWM::stop()
 
 //=======================================
 // Callback
-void GPIO::Callback::operator()(int input)
+void GPIO::Callback::operator()(int input) const
 {
 	if (function != nullptr)
 		function(input);
