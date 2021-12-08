@@ -100,7 +100,6 @@ std::map<int, int> _fd_to_gpio_map;
 
 int _write_sysfs_edge(int gpio, Edge edge, bool allow_none = true)
 {
-    int result;
     auto buf = format("%s/gpio%i/edge", _SYSFS_ROOT, gpio);
 
     int edge_fd = open(buf.c_str(), O_WRONLY);
@@ -109,31 +108,33 @@ int _write_sysfs_edge(int gpio, Edge edge, bool allow_none = true)
         return (int)GPIO::EventResultCode::SysFD_EdgeOpen;
     }
 
-    switch (edge) {
-    case Edge::RISING:
-        result = write(edge_fd, "rising", 7);
-        break;
-    case Edge::FALLING:
-        result = write(edge_fd, "falling", 7);
-        break;
-    case Edge::BOTH:
-        result = write(edge_fd, "both", 7);
-        break;
-    case Edge::NONE: {
-        if (!allow_none) {
-            close(edge_fd);
-            return (int)GPIO::EventResultCode::UnallowedEdgeNone;
+
+    auto get_result = [=]() -> int
+    {
+        switch (edge) {
+        case Edge::RISING:
+            return write(edge_fd, "rising", 7);
+        case Edge::FALLING:
+            return write(edge_fd, "falling", 7);
+        case Edge::BOTH:
+            return write(edge_fd, "both", 7);
+        case Edge::NONE: {
+            if (!allow_none) {
+                close(edge_fd);
+                return (int)GPIO::EventResultCode::UnallowedEdgeNone;
+            }
+            return write(edge_fd, "none", 7);
         }
-        result = write(edge_fd, "none", 7);
-        break;
-    }
-    case Edge::UNKNOWN:
-    
-    default:
-        std::cerr << format("Bad argument, edge=%i\n", (int)edge);
-        close(edge_fd);
-        return (int)GPIO::EventResultCode::IllegalEdgeArgument;
-    }
+        case Edge::UNKNOWN:
+
+        default:
+            std::cerr << format("Bad argument, edge=%i\n", (int)edge);
+            close(edge_fd);
+            return (int)GPIO::EventResultCode::IllegalEdgeArgument;
+        }
+    };
+
+    int result = get_result();
 
     if (result == -1) {
         std::perror("sysfs/edge write");
@@ -196,11 +197,10 @@ void _epoll_thread_loop()
         return;
     }
 
-    int e, event_count, result;
-    epoll_event events[MAX_EPOLL_EVENTS];
+    epoll_event events[MAX_EPOLL_EVENTS]{};
     while (_epoll_run_loop) {
         // Wait a small time for events
-        event_count = epoll_wait(epoll_fd, events, MAX_EPOLL_EVENTS, 1);
+        int event_count = epoll_wait(epoll_fd, events, MAX_EPOLL_EVENTS, 1);
         std::lock_guard<std::recursive_mutex> mutex_lock(_epmutex);
 
         // Handle Events
@@ -219,7 +219,7 @@ void _epoll_thread_loop()
                             .count();
 
             // Iterate through each collected event
-            for (e = 0; e < event_count; e++) {
+            for (int e = 0; e < event_count; e++) {
                 // Obtain the event object for the event
                 auto gpio_it = _fd_to_gpio_map.find(events[e].data.fd);
                 if (gpio_it == _fd_to_gpio_map.end()) {
@@ -351,7 +351,7 @@ void _epoll_end_thread()
 
 int _blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce_time, uint64_t timeout)
 {
-    struct timespec timeout_time, current_time;
+    timespec timeout_time{};
     if (timeout) {
         clock_gettime(CLOCK_REALTIME, &timeout_time);
 
@@ -362,8 +362,8 @@ int _blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce
         timeout_time.tv_sec += timeout / 1000 + overlap;
     }
 
-    int result;
-    std::shared_ptr<_gpioEventObject> geo;
+    int result{};
+    std::shared_ptr<_gpioEventObject> geo{};
     uint64_t gpio_last_event = 0;
     {
         // Enter Mutex
@@ -471,12 +471,12 @@ int _blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce
             goto cleanup;
         }
 
-        int e, event_count;
-        epoll_event events[1];
+        epoll_event events[1]{};
         bool initial_edge = true;
 
         // Remove Initial Event
-        while (1) {
+        timespec current_time{};
+        while (true) {
             if (timeout) {
                 clock_gettime(CLOCK_REALTIME, &current_time);
                 if (current_time.tv_sec > timeout_time.tv_sec ||
@@ -487,7 +487,7 @@ int _blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce
             }
 
             // Wait a small time for events
-            event_count = epoll_wait(epoll_fd, events, 1, 1);
+            int event_count = epoll_wait(epoll_fd, events, 1, 1);
 
             // First trigger is with current state so ignore
             if (initial_edge) {
@@ -589,7 +589,7 @@ bool _edge_event_exists(int gpio)
 
 int _add_edge_detect(int gpio, int channel_id, Edge edge, uint64_t bounce_time)
 {
-    int result;
+    int result{};
 
     // Enter Mutex
     std::lock_guard<std::recursive_mutex> mutex_lock(_epmutex);
