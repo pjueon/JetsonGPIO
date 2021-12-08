@@ -24,9 +24,9 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include "private/gpio_event.h"
+#include "private/PythonFunctions.h"
 
 #include <fcntl.h>
-#include <stdio.h>
 #include <sys/epoll.h>
 #include <time.h>
 #include <unistd.h>
@@ -38,6 +38,9 @@ DEALINGS IN THE SOFTWARE.
 #include <mutex>
 #include <thread>
 #include <vector>
+#include <iostream>
+#include <cstdio>
+#include <cerrno>
 
 #include "JetsonGPIO.h"
 
@@ -98,13 +101,14 @@ std::map<int, int> _fd_to_gpio_map;
 int _write_sysfs_edge(int gpio, Edge edge, bool allow_none = true)
 {
     int result;
-    char buf[256];
-    snprintf(buf, 256, "%s/gpio%i/edge", _SYSFS_ROOT, gpio);
-    int edge_fd = open(buf, O_WRONLY);
+    auto buf = format("%s/gpio%i/edge", _SYSFS_ROOT, gpio);
+
+    int edge_fd = open(buf.c_str(), O_WRONLY);
     if (edge_fd == -1) {
         // I/O Error
         return (int)GPIO::EventResultCode::SysFD_EdgeOpen;
     }
+
     switch (edge) {
     case Edge::RISING:
         result = write(edge_fd, "rising", 7);
@@ -124,14 +128,15 @@ int _write_sysfs_edge(int gpio, Edge edge, bool allow_none = true)
         break;
     }
     case Edge::UNKNOWN:
+    
     default:
-        fprintf(stderr, "Bad argument, edge=%i\n", (int)edge);
+        std::cerr << format("Bad argument, edge=%i\n", (int)edge);
         close(edge_fd);
         return (int)GPIO::EventResultCode::IllegalEdgeArgument;
     }
 
     if (result == -1) {
-        perror("sysfs/edge write");
+        std::perror("sysfs/edge write");
         return (int)GPIO::EventResultCode::SysFD_EdgeWrite;
     } else {
         result = 0;
@@ -143,9 +148,8 @@ int _write_sysfs_edge(int gpio, Edge edge, bool allow_none = true)
 
 int _open_sysfd_value(int gpio, int& fd)
 {
-    char buf[256];
-    snprintf(buf, 256, "%s/gpio%i/value", _SYSFS_ROOT, gpio);
-    fd = open(buf, O_RDONLY);
+    auto buf = format("%s/gpio%i/value", _SYSFS_ROOT, gpio);
+    fd = open(buf.c_str(), O_RDONLY);
 
     if (fd == -1) {
         return (int)GPIO::EventResultCode::SysFD_ValueOpen;
@@ -154,7 +158,7 @@ int _open_sysfd_value(int gpio, int& fd)
     // Set the file descriptor to a non-blocking usage
     int result = fcntl(fd, F_SETFL, fcntl(fd, F_GETFL) | O_NONBLOCK);
     if (result == -1) {
-        perror("fcntl");
+        std::perror("fcntl");
         close(fd);
         return (int)GPIO::EventResultCode::SysFD_ValueNonBlocking;
     }
@@ -177,7 +181,7 @@ _epoll_thread_remove_event(int epoll_fd, std::map<int, std::shared_ptr<_gpioEven
 
     // Close the fd
     if (close(geo->fd) == -1) {
-        fprintf(stderr, "[WARNING] Failed to close Epoll_Thread file descriptor\n");
+        std::cerr << "[WARNING] Failed to close Epoll_Thread file descriptor\n";
     }
 
     // Erase from the map collection
@@ -188,7 +192,7 @@ void _epoll_thread_loop()
 {
     int epoll_fd = epoll_create1(0);
     if (epoll_fd == -1) {
-        perror("[Fatal Error] Failed to create epoll file descriptor for concurrent Epoll Thread\n");
+        std::perror("[Fatal Error] Failed to create epoll file descriptor for concurrent Epoll Thread\n");
         return;
     }
 
@@ -203,7 +207,7 @@ void _epoll_thread_loop()
         if (event_count) {
             if (event_count < 0) {
                 if (errno != EINTR) {
-                    perror("[Fatal Error] epoll_wait");
+                    std::perror("[Fatal Error] epoll_wait");
                     goto cleanup;
                 }
                 break;
@@ -280,7 +284,7 @@ void _epoll_thread_loop()
 
                 if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, geo->fd, &geo->_epoll_event) == -1) {
                     // Error - Leave loop immediately
-                    perror("epoll_ctl()");
+                    std::perror("epoll_ctl()");
                     goto cleanup;
                 }
 
@@ -318,7 +322,7 @@ cleanup:
 
     // epoll
     if (close(epoll_fd) == -1) {
-        perror("[WARNING] Failed to close epoll file descriptor during closure of concurrent Epoll_Thread\n");
+        std::perror("[WARNING] Failed to close epoll file descriptor during closure of concurrent Epoll_Thread\n");
     }
 }
 
@@ -453,7 +457,7 @@ int _blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce
         epoll_fd = epoll_create1(0);
         if (epoll_fd == -1) {
             error = (int)GPIO::EventResultCode::EpollFD_CreateError;
-            perror("epoll_create1(0)");
+            std::perror("epoll_create1(0)");
             goto cleanup;
         }
 
@@ -462,7 +466,7 @@ int _blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce
 
         if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, geo->fd, &geo->_epoll_event) == -1) {
             close(epoll_fd);
-            perror("epoll_ctl():");
+            std::perror("epoll_ctl():");
             error = (int)GPIO::EventResultCode::EpollCTL_Add;
             goto cleanup;
         }
@@ -495,7 +499,7 @@ int _blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce
             if (event_count) {
                 if (event_count == -1) {
                     if (errno != EINTR) {
-                        perror("epoll_wait");
+                        std::perror("epoll_wait");
                         error = (int)EventResultCode::EpollWait;
                     }
                     goto cleanup;
