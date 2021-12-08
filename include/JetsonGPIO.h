@@ -32,6 +32,21 @@ DEALINGS IN THE SOFTWARE.
 #include <type_traits>
 #include <functional>
 
+#if (__cplusplus < 201402L) 
+// if C++14 is not supported,
+
+// define std::decay_t, std::enable_if_t
+namespace std 
+{
+	template< class T >
+	using decay_t = typename decay<T>::type;
+
+	template< bool B, class T = void >
+	using enable_if_t = typename enable_if<B,T>::type;
+}
+
+#endif
+
 #if (__cplusplus < 201703L) 
 // if C++17 is not supported,
 // define std::void_t (std::void_t is C++17 feature) 
