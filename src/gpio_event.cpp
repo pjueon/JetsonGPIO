@@ -199,7 +199,7 @@ void _epoll_thread_loop()
         return;
     }
 
-    auto cleanup = [&epoll_fd]()
+    auto cleanup_and_return = [&epoll_fd]()
     {
         // Cleanup - thread is ending
         // -- GPIO Event Objects
@@ -227,7 +227,7 @@ void _epoll_thread_loop()
             if (event_count < 0) {
                 if (errno != EINTR) {
                     std::perror("[Fatal Error] epoll_wait");
-                    return cleanup();
+                    return cleanup_and_return();
                 }
                 break;
             }
@@ -305,7 +305,7 @@ void _epoll_thread_loop()
                     // Error - Leave loop immediately
                     std::perror("epoll_ctl()");
                     
-                    return cleanup();
+                    return cleanup_and_return();
                 }
 
                 // Avoid the initial event (that would have occurred before this unit has been added)
@@ -330,7 +330,7 @@ void _epoll_thread_loop()
         }
     }
 
-    return cleanup();
+    return cleanup_and_return();
 }
 
 void _epoll_start_thread()
