@@ -197,6 +197,23 @@ void _epoll_thread_loop()
         return;
     }
 
+    auto cleanup = [&epoll_fd]()
+    {
+        // Cleanup - thread is ending
+        // -- GPIO Event Objects
+        {
+            std::lock_guard<std::recursive_mutex> mutex_lock(_epmutex);
+            for (auto geo_it = _gpio_events.begin(); geo_it != _gpio_events.end();) {
+                geo_it = _epoll_thread_remove_event(epoll_fd, geo_it);
+            }
+        }
+
+        // epoll
+        if (close(epoll_fd) == -1) {
+            std::perror("[WARNING] Failed to close epoll file descriptor during closure of concurrent Epoll_Thread\n");
+        }
+    };
+
     epoll_event events[MAX_EPOLL_EVENTS]{};
     while (_epoll_run_loop) {
         // Wait a small time for events
@@ -208,7 +225,7 @@ void _epoll_thread_loop()
             if (event_count < 0) {
                 if (errno != EINTR) {
                     std::perror("[Fatal Error] epoll_wait");
-                    goto cleanup;
+                    return cleanup();
                 }
                 break;
             }
@@ -285,7 +302,8 @@ void _epoll_thread_loop()
                 if (epoll_ctl(epoll_fd, EPOLL_CTL_ADD, geo->fd, &geo->_epoll_event) == -1) {
                     // Error - Leave loop immediately
                     std::perror("epoll_ctl()");
-                    goto cleanup;
+                    
+                    return cleanup();
                 }
 
                 // Avoid the initial event (that would have occurred before this unit has been added)
@@ -310,20 +328,7 @@ void _epoll_thread_loop()
         }
     }
 
-cleanup:
-    // Cleanup - thread is ending
-    // -- GPIO Event Objects
-    {
-        std::lock_guard<std::recursive_mutex> mutex_lock(_epmutex);
-        for (auto geo_it = _gpio_events.begin(); geo_it != _gpio_events.end();) {
-            geo_it = _epoll_thread_remove_event(epoll_fd, geo_it);
-        }
-    }
-
-    // epoll
-    if (close(epoll_fd) == -1) {
-        std::perror("[WARNING] Failed to close epoll file descriptor during closure of concurrent Epoll_Thread\n");
-    }
+    return cleanup();
 }
 
 void _epoll_start_thread()
@@ -452,13 +457,54 @@ int _blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce
 
     // Execute the epoll awaiting the event
     int epoll_fd = 0, error = 0;
+
+    auto cleanup_and_return_result = [&]() -> int
+    {
+        if (epoll_fd >= 0)
+            close(epoll_fd);
+
+        // GPIO Event Object Tidy-up
+        {
+            // Enter Mutex
+            std::unique_lock<std::recursive_mutex> mutex_lock(_epmutex);
+            geo->blocking_usage = false;
+            if (!geo->concurrent_usage) {
+                // Remove it
+                if (geo->_epoll_change_flag == _gpioEventObject::ModifyEvent::ADD) {
+                    // It hasn't been added to the concurrent epoll-thread yet (if there even is one)
+                    auto ftg_it = _fd_to_gpio_map.find(geo->fd);
+                    if (ftg_it != _fd_to_gpio_map.end())
+                        _fd_to_gpio_map.erase(ftg_it);
+                    auto geo_it = _gpio_events.find(gpio);
+                    if (geo_it != _gpio_events.end())
+                        _gpio_events.erase(geo_it);
+
+                    --_auth_event_channel_count;
+                    if (_auth_event_channel_count == 0 && _epoll_fd_thread) {
+                        // Signal shutdown of thread
+                        // -- Doesn't need to run if there are no events
+                        mutex_lock.unlock();
+                        _epoll_end_thread();
+                    }
+                } else {
+                    // Set for removal from the concurrent epoll-thread
+                    _remove_edge_detect(gpio);
+                }
+            }
+        }
+
+        if (error)
+            return error;
+        return result;
+    };
+
     result = (int)EventResultCode::None; // 0
     {
         epoll_fd = epoll_create1(0);
         if (epoll_fd == -1) {
             error = (int)GPIO::EventResultCode::EpollFD_CreateError;
             std::perror("epoll_create1(0)");
-            goto cleanup;
+            return cleanup_and_return_result();
         }
 
         geo->_epoll_event.events = EPOLLIN | EPOLLPRI | EPOLLET;
@@ -468,7 +514,7 @@ int _blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce
             close(epoll_fd);
             std::perror("epoll_ctl():");
             error = (int)GPIO::EventResultCode::EpollCTL_Add;
-            goto cleanup;
+            return cleanup_and_return_result();
         }
 
         epoll_event events[1]{};
@@ -502,7 +548,7 @@ int _blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce
                         std::perror("epoll_wait");
                         error = (int)EventResultCode::EpollWait;
                     }
-                    goto cleanup;
+                    return cleanup_and_return_result();
                 }
 
                 if (events[0].data.fd == geo->fd) {
@@ -519,43 +565,7 @@ int _blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce
         }
     }
 
-cleanup:
-    if (epoll_fd >= 0)
-        close(epoll_fd);
-
-    // GPIO Event Object Tidy-up
-    {
-        // Enter Mutex
-        std::unique_lock<std::recursive_mutex> mutex_lock(_epmutex);
-        geo->blocking_usage = false;
-        if (!geo->concurrent_usage) {
-            // Remove it
-            if (geo->_epoll_change_flag == _gpioEventObject::ModifyEvent::ADD) {
-                // It hasn't been added to the concurrent epoll-thread yet (if there even is one)
-                auto ftg_it = _fd_to_gpio_map.find(geo->fd);
-                if (ftg_it != _fd_to_gpio_map.end())
-                    _fd_to_gpio_map.erase(ftg_it);
-                auto geo_it = _gpio_events.find(gpio);
-                if (geo_it != _gpio_events.end())
-                    _gpio_events.erase(geo_it);
-
-                --_auth_event_channel_count;
-                if (_auth_event_channel_count == 0 && _epoll_fd_thread) {
-                    // Signal shutdown of thread
-                    // -- Doesn't need to run if there are no events
-                    mutex_lock.unlock();
-                    _epoll_end_thread();
-                }
-            } else {
-                // Set for removal from the concurrent epoll-thread
-                _remove_edge_detect(gpio);
-            }
-        }
-    }
-
-    if (error)
-        return error;
-    return result;
+    return cleanup_and_return_result();
 }
 
 bool _edge_event_detected(int gpio)
