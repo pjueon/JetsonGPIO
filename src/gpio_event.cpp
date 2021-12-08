@@ -253,7 +253,7 @@ void _epoll_thread_loop()
 
                 // Fire event
                 geo->event_occurred = true;
-                for (auto cb : geo->callbacks) {
+                for (auto& cb : geo->callbacks) {
                     cb(geo->channel_id);
                 }
             }
