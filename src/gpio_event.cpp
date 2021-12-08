@@ -89,7 +89,7 @@ struct _gpioEventObject {
 };
 
 std::recursive_mutex _epmutex;
-std::thread* _epoll_fd_thread = nullptr;
+std::unique_ptr<std::thread> _epoll_fd_thread = nullptr;
 std::atomic_bool _epoll_run_loop;
 
 std::map<int, std::shared_ptr<_gpioEventObject>> _gpio_events;
@@ -334,7 +334,7 @@ void _epoll_thread_loop()
 void _epoll_start_thread()
 {
     _epoll_run_loop = true;
-    _epoll_fd_thread = new std::thread(_epoll_thread_loop);
+    _epoll_fd_thread = std::make_unique<std::thread>(_epoll_thread_loop);
 }
 
 void _epoll_end_thread()
@@ -347,7 +347,6 @@ void _epoll_end_thread()
     {
         // Enter Mutex and clear thread
         std::lock_guard<std::recursive_mutex> mutex_lock(_epmutex);
-        delete _epoll_fd_thread;
         _epoll_fd_thread = nullptr;
     }
 }
