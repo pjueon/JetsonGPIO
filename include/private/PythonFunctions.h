@@ -30,7 +30,8 @@ DEALINGS IN THE SOFTWARE.
 #include <vector>
 #include <map>
 #include <set>
-
+#include <stdexcept>
+#include <cstdio>
 
 bool startswith(const std::string& s, const std::string& prefix);
 
@@ -60,5 +61,31 @@ bool is_in(const key_t& key, const std::set<key_t>& set)
 {
     return set.find(key) != set.end();
 }
+
+
+
+// modified from https://stackoverflow.com/questions/2342162/stdstring-formatting-like-sprintf
+template<typename ... Args>
+std::string format(const std::string& fmt, Args... args)
+{
+    if(fmt == "" || sizeof...(Args) == 0)
+        return fmt;
+
+    int size_s = std::snprintf(nullptr, 0, fmt.c_str(), args...);
+    if(size_s <= 0)
+        throw std::runtime_error("Error during formatting."); 
+
+    auto size = static_cast<size_t>(size_s);
+    
+    // In C++11 and later, std::string is guaranteed to be null terminated. 
+    // (https://stackoverflow.com/questions/11752705/does-stdstring-have-a-null-terminator)
+    // So do not need an extra space for the last '\0'
+    std::string ret(size, '\0');
+
+    std::snprintf(&ret[0], size, fmt.c_str(), args...);
+    return ret; 
+}
+
+
 
 #endif // PYTHON_FUNCTIONS_H
