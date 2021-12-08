@@ -105,6 +105,7 @@ int _write_sysfs_edge(int gpio, Edge edge, bool allow_none = true)
     int edge_fd = open(buf.c_str(), O_WRONLY);
     if (edge_fd == -1) {
         // I/O Error
+        std::perror("sysfs/edge open");
         return (int)GPIO::EventResultCode::SysFD_EdgeOpen;
     }
 
@@ -153,6 +154,7 @@ int _open_sysfd_value(int gpio, int& fd)
     fd = open(buf.c_str(), O_RDONLY);
 
     if (fd == -1) {
+        std::perror("sysfs/value open");
         return (int)GPIO::EventResultCode::SysFD_ValueOpen;
     }
 
