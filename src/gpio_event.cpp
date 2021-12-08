@@ -154,6 +154,7 @@ int _open_sysfd_value(int gpio, int& fd)
     fd = open(buf.c_str(), O_RDONLY);
 
     if (fd == -1) {
+        std::perror("sysfs/value open");
         return (int)GPIO::EventResultCode::SysFD_ValueOpen;
     }
 
