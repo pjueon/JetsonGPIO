@@ -46,6 +46,7 @@ DEALINGS IN THE SOFTWARE.
 #include "private/PythonFunctions.h"
 #include "private/gpio_event.h"
 #include "private/gpio_pin_data.h"
+#include "private/etc.h"
 
 using namespace GPIO;
 using namespace std;
@@ -399,6 +400,13 @@ void _cleanup_all()
     global._gpio_mode = NumberingModes::None;
 }
 
+
+void _cleanup_and_rethrow(const std::exception& e, const std::string& from)
+{
+    _cleanup_all();
+    _rethrow_exception(e, from);
+}
+
 //==================================================================================
 // APIs
 
@@ -428,8 +436,7 @@ void GPIO::setmode(NumberingModes mode)
         global._channel_data = global._channel_data_by_mode.at(mode);
         global._gpio_mode = mode;
     } catch (exception& e) {
-        cerr << "[Exception] " << e.what() << " (catched from: setmode())" << endl;
-        terminate();
+        _cleanup_and_rethrow(e, "GPIO::setmode()");
     }
 }
 
@@ -463,8 +470,7 @@ void GPIO::setup(const string& channel, Directions direction, int initial)
         } else
             throw runtime_error("GPIO direction must be GPIO::IN or GPIO::OUT");
     } catch (exception& e) {
-        cerr << "[Exception] " << e.what() << " (catched from: setup())" << endl;
-        terminate();
+        _cleanup_and_rethrow(e, "GPIO::setup()");
     }
 }
 
@@ -493,8 +499,7 @@ void GPIO::cleanup(const string& channel)
             _cleanup_one(ch_info);
         }
     } catch (exception& e) {
-        cerr << "[Exception] " << e.what() << " (catched from: cleanup())" << endl;
-        terminate();
+        _rethrow_exception(e, "GPIO::cleanup()");
     }
 }
 
@@ -523,8 +528,7 @@ int GPIO::input(const string& channel)
             return value_read;
         } // scope ends
     } catch (exception& e) {
-        cerr << "[Exception] " << e.what() << " (catched from: input())" << endl;
-        terminate();
+        _cleanup_and_rethrow(e, "GPIO::input()");
     }
 }
 
@@ -541,8 +545,7 @@ void GPIO::output(const string& channel, int value)
             throw runtime_error("The GPIO channel has not been set up as an OUTPUT");
         _output_one(ch_info.gpio, value);
     } catch (exception& e) {
-        cerr << "[Exception] " << e.what() << " (catched from: output())" << endl;
-        terminate();
+        _cleanup_and_rethrow(e, "GPIO::output()");
     }
 }
 
@@ -556,8 +559,7 @@ Directions GPIO::gpio_function(const string& channel)
         ChannelInfo ch_info = _channel_to_info(channel);
         return _sysfs_channel_configuration(ch_info);
     } catch (exception& e) {
-        cerr << "[Exception] " << e.what() << " (catched from: gpio_function())" << endl;
-        terminate();
+        _cleanup_and_rethrow(e, "GPIO::gpio_function()");
     }
 }
 
@@ -576,9 +578,7 @@ bool GPIO::event_detected(const std::string& channel)
 
         return _edge_event_detected(ch_info.gpio);
     } catch (exception& e) {
-        cerr << "[Exception] " << e.what() << " (catched from: GPIO::event_detected())" << endl;
-        _cleanup_all();
-        terminate();
+        _cleanup_and_rethrow(e, "GPIO::event_detected()");
     }
 }
 
@@ -615,9 +615,7 @@ void GPIO::add_event_callback(const std::string& channel, const Callback& callba
         }
         }
     } catch (exception& e) {
-        cerr << "[Exception] " << e.what() << " (catched from: GPIO::add_event_callback())" << endl;
-        _cleanup_all();
-        terminate();
+        _cleanup_and_rethrow(e, "GPIO::add_event_callback()");
     }
 }
 
@@ -675,9 +673,7 @@ void GPIO::add_event_detect(int channel, Edge edge, const Callback& callback, un
                 throw runtime_error("Couldn't add callback due to unknown error with just added event");
         }
     } catch (exception& e) {
-        cerr << "[Exception] " << e.what() << " (catched from: GPIO::add_event_detect())" << endl;
-        _cleanup_all();
-        terminate();
+        _cleanup_and_rethrow(e, "GPIO::add_event_detect()");
     }
 }
 
@@ -726,9 +722,7 @@ int GPIO::wait_for_edge(int channel, Edge edge, uint64_t bounce_time, uint64_t t
         }
         }
     } catch (exception& e) {
-        cerr << "[Exception] " << e.what() << " (catched from: GPIO::wait_for_edge())" << endl;
-        _cleanup_all();
-        terminate();
+        _cleanup_and_rethrow(e, "GPIO::wait_for_edge()");
     }
 }
 
@@ -805,8 +799,8 @@ GPIO::PWM::PWM(int channel, int frequency_hz)
         pImpl->_reconfigure(frequency_hz, 0.0);
         global._channel_configuration[to_string(channel)] = HARD_PWM;
     } catch (exception& e) {
-        cerr << "[Exception] " << e.what() << " (catched from: PWM::PWM())" << endl;
         _cleanup_all();
+        cerr << _error_message(e, "GPIO::PWM::PWM()");
         terminate();
     }
 }
@@ -819,12 +813,18 @@ GPIO::PWM::~PWM()
            attempts to repeat the cleanup operations. */
         return;
     }
+
     try {
         stop();
         _unexport_pwm(pImpl->_ch_info);
         global._channel_configuration.erase(pImpl->_ch_info.channel);
-    } catch (...) {
-        cerr << "[Exception] ~PWM Exception! shut down the program." << endl;
+    } catch(exception& e) {
+        _cleanup_all();
+        cerr << _error_message(e, "GPIO::PWM::~PWM()");
+        terminate();
+    } 
+    catch (...) {
+        cerr << "[Exception] unknown error from GPIO::PWM::~PWM()! shut down the program." << endl;
         _cleanup_all();
         terminate();
     }
@@ -848,9 +848,7 @@ void GPIO::PWM::start(double duty_cycle_percent)
     try {
         pImpl->_reconfigure(pImpl->_frequency_hz, duty_cycle_percent, true);
     } catch (exception& e) {
-        cerr << "[Exception] " << e.what() << " (catched from: PWM::start())" << endl;
-        _cleanup_all();
-        terminate();
+        _cleanup_and_rethrow(e, "GPIO::PWM::start()");
     }
 }
 
@@ -859,8 +857,7 @@ void GPIO::PWM::ChangeFrequency(int frequency_hz)
     try {
         pImpl->_reconfigure(frequency_hz, pImpl->_duty_cycle_percent);
     } catch (exception& e) {
-        cerr << "[Exception] " << e.what() << " (catched from: PWM::ChangeFrequency())" << endl;
-        terminate();
+        _cleanup_and_rethrow(e, "GPIO::PWM::ChangeFrequency()");
     }
 }
 
@@ -869,8 +866,7 @@ void GPIO::PWM::ChangeDutyCycle(double duty_cycle_percent)
     try {
         pImpl->_reconfigure(pImpl->_frequency_hz, duty_cycle_percent);
     } catch (exception& e) {
-        cerr << "[Exception] " << e.what() << " (catched from: PWM::ChangeDutyCycle())" << endl;
-        terminate();
+        _cleanup_and_rethrow(e, "GPIO::PWM::ChangeDutyCycle()");
     }
 }
 
@@ -882,8 +878,7 @@ void GPIO::PWM::stop()
 
         _disable_pwm(pImpl->_ch_info);
     } catch (exception& e) {
-        cerr << "[Exception] " << e.what() << " (catched from: PWM::stop())" << endl;
-        throw runtime_error("Exeception from GPIO::PWM::stop");
+        _cleanup_and_rethrow(e, "GPIO::PWM::stop()");
     }
 }
 
