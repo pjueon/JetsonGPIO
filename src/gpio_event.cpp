@@ -121,7 +121,6 @@ int _write_sysfs_edge(int gpio, Edge edge, bool allow_none = true)
             return write(edge_fd, "both", 7);
         case Edge::NONE: {
             if (!allow_none) {
-                close(edge_fd);
                 return (int)GPIO::EventResultCode::UnallowedEdgeNone;
             }
             return write(edge_fd, "none", 7);
@@ -130,18 +129,18 @@ int _write_sysfs_edge(int gpio, Edge edge, bool allow_none = true)
 
         default:
             std::cerr << format("Bad argument, edge=%i\n", (int)edge);
-            close(edge_fd);
             return (int)GPIO::EventResultCode::IllegalEdgeArgument;
         }
     };
 
     int result = get_result();
 
-    if (result == -1) {
-        std::perror("sysfs/edge write");
-        return (int)GPIO::EventResultCode::SysFD_EdgeWrite;
-    } else {
+    if (result >= 0)
         result = 0;
+    else if (result == -1) {
+        // Print additional detail and label as a edge write error
+        std::perror("sysfs/edge write");
+        result = (int)GPIO::EventResultCode::SysFD_EdgeWrite;
     }
 
     close(edge_fd);
