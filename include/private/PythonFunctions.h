@@ -79,10 +79,11 @@ std::string format(const std::string& fmt, Args... args)
     
     // In C++11 and later, std::string is guaranteed to be null terminated. 
     // (https://stackoverflow.com/questions/11752705/does-stdstring-have-a-null-terminator)
-    // So do not need an extra space for the last '\0'
+    // So do not need an extra space for the null-terminator.
     std::string ret(size, '\0');
 
-    std::snprintf(&ret[0], size, fmt.c_str(), args...);
+    // for snprintf, an extra space for the null-terminator MUST be included. (size + 1)
+    std::snprintf(&ret[0], size + 1, fmt.c_str(), args...);
     return ret; 
 }
 

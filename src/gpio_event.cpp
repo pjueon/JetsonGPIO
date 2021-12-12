@@ -121,7 +121,6 @@ int _write_sysfs_edge(int gpio, Edge edge, bool allow_none = true)
             return write(edge_fd, "both", 7);
         case Edge::NONE: {
             if (!allow_none) {
-                close(edge_fd);
                 return (int)GPIO::EventResultCode::UnallowedEdgeNone;
             }
             return write(edge_fd, "none", 7);
@@ -130,18 +129,18 @@ int _write_sysfs_edge(int gpio, Edge edge, bool allow_none = true)
 
         default:
             std::cerr << format("Bad argument, edge=%i\n", (int)edge);
-            close(edge_fd);
             return (int)GPIO::EventResultCode::IllegalEdgeArgument;
         }
     };
 
     int result = get_result();
 
-    if (result == -1) {
-        std::perror("sysfs/edge write");
-        return (int)GPIO::EventResultCode::SysFD_EdgeWrite;
-    } else {
+    if (result >= 0)
         result = 0;
+    else if (result == -1) {
+        // Print additional detail and label as a edge write error
+        std::perror("sysfs/edge write");
+        result = (int)GPIO::EventResultCode::SysFD_EdgeWrite;
     }
 
     close(edge_fd);
@@ -476,6 +475,12 @@ int _blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce
                     auto ftg_it = _fd_to_gpio_map.find(geo->fd);
                     if (ftg_it != _fd_to_gpio_map.end())
                         _fd_to_gpio_map.erase(ftg_it);
+
+                    // Close the fd
+                    if (close(geo->fd) == -1) {
+                        std::cerr << "[WARNING] Failed to close Epoll_Thread file descriptor\n";
+                    }
+
                     auto geo_it = _gpio_events.find(gpio);
                     if (geo_it != _gpio_events.end())
                         _gpio_events.erase(geo_it);
