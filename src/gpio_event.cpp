@@ -475,6 +475,12 @@ int _blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce
                     auto ftg_it = _fd_to_gpio_map.find(geo->fd);
                     if (ftg_it != _fd_to_gpio_map.end())
                         _fd_to_gpio_map.erase(ftg_it);
+
+                    // Close the fd
+                    if (close(geo->fd) == -1) {
+                        std::cerr << "[WARNING] Failed to close Epoll_Thread file descriptor\n";
+                    }
+
                     auto geo_it = _gpio_events.find(gpio);
                     if (geo_it != _gpio_events.end())
                         _gpio_events.erase(geo_it);
