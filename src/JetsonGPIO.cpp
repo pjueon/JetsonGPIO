@@ -563,7 +563,7 @@ Directions GPIO::gpio_function(const string& channel)
     }
 }
 
-Directions GPIO::gpio_function(int channel) { gpio_function(to_string(channel)); }
+Directions GPIO::gpio_function(int channel) { return gpio_function(to_string(channel)); }
 
 //=============================== Events =================================
 
