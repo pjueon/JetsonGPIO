@@ -49,5 +49,5 @@ set(JetsonGPIO_test_SRCS
    ${JetsonGPIO_LIB_SRCS}
    ${CMAKE_CURRENT_SOURCE_DIR}/src/test.cpp )
 
-add_executable(test ${JetsonGPIO_test_SRCS})
-TARGET_LINK_LIBRARIES(test Threads::Threads)
+add_executable(jetsongpio_test ${JetsonGPIO_test_SRCS})
+TARGET_LINK_LIBRARIES(jetsongpio_test Threads::Threads)
