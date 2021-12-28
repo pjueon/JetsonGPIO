@@ -1,7 +1,7 @@
 # JetsonGPIO(C++)
-JetsonGPIO(C++) is an C++ port of the **NVIDIA's Jetson.GPIO Python library**(https://github.com/NVIDIA/jetson-gpio).    
+JetsonGPIO(C++) is an C++ port of the **NVIDIA's Jetson.GPIO Python library**(https://github.com/NVIDIA/jetson-gpio).
 
-Jetson TX1, TX2, AGX Xavier, and Nano development boards contain a 40 pin GPIO header, similar to the 40 pin header in the Raspberry Pi. These GPIOs can be controlled for digital input and output using this library. The library provides almost same APIs as the Jetson.GPIO Python library.  
+Jetson TX1, TX2, AGX Xavier, and Nano development boards contain a 40 pin GPIO header, similar to the 40 pin header in the Raspberry Pi. These GPIOs can be controlled for digital input and output using this library. The library provides almost same APIs as the Jetson.GPIO Python library.
   
 
 # Installation
@@ -9,29 +9,23 @@ Clone this repository, build it, and install it.
 ```
 git clone https://github.com/pjueon/JetsonGPIO
 cd JetsonGPIO/build
-make all
+cmake -DCMAKE_INSTALL_PREFIX=/usr ../
 sudo make install
 ```
 
 
 # Setting User Permissions
 
-In order to use the Jetson GPIO Library, the correct user permissions/groups must  
-be set first. Or you have to run your program with root permission.    
+In order to use the Jetson GPIO Library, the correct user permissions/groups must
+be set first. Or you have to run your program with root permission.
 
-Create a new gpio user group. Then add your user to the newly created group.  
+Create a new gpio user group. Then add your user to the newly created group.
 ```
 sudo groupadd -f -r gpio
 sudo usermod -a -G gpio your_user_name
 ```
-Install custom udev rules by copying the 99-gpio.rules file into the rules.d  
-directory. The 99-gpio.rules file was copied from NVIDIA's official repository.  
 
-```
-sudo cp JetsonGPIO/99-gpio.rules /etc/udev/rules.d/
-```
-
-For the new rule to take place, you either need to reboot or reload the udev
+A udev rules file 99-gpio.rules is installed. For the new rule to take place, you either need to reboot or reload the udev
 rules by running:
 ```
 sudo udevadm control --reload-rules && sudo udevadm trigger
@@ -40,7 +34,7 @@ sudo udevadm control --reload-rules && sudo udevadm trigger
 # Library API
 
 The library provides almost same APIs as the the NVIDIA's Jetson GPIO Python library.
-The following discusses the use of each API:  
+The following discusses the use of each API:
 
 #### 1. Include the libary
 
@@ -49,7 +43,7 @@ To include the JetsonGPIO use:
 #include <JetsonGPIO>
 ```
 
-All public APIs are declared in namespace "GPIO". If you want to make your code shorter, you can use:  
+All public APIs are declared in namespace "GPIO". If you want to make your code shorter, you can use:
 ```cpp
 using namespace GPIO; // optional
 ```
