@@ -128,7 +128,7 @@ EntirePinData::EntirePinData()
         { 140, "2200000.gpio", "11", "17", "UART1_RTS", "UART1_RTS", "None", -1 },
         { 157, "2200000.gpio", "12", "18", "I2S0_SCLK", "DAP5_SCLK", "None", -1 },
         { 192, "2200000.gpio", "13", "27", "SPI1_SCK", "SPI3_SCK", "None", -1 },
-        { 20, "c2f0000.gpio", "15", "22", "GPIO12", "TOUCH_CLK", "c340000.pwm", 0 },
+        { 20, "c2f0000.gpio", "15", "22", "GPIO12", "TOUCH_CLK", "None", -1 },
         { 196, "2200000.gpio", "16", "23", "SPI1_CS1", "SPI3_CS1_N", "None", -1 },
         { 195, "2200000.gpio", "18", "24", "SPI1_CS0", "SPI3_CS0_N", "None", -1 },
         { 205, "2200000.gpio", "19", "10", "SPI0_MOSI", "SPI1_MOSI", "None", -1 },
