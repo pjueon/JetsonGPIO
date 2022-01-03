@@ -40,7 +40,7 @@ The following discusses the use of each API:
 
 To include the JetsonGPIO use:
 ```cpp
-#include <JetsonGPIO>
+#include <JetsonGPIO.h>
 ```
 
 All public APIs are declared in namespace "GPIO". If you want to make your code shorter, you can use:
