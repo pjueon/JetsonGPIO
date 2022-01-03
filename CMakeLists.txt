@@ -37,10 +37,6 @@ INSTALL(FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/JetsonGPIO.h
     DESTINATION include/JetsonGPIO)
 
-# Install Private Headers
-file(GLOB JetsonGPIO_Private_Headers ${CMAKE_CURRENT_SOURCE_DIR}/include/private/*.h)
-install( FILES ${JetsonGPIO_Private_Headers} DESTINATION include/JetsonGPIO/private)
-
 # Install Udev rules
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/99-gpio.rules DESTINATION ${UDEVRULES_INSTALL_DIR})
 
