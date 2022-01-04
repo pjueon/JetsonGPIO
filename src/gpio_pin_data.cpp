@@ -597,6 +597,6 @@ PinData get_data()
     }
     catch(exception& e)
     {
-        _rethrow_exception(e, "GPIO::get_data()");
+        throw _error(e, "GPIO::get_data()");
     }
 }

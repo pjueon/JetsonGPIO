@@ -47,23 +47,4 @@ constexpr Model JETSON_TX2 = Model::JETSON_TX2;
 constexpr Model JETSON_TX1 = Model::JETSON_TX1;
 constexpr Model JETSON_NANO = Model::JETSON_NANO;
 
-static std::string ModelToString(Model m)
-{
-    if(m == Model::CLARA_AGX_XAVIER)
-        return "CLARA_AGX_XAVIER";
-    else if(m == Model::JETSON_NX) 
-        return "JETSON_NX";
-    else if(m == Model::JETSON_XAVIER) 
-        return "JETSON_XAVIER";
-    else if(m == Model::JETSON_TX1) 
-        return "JETSON_TX1";
-    else if(m == Model::JETSON_TX2) 
-        return "JETSON_TX2";
-    else if(m == Model::JETSON_NANO) 
-        return "JETSON_NANO";
-    else
-        return "None";
-}
-
-
 #endif

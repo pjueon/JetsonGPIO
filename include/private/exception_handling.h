@@ -38,9 +38,9 @@ namespace GPIO
         return format("[Exception] %s (catched from: %s)\n", e.what(), from.c_str());
     }
 
-    static void _rethrow_exception(const std::exception& e, const std::string& from)
+    static std::runtime_error _error(const std::exception& e, const std::string& from)
     {
-        throw std::runtime_error(_error_message(e, from));
+        return std::runtime_error(_error_message(e, from));
     }
 }
 
