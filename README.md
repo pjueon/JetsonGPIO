@@ -11,10 +11,16 @@ git clone https://github.com/pjueon/JetsonGPIO
 ```
 
 ### 2. Build and install the library. 
-The following commands will build the library and install it to `/usr/local` directory by default.
-You can add `-DCMAKE_INSTALL_PREFIX=/usr` option to install it instead of `/usr` according to your preference.
+
+Make build directory and change directory to it.
 ```
+mkdir build
 cd JetsonGPIO/build
+```
+
+The following commands will build the library and install it to `/usr/local` directory by default.
+You can add `-DCMAKE_INSTALL_PREFIX=/usr` option to install it to `/usr` according to your preference.
+```
 cmake ../
 sudo make install
 ```
@@ -36,12 +42,10 @@ rules by running:
 sudo udevadm control --reload-rules && sudo udevadm trigger
 ```
 
-# Library API
 
-The library provides almost same APIs as the the NVIDIA's Jetson GPIO Python library.
-The following discusses the use of each API:
+# Link the library to your code
 
-#### 1. Find JetsonGPIO Library and Include Directory
+#### 1. With CMake
 
 Add this to your CMakeLists.txt
 
@@ -53,9 +57,28 @@ include_directories(${JetsonGPIO_INCLUDE_DIR})
 
 assuming you added a target called `mytarget`, then you can link it with:
 
-`target_link_libraries(mytarget ${JetsonGPIO_LIBRARIES} Threads::Threads)`
+```
+target_link_libraries(mytarget ${JetsonGPIO_LIBRARIES} Threads::Threads)
+```
 
-#### 2. Include the library
+### 2. Without CMake
+
+The library header `JetsonGPIO.h` will be in `/usr/local/include/JetsonGPIO` by default. If you installed the library to `/usr`, it will be in `/usr/include/JetsonGPIO`.
+Because the library uses `std::thread`, you should link pthread as well when you link it to your code.  
+
+The following simple example shows how to build your code with the library: 
+```
+g++ -o your_program_name your_source_code.cpp -lJetsonGPIO -lpthread -I/usr/local/include/JetsonGPIO
+```
+
+
+# Library API
+
+The library provides almost same APIs as the the NVIDIA's Jetson GPIO Python library.
+The following discusses the use of each API:
+
+
+#### 1. Include the library
 
 To include the JetsonGPIO use:
 ```cpp
