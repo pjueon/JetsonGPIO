@@ -5,12 +5,12 @@ Jetson TX1, TX2, AGX Xavier, and Nano development boards contain a 40 pin GPIO h
   
 
 # Installation
-### 1. Clone the repository.
+#### 1. Clone the repository.
 ```
 git clone https://github.com/pjueon/JetsonGPIO
 ```
 
-### 2. Build and install the library. 
+#### 2. Build and install the library. 
 
 Make build directory and change directory to it.
 ```
