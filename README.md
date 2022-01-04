@@ -11,11 +11,11 @@ git clone https://github.com/pjueon/JetsonGPIO
 ```
 
 ### 2. Build and install the library. 
-The following commands will build the library and install it to `/usr` directory.
-You can change `-DCMAKE_INSTALL_PREFIX` option to `/usr/local` according to your preference.
+The following commands will build the library and install it to `/usr/local` directory by default.
+You can add `-DCMAKE_INSTALL_PREFIX=/usr` option to install it instead of `/usr` according to your preference.
 ```
 cd JetsonGPIO/build
-cmake -DCMAKE_INSTALL_PREFIX=/usr ../
+cmake ../
 sudo make install
 ```
 
@@ -41,7 +41,21 @@ sudo udevadm control --reload-rules && sudo udevadm trigger
 The library provides almost same APIs as the the NVIDIA's Jetson GPIO Python library.
 The following discusses the use of each API:
 
-#### 1. Include the libary
+#### 1. Find JetsonGPIO Library and Include Directory
+
+Add this to your CMakeLists.txt
+
+```
+find_package(JetsonGPIO REQUIRED)
+find_package(Threads REQUIRED)
+include_directories(${JetsonGPIO_INCLUDE_DIR})
+```
+
+assuming you added a target called `mytarget`, then you can link it with:
+
+`target_link_libraries(mytarget ${JetsonGPIO_LIBRARIES} Threads::Threads)`
+
+#### 2. Include the library
 
 To include the JetsonGPIO use:
 ```cpp
@@ -52,12 +66,6 @@ All public APIs are declared in namespace "GPIO". If you want to make your code 
 ```cpp
 using namespace GPIO; // optional
 ```
-
-To compile your program use:
-```
-g++ -o your_program_name your_source_code.cpp -lpthread -lJetsonGPIO
-```
-
 
 #### 2. Pin numbering
 
