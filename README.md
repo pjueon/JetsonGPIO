@@ -61,7 +61,7 @@ assuming you added a target called `mytarget`, then you can link it with:
 target_link_libraries(mytarget ${JetsonGPIO_LIBRARIES} Threads::Threads)
 ```
 
-### 2. Without CMake
+#### 2. Without CMake
 
 The library header `JetsonGPIO.h` will be in `/usr/local/include/JetsonGPIO` by default. If you installed the library to `/usr`, it will be in `/usr/include/JetsonGPIO`.
 Because the library uses `std::thread`, you should link pthread as well when you link it to your code.  
