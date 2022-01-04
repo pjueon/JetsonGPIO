@@ -38,7 +38,7 @@ DEALINGS IN THE SOFTWARE.
 #include "JetsonGPIO.h"
 #include "private/gpio_pin_data.h"
 #include "private/PythonFunctions.h"
-#include "private/etc.h"
+#include "private/exception_handling.h"
 
 
 using namespace GPIO;
@@ -597,6 +597,6 @@ PinData get_data()
     }
     catch(exception& e)
     {
-        _rethrow_exception(e, "GPIO::get_data()");
+        throw _error(e, "GPIO::get_data()");
     }
 }

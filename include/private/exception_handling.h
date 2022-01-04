@@ -23,28 +23,26 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #pragma once
-#ifndef MODEL_H
-#define MODEL_H
+#ifndef EXCEPTION_HANDLING_H
+#define EXCEPTION_HANDLING_H
 
 #include <string>
+#include <stdexcept>
+#include "PythonFunctions.h"
 
-// Jetson Models
-enum class Model
+namespace GPIO
 {
-    CLARA_AGX_XAVIER,
-    JETSON_NX,
-    JETSON_XAVIER,
-    JETSON_TX2,
-    JETSON_TX1,
-    JETSON_NANO
-};
+    // for exception handling
+    static std::string _error_message(const std::exception& e, const std::string& from)
+    {
+        return format("[Exception] %s (catched from: %s)\n", e.what(), from.c_str());
+    }
 
-// alias
-constexpr Model CLARA_AGX_XAVIER = Model::CLARA_AGX_XAVIER;
-constexpr Model JETSON_NX = Model::JETSON_NX;
-constexpr Model JETSON_XAVIER = Model::JETSON_XAVIER;
-constexpr Model JETSON_TX2 = Model::JETSON_TX2;
-constexpr Model JETSON_TX1 = Model::JETSON_TX1;
-constexpr Model JETSON_NANO = Model::JETSON_NANO;
+    static std::runtime_error _error(const std::exception& e, const std::string& from)
+    {
+        return std::runtime_error(_error_message(e, from));
+    }
+}
+
 
 #endif

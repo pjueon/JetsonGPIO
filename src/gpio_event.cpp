@@ -369,7 +369,7 @@ int _blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce
 
     int result{};
     std::shared_ptr<_gpioEventObject> geo{};
-    uint64_t gpio_last_event = 0;
+
     {
         // Enter Mutex
         std::lock_guard<std::recursive_mutex> mutex_lock(_epmutex);
