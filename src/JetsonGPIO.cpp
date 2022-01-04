@@ -46,7 +46,7 @@ DEALINGS IN THE SOFTWARE.
 #include "private/PythonFunctions.h"
 #include "private/gpio_event.h"
 #include "private/gpio_pin_data.h"
-#include "private/etc.h"
+#include "private/exception_handling.h"
 
 using namespace GPIO;
 using namespace std;
