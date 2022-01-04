@@ -5,14 +5,19 @@ Jetson TX1, TX2, AGX Xavier, and Nano development boards contain a 40 pin GPIO h
   
 
 # Installation
-Clone this repository, build it, and install it.
+### 1. Clone the repository.
 ```
 git clone https://github.com/pjueon/JetsonGPIO
+```
+
+### 2. Build and install the library. 
+The following commands will build the library and install it to `/usr` directory.
+You can change `-DCMAKE_INSTALL_PREFIX` option to `/usr/local` according to your preference.
+```
 cd JetsonGPIO/build
 cmake -DCMAKE_INSTALL_PREFIX=/usr ../
 sudo make install
 ```
-
 
 # Setting User Permissions
 
