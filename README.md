@@ -43,13 +43,27 @@ sudo udevadm control --reload-rules && sudo udevadm trigger
 ```
 
 
-# Link the library to your code
+# Link the library to your program
 
 #### 1. With CMake
 
-Add this to your CMakeLists.txt
+First, you need `cmake_modules/FindJetsonGPIO.cmake` file. 
+Copy this file from the repository to your project folder and place it under `cmake_modules` directory.
+
+example:
+```
+your_project
+├── CMakeLists.txt
+├── build
+├── cmake_modules
+│   └── FindJetsonGPIO.cmake
+├── ...
+```
+
+And add this to your CMakeLists.txt
 
 ```
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake_modules/")
 find_package(JetsonGPIO REQUIRED)
 find_package(Threads REQUIRED)
 include_directories(${JetsonGPIO_INCLUDE_DIR})
