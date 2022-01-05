@@ -1,64 +1,107 @@
 # JetsonGPIO(C++)
-JetsonGPIO(C++) is an C++ port of the **NVIDIA's Jetson.GPIO Python library**(https://github.com/NVIDIA/jetson-gpio).    
+JetsonGPIO(C++) is a C++ port of the **NVIDIA's Jetson.GPIO Python library**(https://github.com/NVIDIA/jetson-gpio).
 
-Jetson TX1, TX2, AGX Xavier, and Nano development boards contain a 40 pin GPIO header, similar to the 40 pin header in the Raspberry Pi. These GPIOs can be controlled for digital input and output using this library. The library provides almost same APIs as the Jetson.GPIO Python library.  
+Jetson TX1, TX2, AGX Xavier, and Nano development boards contain a 40 pin GPIO header, similar to the 40 pin header in the Raspberry Pi. These GPIOs can be controlled for digital input and output using this library. The library provides almost same APIs as the Jetson.GPIO Python library.
   
 
 # Installation
-Clone this repository, build it, and install it.
+### 1. Clone the repository.
 ```
 git clone https://github.com/pjueon/JetsonGPIO
+```
+
+### 2. Build and install the library. 
+
+Make build directory and change directory to it.
+```
+mkdir build
 cd JetsonGPIO/build
-make all
+```
+
+The following commands will build the library and install it to `/usr/local` directory by default.
+You can add `-DCMAKE_INSTALL_PREFIX=/usr` option to install it to `/usr` according to your preference.
+```
+cmake ../
 sudo make install
 ```
 
-
 # Setting User Permissions
 
-In order to use the Jetson GPIO Library, the correct user permissions/groups must  
-be set first. Or you have to run your program with root permission.    
+In order to use the Jetson GPIO Library, the correct user permissions/groups must
+be set first. Or you have to run your program with root permission.
 
-Create a new gpio user group. Then add your user to the newly created group.  
+Create a new gpio user group. Then add your user to the newly created group.
 ```
 sudo groupadd -f -r gpio
 sudo usermod -a -G gpio your_user_name
 ```
-Install custom udev rules by copying the 99-gpio.rules file into the rules.d  
-directory. The 99-gpio.rules file was copied from NVIDIA's official repository.  
 
-```
-sudo cp JetsonGPIO/99-gpio.rules /etc/udev/rules.d/
-```
-
-For the new rule to take place, you either need to reboot or reload the udev
+A udev rules file 99-gpio.rules is installed. For the new rule to take place, you either need to reboot or reload the udev
 rules by running:
 ```
 sudo udevadm control --reload-rules && sudo udevadm trigger
 ```
 
+
+# Linking the Library 
+
+## Using CMake
+
+First, you need `cmake_modules/FindJetsonGPIO.cmake` file. 
+Copy this file from the repository to your project folder and place it under `cmake_modules` directory.
+
+example:
+```
+your_project
+├── CMakeLists.txt
+├── cmake_modules
+│   └── FindJetsonGPIO.cmake
+├── ...
+```
+
+And add this to your CMakeLists.txt
+
+```
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake_modules/")
+find_package(JetsonGPIO REQUIRED)
+find_package(Threads REQUIRED)
+include_directories(${JetsonGPIO_INCLUDE_DIR})
+```
+
+assuming you added a target called `mytarget`, then you can link it with:
+
+```
+target_link_libraries(mytarget ${JetsonGPIO_LIBRARIES} Threads::Threads)
+```
+
+## Manual Configuration (Without CMake)
+
+The library header `JetsonGPIO.h` will be in `/usr/local/include/JetsonGPIO` by default. If you installed the library to `/usr`, it will be in `/usr/include/JetsonGPIO`.
+Because the library uses `std::thread`, you should link pthread as well when you link it to your code.  
+
+The following simple example shows how to build your code with the library: 
+```
+g++ -o your_program_name your_source_code.cpp -lJetsonGPIO -lpthread -I/usr/local/include/JetsonGPIO
+```
+
+
 # Library API
 
 The library provides almost same APIs as the the NVIDIA's Jetson GPIO Python library.
-The following discusses the use of each API:  
+The following discusses the use of each API:
 
-#### 1. Include the libary
+
+#### 1. Include the library
 
 To include the JetsonGPIO use:
 ```cpp
-#include <JetsonGPIO>
+#include <JetsonGPIO.h>
 ```
 
-All public APIs are declared in namespace "GPIO". If you want to make your code shorter, you can use:  
+All public APIs are declared in namespace "GPIO". If you want to make your code shorter, you can use:
 ```cpp
 using namespace GPIO; // optional
 ```
-
-To compile your program use:
-```
-g++ -o your_program_name your_source_code.cpp -lpthread -lJetsonGPIO
-```
-
 
 #### 2. Pin numbering
 

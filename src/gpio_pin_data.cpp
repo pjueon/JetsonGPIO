@@ -39,6 +39,7 @@ DEALINGS IN THE SOFTWARE.
 #include "private/gpio_pin_data.h"
 #include "private/PythonFunctions.h"
 #include "private/PinDefinition.h"
+#include "private/exception_handling.h"
 
 
 using namespace GPIO;
@@ -598,7 +599,6 @@ PinData get_data()
     }
     catch(exception& e)
     {
-        cerr << "[Exception] " << e.what() << " (catched from: get_data())" << endl;
-      	throw false;
+        throw _error(e, "GPIO::get_data()");
     }
 }
