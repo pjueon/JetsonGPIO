@@ -5,12 +5,12 @@ Jetson TX1, TX2, AGX Xavier, and Nano development boards contain a 40 pin GPIO h
   
 
 # Installation
-#### 1. Clone the repository.
+### 1. Clone the repository.
 ```
 git clone https://github.com/pjueon/JetsonGPIO
 ```
 
-#### 2. Build and install the library. 
+### 2. Build and install the library. 
 
 Make build directory and change directory to it.
 ```
@@ -43,9 +43,9 @@ sudo udevadm control --reload-rules && sudo udevadm trigger
 ```
 
 
-# Link the library to your program
+# Linking the Library 
 
-#### 1. With CMake
+## Using CMake
 
 First, you need `cmake_modules/FindJetsonGPIO.cmake` file. 
 Copy this file from the repository to your project folder and place it under `cmake_modules` directory.
@@ -54,7 +54,6 @@ example:
 ```
 your_project
 ├── CMakeLists.txt
-├── build
 ├── cmake_modules
 │   └── FindJetsonGPIO.cmake
 ├── ...
@@ -75,7 +74,7 @@ assuming you added a target called `mytarget`, then you can link it with:
 target_link_libraries(mytarget ${JetsonGPIO_LIBRARIES} Threads::Threads)
 ```
 
-#### 2. Without CMake
+## Manual Configuration (Without CMake)
 
 The library header `JetsonGPIO.h` will be in `/usr/local/include/JetsonGPIO` by default. If you installed the library to `/usr`, it will be in `/usr/include/JetsonGPIO`.
 Because the library uses `std::thread`, you should link pthread as well when you link it to your code.  
