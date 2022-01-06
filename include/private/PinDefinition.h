@@ -31,43 +31,47 @@ DEALINGS IN THE SOFTWARE.
 
 #include <string>
 
-struct PinDefinition
+namespace GPIO
 {
-    const std::string LinuxPin;    // Linux GPIO pin number
-    const std::string SysfsDir;    // GPIO chip sysfs directory
-    const std::string BoardPin;    // Pin number (BOARD mode)
-    const std::string BCMPin;      // Pin number (BCM mode)
-    const std::string CVMPin;      // Pin name (CVM mode)
-    const std::string TEGRAPin;    // Pin name (TEGRA_SOC mode)
-    const std::string PWMSysfsDir; // PWM chip sysfs directory
-    const int PWMID;               // PWM ID within PWM chip
-
-    int LinuxPinNum () const
+    struct PinDefinition
     {
-        if(is_None(LinuxPin))
-            return -1;
+        const std::string LinuxPin;    // Linux GPIO pin number
+        const std::string SysfsDir;    // GPIO chip sysfs directory
+        const std::string BoardPin;    // Pin number (BOARD mode)
+        const std::string BCMPin;      // Pin number (BCM mode)
+        const std::string CVMPin;      // Pin name (CVM mode)
+        const std::string TEGRAPin;    // Pin name (TEGRA_SOC mode)
+        const std::string PWMSysfsDir; // PWM chip sysfs directory
+        const int PWMID;               // PWM ID within PWM chip
 
-        try
+        int LinuxPinNum () const
         {
-            return std::stoi(strip(LinuxPin)); 
-        }
-        catch(std::exception&)
-        {
-            return -1;
-        }
-    }
+            if(is_None(LinuxPin))
+                return -1;
 
-    std::string PinName(GPIO::NumberingModes key) const
-    {
-        if (key == GPIO::BOARD)
-            return BoardPin;
-        else if (key == GPIO::BCM)
-            return BCMPin;
-        else if (key == GPIO::CVM)
-            return CVMPin;
-        else // TEGRA_SOC
-            return TEGRAPin;
-    }
-};
+            try
+            {
+                return std::stoi(strip(LinuxPin)); 
+            }
+            catch(std::exception&)
+            {
+                return -1;
+            }
+        }
+
+        std::string PinName(NumberingModes key) const
+        {
+            if (key == BOARD)
+                return BoardPin;
+            else if (key == BCM)
+                return BCMPin;
+            else if (key == CVM)
+                return CVMPin;
+            else // TEGRA_SOC
+                return TEGRAPin;
+        }
+    };
+}
+
 
 #endif
