@@ -62,7 +62,11 @@ bool is_in(const key_t& key, const std::set<key_t>& set)
     return set.find(key) != set.end();
 }
 
-
+template<class key_t, class char_t>
+bool is_in(const key_t& key, const std::basic_string<char_t>& str)
+{
+    return str.find(key) != std::basic_string<char_t>::npos;
+}
 
 // modified from https://stackoverflow.com/questions/2342162/stdstring-formatting-like-sprintf
 template<typename ... Args>
