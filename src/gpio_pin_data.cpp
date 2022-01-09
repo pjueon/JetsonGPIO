@@ -206,7 +206,7 @@ EntirePinData::EntirePinData()
         { 14, "3160000.i2c/i2c-0/0-0074", "22", "25", "GPIO_EXP_P16", "GPIO_EXP_P16", "None", -1 },
         { 107, "2200000.gpio", "23", "11", "SPI1_CLK", "GPIO_CAM4", "None", -1 },
         { 110, "2200000.gpio", "24", "8", "SPI1_CS0", "GPIO_CAM7", "None", -1 },
-        { -1, "None", "26", "7", "SPI1_CS1", "None", "None", -1 },
+        // Board pin 26 is not available on this board
         { 78, "2200000.gpio", "29", "5", "GPIO19_AUD_RST", "GPIO_AUD1", "None", -1 },
         { 42, "c2f0000.gpio", "31", "6", "GPIO9_MOTION_INT", "CAN_GPIO2", "None", -1 },
         // Output-only (due to module):
