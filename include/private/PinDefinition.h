@@ -28,47 +28,46 @@ DEALINGS IN THE SOFTWARE.
 
 #include "JetsonGPIO.h"
 #include "private/PythonFunctions.h"
+#include "private/DictionaryLike.h"
 
 #include <string>
+#include <stdexcept>
 
 namespace GPIO
 {
     struct PinDefinition
     {
-        const std::string LinuxPin;    // Linux GPIO pin number
-        const std::string SysfsDir;    // GPIO chip sysfs directory
-        const std::string BoardPin;    // Pin number (BOARD mode)
-        const std::string BCMPin;      // Pin number (BCM mode)
-        const std::string CVMPin;      // Pin name (CVM mode)
-        const std::string TEGRAPin;    // Pin name (TEGRA_SOC mode)
-        const std::string PWMSysfsDir; // PWM chip sysfs directory
-        const int PWMID;               // PWM ID within PWM chip
+        const DictionaryLike LinuxPin;       // Linux GPIO pin number (within chip, not global),
+                                             // (map from chip GPIO count to value, to cater for different numbering schemes)
 
-        int LinuxPinNum () const
-        {
-            if(is_None(LinuxPin))
-                return -1;
-
-            try
-            {
-                return std::stoi(strip(LinuxPin)); 
-            }
-            catch(std::exception&)
-            {
-                return -1;
-            }
-        }
+        const DictionaryLike ExportedName;   // Linux exported GPIO name,
+                                             // (map from chip GPIO count to value, to cater for different naming schemes)
+                                             // (entries omitted if exported filename is gpio%i)
+         
+        const std::string SysfsDir;          // GPIO chip sysfs directory
+        const std::string BoardPin;          // Pin number (BOARD mode)
+        const std::string BCMPin;            // Pin number (BCM mode)
+        const std::string CVMPin;            // Pin name (CVM mode)
+        const std::string TEGRAPin;          // Pin name (TEGRA_SOC mode)
+        const std::string PWMSysfsDir;       // PWM chip sysfs directory
+        const int PWMID;                     // PWM ID within PWM chip
 
         std::string PinName(NumberingModes key) const
         {
-            if (key == BOARD)
+            switch (key)
+            {
+            case BOARD:
                 return BoardPin;
-            else if (key == BCM)
+            case BCM:
                 return BCMPin;
-            else if (key == CVM)
+            case CVM:
                 return CVMPin;
-            else // TEGRA_SOC
+            case TEGRA_SOC:
                 return TEGRAPin;
+
+            default:
+                throw std::runtime_error("[PinDefinition::PinName] invalid NumberingMode");
+            }
         }
     };
 }

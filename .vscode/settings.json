@@ -55,7 +55,8 @@
         "iomanip": "cpp",
         "mutex": "cpp",
         "cfenv": "cpp",
-        "cinttypes": "cpp"
+        "cinttypes": "cpp",
+        "regex": "cpp"
     },
     "C_Cpp.clang_format_style": "file"
 }

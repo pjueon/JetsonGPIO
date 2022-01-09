@@ -32,7 +32,6 @@ DEALINGS IN THE SOFTWARE.
 
 #include "JetsonGPIO.h"
 #include "private/Model.h"
-#include "private/PythonFunctions.h"
 
 
 struct PinInfo
@@ -49,18 +48,21 @@ struct ChannelInfo
 {
     const std::string channel;
     const std::string gpio_chip_dir;
-    const int chip_gpio;
+    // const int chip_gpio;
     const int gpio;
+    const std::string gpio_name;
     const std::string pwm_chip_dir;
     const int pwm_id;
 
     ChannelInfo(const std::string &channel, const std::string &gpio_chip_dir,
-                int chip_gpio, int gpio, const std::string &pwm_chip_dir,
+                // int chip_gpio, 
+                int gpio, const std::string& gpio_name, const std::string &pwm_chip_dir,
                 int pwm_id)
         : channel(channel),
           gpio_chip_dir(gpio_chip_dir),
-          chip_gpio(chip_gpio),
+        //   chip_gpio(chip_gpio),
           gpio(gpio),
+          gpio_name(gpio_name),
           pwm_chip_dir(pwm_chip_dir),
           pwm_id(pwm_id)
     {}
