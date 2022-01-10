@@ -47,3 +47,11 @@ set(JetsonGPIO_test_SRCS
 
 add_executable(jetsongpio_test ${JetsonGPIO_test_SRCS})
 TARGET_LINK_LIBRARIES(jetsongpio_test Threads::Threads)
+
+# Build Test all APIs
+set(test_all_apis_SRCS
+   ${JetsonGPIO_LIB_SRCS}
+   ${CMAKE_CURRENT_SOURCE_DIR}/samples/test_all_apis.cpp )
+
+add_executable(test_all_apis ${test_all_apis_SRCS})
+TARGET_LINK_LIBRARIES(test_all_apis Threads::Threads)
