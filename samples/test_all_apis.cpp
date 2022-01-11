@@ -34,18 +34,22 @@ DEALINGS IN THE SOFTWARE.
 #include <thread>
 #include <tuple>
 #include <utility>
-
-#include "private/PythonFunctions.h"
+#include <algorithm>
 
 using namespace std::string_literals;
 
-
-// utility classes------
 void sleep(double sec)
 {
     std::this_thread::sleep_for(std::chrono::duration<double>(sec));
 }
 
+template<class T, class Q>
+bool is_in(T&& element, Q&& container)
+{
+    return std::find(container.begin(), container.end(), element) != container.end();
+}
+
+// utility classes------
 class Warning
 {
 public:
