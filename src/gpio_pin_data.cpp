@@ -96,7 +96,7 @@ EntirePinData::EntirePinData()
         { "{224: 134, 169: 106}"s, "{169:  PQ.06}"s, "2200000.gpio", "7", "4", "MCLK05"s, "SOC_GPIO42"s, "None"s, -1 },
         { "{224: 140, 169: 112}"s, "{169:  PR.04}"s, "2200000.gpio", "11", "17", "UART1_RTS", "UART1_RTS", "None", -1 },
         { "{224:  63, 169:  51}"s, "{169:  PH.07}"s, "2200000.gpio","12", "18", "I2S2_CLK", "DAP2_SCLK", "None", -1 },
-        { "{224: 124, 169:  96}"s, "{169:  PP.00}"s, "2200000.gpio", "13", "27", "GPIO32", "SOC_GPIO04", "None", -1 },
+        { "{224: 124, 169:  96}"s, "{169:  PP.04}"s, "2200000.gpio", "13", "27", "GPIO32", "SOC_GPIO04", "None", -1 },
         // Older versions of L4T don"t enable this PWM controller in DT, so this PWM
         // channel may not be available.
         { "{224: 105, 169:  84}"s, "{169:  PN.01}"s, "2200000.gpio", "15", "22", "GPIO27", "SOC_GPIO54", "3280000.pwm", 0 },
