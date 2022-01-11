@@ -764,22 +764,27 @@ void GPIO::PWM::Impl::_reconfigure(int frequency_hz, double duty_cycle_percent, 
 {
     if (duty_cycle_percent < 0.0 || duty_cycle_percent > 100.0)
         throw runtime_error("invalid duty_cycle_percent");
-    bool restart = start || _started;
+        
+    bool freq_change = start || (frequency_hz != _frequency_hz);
+    bool stop = _started && freq_change;
 
-    if (_started) {
+    if (stop) {
         _started = false;
         _disable_pwm(_ch_info);
     }
 
-    _frequency_hz = frequency_hz;
-    _period_ns = int(1000000000.0 / frequency_hz);
-    _set_pwm_period(_ch_info, _period_ns);
+    if(freq_change)
+    {
+        _frequency_hz = frequency_hz;
+        _period_ns = int(1000000000.0 / frequency_hz);
+        _set_pwm_period(_ch_info, _period_ns);
+    }
 
     _duty_cycle_percent = duty_cycle_percent;
     _duty_cycle_ns = int(_period_ns * (duty_cycle_percent / 100.0));
     _set_pwm_duty_cycle(_ch_info, _duty_cycle_ns);
 
-    if (restart) {
+    if (stop || start) {
         _enable_pwm(_ch_info);
         _started = true;
     }
@@ -817,6 +822,8 @@ GPIO::PWM::PWM(int channel, int frequency_hz)
 
         _export_pwm(pImpl->_ch_info);
         _set_pwm_duty_cycle(pImpl->_ch_info, 0);
+        // Anything that doesn't match new frequency_hz
+        pImpl->_frequency_hz = -1 * frequency_hz;
         pImpl->_reconfigure(frequency_hz, 0.0);
         global()._channel_configuration[to_string(channel)] = HARD_PWM;
     } catch (exception& e) {
