@@ -56,7 +56,16 @@
         "mutex": "cpp",
         "cfenv": "cpp",
         "cinttypes": "cpp",
-        "regex": "cpp"
+        "regex": "cpp",
+        "future": "cpp",
+        "cerrno": "cpp",
+        "cfloat": "cpp",
+        "climits": "cpp",
+        "ios": "cpp",
+        "locale": "cpp",
+        "queue": "cpp",
+        "stack": "cpp",
+        "random": "cpp"
     },
     "C_Cpp.clang_format_style": "file"
 }
