@@ -321,9 +321,7 @@ string _pwm_enable_path(const ChannelInfo& ch_info) { return _pwm_path(ch_info) 
 
 void _export_pwm(const ChannelInfo& ch_info)
 {
-    if (os_path_exists(_pwm_path(ch_info)))
-        return;
-
+    if (!os_path_exists(_pwm_path(ch_info)))
     { // scope for f
         string path = _pwm_export_path(ch_info);
         ofstream f(path);
@@ -343,10 +341,14 @@ void _export_pwm(const ChannelInfo& ch_info)
             throw runtime_error("Permission denied: path: " + enable_path +
                                 "\n Please configure permissions or use the root user to run this.");
     }
+
+    ch_info.f_duty_cycle->open(_pwm_duty_cycle_path(ch_info), std::ios::in | std::ios::out);
 }
 
 void _unexport_pwm(const ChannelInfo& ch_info)
 {
+    ch_info.f_duty_cycle->close();
+
     ofstream f(_pwm_unexport_path(ch_info));
     f << ch_info.pwm_id;
 }
@@ -368,9 +370,9 @@ void _set_pwm_duty_cycle(const ChannelInfo& ch_info, const int duty_cycle_ns)
     // this check only for the 0 duty cycle case, to avoid having to read the
     // current value every time the duty cycle is set.
     if (duty_cycle_ns == 0) {
-        ifstream f(_pwm_duty_cycle_path(ch_info));
-        stringstream buffer;
-        buffer << f.rdbuf();
+        ch_info.f_duty_cycle->seekg(0, std::ios::beg);
+        stringstream buffer{};
+        buffer << ch_info.f_duty_cycle->rdbuf();
         auto cur = buffer.str();
         cur = strip(cur);
 
@@ -378,8 +380,9 @@ void _set_pwm_duty_cycle(const ChannelInfo& ch_info, const int duty_cycle_ns)
             return;
     }
 
-    ofstream f(_pwm_duty_cycle_path(ch_info));
-    f << duty_cycle_ns;
+    ch_info.f_duty_cycle->seekg(0, std::ios::beg);
+    *ch_info.f_duty_cycle << duty_cycle_ns;
+    ch_info.f_duty_cycle->flush();
 }
 
 void _enable_pwm(const ChannelInfo& ch_info)
@@ -764,7 +767,7 @@ void GPIO::PWM::Impl::_reconfigure(int frequency_hz, double duty_cycle_percent, 
 {
     if (duty_cycle_percent < 0.0 || duty_cycle_percent > 100.0)
         throw runtime_error("invalid duty_cycle_percent");
-        
+
     bool freq_change = start || (frequency_hz != _frequency_hz);
     bool stop = _started && freq_change;
 
