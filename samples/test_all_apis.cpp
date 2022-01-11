@@ -636,6 +636,7 @@ private:
         const auto line = "==========================";
 
         std::cout << line << std::endl;
+        std::cout << "[Library Version] " << GPIO::VERSION << std::endl;
         std::cout << "[Model] " << GPIO::model << std::endl;
         std::cout << GPIO::JETSON_INFO;
         std::cout << line << std::endl;
