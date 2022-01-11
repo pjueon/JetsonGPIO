@@ -203,12 +203,12 @@ vector<ChannelInfo> _channels_to_infos(const vector<string>& channels, bool need
 Directions _sysfs_channel_configuration(const ChannelInfo& ch_info)
 {
     if (!is_None(ch_info.pwm_chip_dir)) {
-        string pwm_dir = ch_info.pwm_chip_dir + "/pwm" + to_string(ch_info.pwm_id);
+        string pwm_dir = format("%s/pwm%i", ch_info.pwm_chip_dir.c_str(), ch_info.pwm_id);
         if (os_path_exists(pwm_dir))
             return HARD_PWM;
     }
 
-    string gpio_dir = _SYSFS_ROOT + "/gpio"s + to_string(ch_info.gpio);
+    string gpio_dir = _SYSFS_ROOT + "/"s + ch_info.gpio_name;
     if (!os_path_exists(gpio_dir))
         return UNKNOWN; // Originally returns None in NVIDIA's GPIO Python Library
 
@@ -241,16 +241,16 @@ Directions _app_channel_configuration(const ChannelInfo& ch_info)
     return global()._channel_configuration[ch_info.channel];
 }
 
-void _export_gpio(const int gpio)
+void _export_gpio(const ChannelInfo& ch_info)
 {
-    if (os_path_exists(_SYSFS_ROOT + "/gpio"s + to_string(gpio)))
+    if (os_path_exists(_SYSFS_ROOT + "/"s + ch_info.gpio_name))
         return;
     { // scope for f_export
         ofstream f_export(_SYSFS_ROOT + "/export"s);
-        f_export << gpio;
+        f_export << ch_info.gpio;
     } // scope ends
 
-    string value_path = _SYSFS_ROOT + "/gpio"s + to_string(gpio) + "/value"s;
+    string value_path = _SYSFS_ROOT + "/"s + ch_info.gpio_name + "/value"s;
 
     int time_count = 0;
     while (!os_access(value_path, R_OK | W_OK)) {
@@ -261,44 +261,42 @@ void _export_gpio(const int gpio)
     }
 }
 
-void _unexport_gpio(const int gpio)
+void _unexport_gpio(const ChannelInfo& ch_info)
 {
-    if (!os_path_exists(_SYSFS_ROOT + "/gpio"s + to_string(gpio)))
+    if (!os_path_exists(_SYSFS_ROOT + "/"s + ch_info.gpio_name))
         return;
 
     ofstream f_unexport(_SYSFS_ROOT + "/unexport"s);
-    f_unexport << gpio;
+    f_unexport << ch_info.gpio;
 }
 
-void _output_one(const string gpio, const int value)
+void _output_one(const ChannelInfo& ch_info, const int value)
 {
-    ofstream value_file(_SYSFS_ROOT + "/gpio"s + gpio + "/value"s);
+    ofstream value_file(_SYSFS_ROOT + "/"s + ch_info.gpio_name + "/value"s);
     value_file << int(bool(value));
 }
 
-void _output_one(const int gpio, const int value) { _output_one(to_string(gpio), value); }
-
 void _setup_single_out(const ChannelInfo& ch_info, int initial = -1)
 {
-    _export_gpio(ch_info.gpio);
+    _export_gpio(ch_info);
 
-    string gpio_dir_path = _SYSFS_ROOT + "/gpio"s + to_string(ch_info.gpio) + "/direction"s;
+    string gpio_dir_path = _SYSFS_ROOT + "/"s + ch_info.gpio_name + "/direction"s;
     { // scope for direction_file
         ofstream direction_file(gpio_dir_path);
         direction_file << "out";
     } // scope ends
 
     if (initial != -1)
-        _output_one(ch_info.gpio, initial);
+        _output_one(ch_info, initial);
 
     global()._channel_configuration[ch_info.channel] = OUT;
 }
 
 void _setup_single_in(const ChannelInfo& ch_info)
 {
-    _export_gpio(ch_info.gpio);
+    _export_gpio(ch_info);
 
-    string gpio_dir_path = _SYSFS_ROOT + "/gpio"s + to_string(ch_info.gpio) + "/direction"s;
+    string gpio_dir_path = _SYSFS_ROOT + "/"s + ch_info.gpio_name + "/direction"s;
     { // scope for direction_file
         ofstream direction_file(gpio_dir_path);
         direction_file << "in";
@@ -401,8 +399,8 @@ void _cleanup_one(const ChannelInfo& ch_info)
         _disable_pwm(ch_info);
         _unexport_pwm(ch_info);
     } else {
-        _event_cleanup(ch_info.gpio);
-        _unexport_gpio(ch_info.gpio);
+        _event_cleanup(ch_info.gpio, ch_info.gpio_name);
+        _unexport_gpio(ch_info);
     }
     global()._channel_configuration.erase(ch_info.channel);
 }
@@ -538,7 +536,7 @@ int GPIO::input(const string& channel)
             throw runtime_error("You must setup() the GPIO channel first");
 
         { // scope for value
-            ifstream value(_SYSFS_ROOT + "/gpio"s + to_string(ch_info.gpio) + "/value"s);
+            ifstream value(_SYSFS_ROOT + "/"s + ch_info.gpio_name + "/value"s);
             int value_read;
             value >> value_read;
             return value_read;
@@ -560,7 +558,7 @@ void GPIO::output(const string& channel, int value)
         // check that the channel has been set as output
         if (_app_channel_configuration(ch_info) != OUT)
             throw runtime_error("The GPIO channel has not been set up as an OUTPUT");
-        _output_one(ch_info.gpio, value);
+        _output_one(ch_info, value);
     } catch (exception& e) {
         _cleanup_all();
         throw _error(e, "GPIO::output()");
@@ -678,7 +676,7 @@ void GPIO::add_event_detect(int channel, Edge edge, const Callback& callback, un
             throw invalid_argument("argument 'edge' must be set to RISING, FALLING or BOTH");
 
         // Execute
-        EventResultCode result = (EventResultCode)_add_edge_detect(ch_info.gpio, channel, edge, bounce_time);
+        EventResultCode result = (EventResultCode)_add_edge_detect(ch_info.gpio, ch_info.gpio_name, channel, edge, bounce_time);
         switch (result) {
         case EventResultCode::None:
             break;
@@ -703,7 +701,7 @@ void GPIO::remove_event_detect(const std::string& channel)
 {
     ChannelInfo ch_info = _channel_to_info(channel, true);
 
-    _remove_edge_detect(ch_info.gpio);
+    _remove_edge_detect(ch_info.gpio, ch_info.gpio_name);
 }
 
 void GPIO::remove_event_detect(int channel) { remove_event_detect(std::to_string(channel)); }
@@ -730,7 +728,7 @@ int GPIO::wait_for_edge(int channel, Edge edge, uint64_t bounce_time, uint64_t t
 
         // Execute
         EventResultCode result =
-            (EventResultCode)_blocking_wait_for_edge(ch_info.gpio, channel, edge, bounce_time, timeout);
+            (EventResultCode)_blocking_wait_for_edge(ch_info.gpio, ch_info.gpio_name, channel, edge, bounce_time, timeout);
         switch (result) {
         case EventResultCode::None:
             // Timeout
@@ -757,7 +755,6 @@ struct GPIO::PWM::Impl {
     int _period_ns;
     double _duty_cycle_percent;
     int _duty_cycle_ns;
-    ~Impl() = default;
 
     void _reconfigure(int frequency_hz, double duty_cycle_percent, bool start = false);
 };

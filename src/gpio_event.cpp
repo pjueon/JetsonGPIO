@@ -98,9 +98,9 @@ std::map<int, int> _fd_to_gpio_map;
 
 //----------------------------------
 
-int _write_sysfs_edge(int gpio, Edge edge, bool allow_none = true)
+int _write_sysfs_edge(const std::string gpio_name, Edge edge, bool allow_none = true)
 {
-    auto buf = format("%s/gpio%i/edge", _SYSFS_ROOT, gpio);
+    auto buf = format("%s/%s/edge", _SYSFS_ROOT, gpio_name.c_str());
 
     int edge_fd = open(buf.c_str(), O_WRONLY);
     if (edge_fd == -1) {
@@ -147,9 +147,9 @@ int _write_sysfs_edge(int gpio, Edge edge, bool allow_none = true)
     return result;
 }
 
-int _open_sysfd_value(int gpio, int& fd)
+int _open_sysfd_value(const std::string& gpio_name, int& fd)
 {
-    auto buf = format("%s/gpio%i/value", _SYSFS_ROOT, gpio);
+    auto buf = format("%s/%s/value", _SYSFS_ROOT, gpio_name.c_str());
     fd = open(buf.c_str(), O_RDONLY);
 
     if (fd == -1) {
@@ -354,7 +354,7 @@ void _epoll_end_thread()
 
 //-------------- Operations -------------------- //
 
-int _blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce_time, uint64_t timeout)
+int _blocking_wait_for_edge(int gpio, const std::string& gpio_name, int channel_id, Edge edge, uint64_t bounce_time, uint64_t timeout)
 {
     timespec timeout_time{};
     if (timeout) {
@@ -405,7 +405,7 @@ int _blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce
                     geo->edge = edge;
 
                     // Set Event
-                    result = _write_sysfs_edge(gpio, edge);
+                    result = _write_sysfs_edge(gpio_name, edge);
                     if (result) {
                         return result;
                     }
@@ -433,13 +433,13 @@ int _blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce
             geo->last_event = 0;
 
             // Open the value fd
-            result = _open_sysfd_value(gpio, geo->fd);
+            result = _open_sysfd_value(gpio_name, geo->fd);
             if (result) {
                 return result;
             }
 
             // Set Event
-            result = _write_sysfs_edge(gpio, edge);
+            result = _write_sysfs_edge(gpio_name, edge);
             if (result) {
                 close(geo->fd);
                 return result;
@@ -494,7 +494,7 @@ int _blocking_wait_for_edge(int gpio, int channel_id, Edge edge, uint64_t bounce
                     }
                 } else {
                     // Set for removal from the concurrent epoll-thread
-                    _remove_edge_detect(gpio);
+                    _remove_edge_detect(gpio, gpio_name);
                 }
             }
         }
@@ -603,7 +603,7 @@ bool _edge_event_exists(int gpio)
     return false;
 }
 
-int _add_edge_detect(int gpio, int channel_id, Edge edge, uint64_t bounce_time)
+int _add_edge_detect(int gpio, const std::string& gpio_name, int channel_id, Edge edge, uint64_t bounce_time)
 {
     int result{};
 
@@ -639,7 +639,7 @@ int _add_edge_detect(int gpio, int channel_id, Edge edge, uint64_t bounce_time)
                 geo->edge = edge;
 
                 // Set Event
-                result = _write_sysfs_edge(gpio, edge);
+                result = _write_sysfs_edge(gpio_name, edge);
                 if (result) {
                     return result;
                 }
@@ -664,14 +664,14 @@ int _add_edge_detect(int gpio, int channel_id, Edge edge, uint64_t bounce_time)
         geo->event_occurred = false;
 
         // Open the value fd
-        result = _open_sysfd_value(gpio, geo->fd);
+        result = _open_sysfd_value(gpio_name, geo->fd);
         if (result) {
             return result;
         }
         _fd_to_gpio_map[geo->fd] = gpio;
 
         // Set Event
-        result = _write_sysfs_edge(gpio, edge);
+        result = _write_sysfs_edge(gpio_name, edge);
         if (result) {
             close(geo->fd);
             return result;
@@ -692,7 +692,7 @@ int _add_edge_detect(int gpio, int channel_id, Edge edge, uint64_t bounce_time)
     return 0;
 }
 
-void _remove_edge_detect(int gpio)
+void _remove_edge_detect(int gpio, const std::string& gpio_name)
 {
     // Enter Mutex
     std::unique_lock<std::recursive_mutex> mutex_lock(_epmutex);
@@ -755,6 +755,6 @@ void _remove_edge_callback(int gpio, const Callback& callback)
     }
 }
 
-void _event_cleanup(int gpio) { _remove_edge_detect(gpio); }
+void _event_cleanup(int gpio, const std::string& gpio_name) { _remove_edge_detect(gpio, gpio_name); }
 
 } // namespace GPIO

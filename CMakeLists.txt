@@ -22,7 +22,8 @@ set(JetsonGPIO_LIB_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/JetsonGPIO.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/PythonFunctions.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gpio_pin_data.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/gpio_event.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/gpio_event.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/DictionaryLike.cpp)
 
 # Build a shared library
 ADD_LIBRARY(JetsonGPIO SHARED ${JetsonGPIO_LIB_SRCS})
@@ -47,3 +48,19 @@ set(JetsonGPIO_test_SRCS
 
 add_executable(jetsongpio_test ${JetsonGPIO_test_SRCS})
 TARGET_LINK_LIBRARIES(jetsongpio_test Threads::Threads)
+
+# Build Test for DictionaryLike
+set(DictionaryLike_test_SRCS
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/DictionaryLike.cpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/TestForDictionaryLike.cpp
+   ${CMAKE_CURRENT_SOURCE_DIR}/src/PythonFunctions.cpp)
+
+add_executable(dictionarylike_test ${DictionaryLike_test_SRCS})
+
+# Build Test all APIs
+set(test_all_apis_SRCS
+   ${JetsonGPIO_LIB_SRCS}
+   ${CMAKE_CURRENT_SOURCE_DIR}/samples/test_all_apis.cpp )
+
+add_executable(test_all_apis ${test_all_apis_SRCS})
+TARGET_LINK_LIBRARIES(test_all_apis Threads::Threads)
