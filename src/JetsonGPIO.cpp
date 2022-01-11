@@ -243,8 +243,7 @@ Directions _app_channel_configuration(const ChannelInfo& ch_info)
 
 void _export_gpio(const ChannelInfo& ch_info)
 {
-    if (os_path_exists(_SYSFS_ROOT + "/"s + ch_info.gpio_name))
-        return;
+    if (!os_path_exists(_SYSFS_ROOT + "/"s + ch_info.gpio_name))
     { // scope for f_export
         ofstream f_export(_SYSFS_ROOT + "/export"s);
         f_export << ch_info.gpio;
@@ -257,12 +256,18 @@ void _export_gpio(const ChannelInfo& ch_info)
         this_thread::sleep_for(chrono::milliseconds(10));
         if (time_count++ > 100)
             throw runtime_error("Permission denied: path: " + value_path +
-                                "\n Please configure permissions or use the root user to run this.");
+                                "\n Please configure permissions or use the root user to run this.");                   
     }
+
+    ch_info.f_direction->open(_SYSFS_ROOT + "/"s + ch_info.gpio_name + "/direction", std::ios::out);
+    ch_info.f_value->open(value_path, std::ios::in | std::ios::out);
 }
 
 void _unexport_gpio(const ChannelInfo& ch_info)
 {
+    ch_info.f_direction->close();
+    ch_info.f_value->close();
+
     if (!os_path_exists(_SYSFS_ROOT + "/"s + ch_info.gpio_name))
         return;
 
@@ -272,19 +277,18 @@ void _unexport_gpio(const ChannelInfo& ch_info)
 
 void _output_one(const ChannelInfo& ch_info, const int value)
 {
-    ofstream value_file(_SYSFS_ROOT + "/"s + ch_info.gpio_name + "/value"s);
-    value_file << int(bool(value));
+    ch_info.f_value->seekg(0, std::ios::beg);
+    *ch_info.f_value << int(bool(value));
+    ch_info.f_value->flush();
 }
 
 void _setup_single_out(const ChannelInfo& ch_info, int initial = -1)
 {
     _export_gpio(ch_info);
 
-    string gpio_dir_path = _SYSFS_ROOT + "/"s + ch_info.gpio_name + "/direction"s;
-    { // scope for direction_file
-        ofstream direction_file(gpio_dir_path);
-        direction_file << "out";
-    } // scope ends
+    ch_info.f_direction->seekg(0, std::ios::beg);
+    *ch_info.f_direction << "out";
+    ch_info.f_direction->flush();
 
     if (initial != -1)
         _output_one(ch_info, initial);
@@ -296,11 +300,9 @@ void _setup_single_in(const ChannelInfo& ch_info)
 {
     _export_gpio(ch_info);
 
-    string gpio_dir_path = _SYSFS_ROOT + "/"s + ch_info.gpio_name + "/direction"s;
-    { // scope for direction_file
-        ofstream direction_file(gpio_dir_path);
-        direction_file << "in";
-    } // scope ends
+    ch_info.f_direction->seekg(0, std::ios::beg);
+    *ch_info.f_direction << "in";
+    ch_info.f_direction->flush();
 
     global()._channel_configuration[ch_info.channel] = IN;
 }
@@ -535,12 +537,11 @@ int GPIO::input(const string& channel)
         if (app_cfg != IN && app_cfg != OUT)
             throw runtime_error("You must setup() the GPIO channel first");
 
-        { // scope for value
-            ifstream value(_SYSFS_ROOT + "/"s + ch_info.gpio_name + "/value"s);
-            int value_read;
-            value >> value_read;
-            return value_read;
-        } // scope ends
+        ch_info.f_value->seekg(0, std::ios::beg);
+        int value_read{};
+        *ch_info.f_value >> value_read;
+        return value_read;
+
     } catch (exception& e) {
         _cleanup_all();
         throw _error(e, "GPIO::input()");
