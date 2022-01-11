@@ -751,171 +751,188 @@ int GPIO::wait_for_edge(int channel, Edge edge, uint64_t bounce_time, uint64_t t
     }
 }
 
-// PWM class ==========================================================
+//=======================================
+// PWM 
+
 struct GPIO::PWM::Impl {
     ChannelInfo _ch_info;
-    bool _started;
-    int _frequency_hz;
-    int _period_ns;
-    double _duty_cycle_percent;
-    int _duty_cycle_ns;
+    bool _started = false;
+    int _frequency_hz = 0;
+    int _period_ns = 0;
+    double _duty_cycle_percent = 0;
+    int _duty_cycle_ns = 0;
 
-    void _reconfigure(int frequency_hz, double duty_cycle_percent, bool start = false);
+    Impl(int channel, int frequency_hz) : _ch_info(_channel_to_info(to_string(channel), false, true))
+    {
+        try {
+            Directions app_cfg = _app_channel_configuration(_ch_info);
+            if (app_cfg == HARD_PWM)
+                throw runtime_error("Can't create duplicate PWM objects");
+            /*
+            Apps typically set up channels as GPIO before making them be PWM,
+            because RPi.GPIO does soft-PWM. We must undo the GPIO export to
+            allow HW PWM to run on the pin.
+            */
+            if (app_cfg == IN || app_cfg == OUT) 
+                cleanup(channel);
+            
+
+            if (global()._gpio_warnings) {
+                auto sysfs_cfg = _sysfs_channel_configuration(_ch_info);
+                app_cfg = _app_channel_configuration(_ch_info);
+
+                // warn if channel has been setup external to current program
+                if (app_cfg == UNKNOWN && sysfs_cfg != UNKNOWN) {
+                    cerr << "[WARNING] This channel is already in use, continuing "
+                            "anyway. "
+                            "Use GPIO::setwarnings(false) to disable warnings"
+                        << endl;
+                }
+            }
+
+            _export_pwm(_ch_info);
+            _set_pwm_duty_cycle(_ch_info, 0);
+            // Anything that doesn't match new frequency_hz
+            _frequency_hz = -1 * frequency_hz;
+            _reconfigure(frequency_hz, 0.0);
+            global()._channel_configuration[to_string(channel)] = HARD_PWM;
+        } catch (exception& e) {
+            _cleanup_all();
+            throw _error(e, "GPIO::PWM::PWM()");
+        }
+    }
+
+    ~Impl()
+    {
+        if (!is_in(_ch_info.channel, global()._channel_configuration) || 
+            global()._channel_configuration.at(_ch_info.channel) != HARD_PWM) {
+            /* The user probably ran cleanup() on the channel already, so avoid
+            attempts to repeat the cleanup operations. */
+            return;
+        }
+
+        try {
+            stop();
+            _unexport_pwm(_ch_info);
+            global()._channel_configuration.erase(_ch_info.channel);
+        } catch(exception& e) {
+            _cleanup_all();
+            cerr << _error_message(e, "GPIO::PWM::~PWM()");
+            terminate();
+        } 
+        catch (...) {
+            cerr << "[Exception] unknown error from GPIO::PWM::~PWM()! shut down the program." << endl;
+            _cleanup_all();
+            terminate();
+        }
+    }
+
+    void start(double duty_cycle_percent)
+    {
+        try {
+            _reconfigure(_frequency_hz, duty_cycle_percent, true);
+        } catch (exception& e) {
+            _cleanup_all();
+            throw _error(e, "GPIO::PWM::start()");
+        }
+    }
+
+
+    void ChangeFrequency(int frequency_hz)
+    {
+        try {
+           _reconfigure(frequency_hz, _duty_cycle_percent);
+        } catch (exception& e) {
+            _cleanup_all();
+            throw _error(e, "GPIO::PWM::ChangeFrequency()");
+        }
+    }
+
+    void ChangeDutyCycle(double duty_cycle_percent)
+    {
+        try {
+            _reconfigure(_frequency_hz, duty_cycle_percent);
+        } catch (exception& e) {
+            _cleanup_all();
+            throw _error(e, "GPIO::PWM::ChangeDutyCycle()");
+        }
+    }
+
+
+    void stop()
+    {
+        try {
+            if (!_started)
+                return;
+
+            _disable_pwm(_ch_info);
+        } catch (exception& e) {
+            _cleanup_all();
+            throw _error(e, "GPIO::PWM::stop()");
+        }
+    }
+
+
+    void _reconfigure(int frequency_hz, double duty_cycle_percent, bool start = false)
+    {
+        if (duty_cycle_percent < 0.0 || duty_cycle_percent > 100.0)
+            throw runtime_error("invalid duty_cycle_percent");
+
+        bool freq_change = start || (frequency_hz != _frequency_hz);
+        bool stop = _started && freq_change;
+
+        if (stop) {
+            _started = false;
+            _disable_pwm(_ch_info);
+        }
+
+        if(freq_change)
+        {
+            _frequency_hz = frequency_hz;
+            _period_ns = int(1000000000.0 / frequency_hz);
+            _set_pwm_period(_ch_info, _period_ns);
+        }
+
+        _duty_cycle_percent = duty_cycle_percent;
+        _duty_cycle_ns = int(_period_ns * (duty_cycle_percent / 100.0));
+        _set_pwm_duty_cycle(_ch_info, _duty_cycle_ns);
+
+        if (stop || start) {
+            _enable_pwm(_ch_info);
+            _started = true;
+        }
+    }
 };
 
-void GPIO::PWM::Impl::_reconfigure(int frequency_hz, double duty_cycle_percent, bool start)
-{
-    if (duty_cycle_percent < 0.0 || duty_cycle_percent > 100.0)
-        throw runtime_error("invalid duty_cycle_percent");
 
-    bool freq_change = start || (frequency_hz != _frequency_hz);
-    bool stop = _started && freq_change;
+GPIO::PWM::PWM(int channel, int frequency_hz): pImpl(make_unique<Impl>(channel, frequency_hz)) {}
+GPIO::PWM::~PWM() = default;
 
-    if (stop) {
-        _started = false;
-        _disable_pwm(_ch_info);
-    }
-
-    if(freq_change)
-    {
-        _frequency_hz = frequency_hz;
-        _period_ns = int(1000000000.0 / frequency_hz);
-        _set_pwm_period(_ch_info, _period_ns);
-    }
-
-    _duty_cycle_percent = duty_cycle_percent;
-    _duty_cycle_ns = int(_period_ns * (duty_cycle_percent / 100.0));
-    _set_pwm_duty_cycle(_ch_info, _duty_cycle_ns);
-
-    if (stop || start) {
-        _enable_pwm(_ch_info);
-        _started = true;
-    }
-}
-
-GPIO::PWM::PWM(int channel, int frequency_hz)
-: pImpl(make_unique<Impl>(
-      Impl{_channel_to_info(to_string(channel), false, true), false, 0, 0, 0.0, 0})) // temporary values
-{
-    try {
-        Directions app_cfg = _app_channel_configuration(pImpl->_ch_info);
-        if (app_cfg == HARD_PWM)
-            throw runtime_error("Can't create duplicate PWM objects");
-        /*
-        Apps typically set up channels as GPIO before making them be PWM,
-        because RPi.GPIO does soft-PWM. We must undo the GPIO export to
-        allow HW PWM to run on the pin.
-        */
-        if (app_cfg == IN || app_cfg == OUT) {
-            cleanup(channel);
-        }
-
-        if (global()._gpio_warnings) {
-            auto sysfs_cfg = _sysfs_channel_configuration(pImpl->_ch_info);
-            app_cfg = _app_channel_configuration(pImpl->_ch_info);
-
-            // warn if channel has been setup external to current program
-            if (app_cfg == UNKNOWN && sysfs_cfg != UNKNOWN) {
-                cerr << "[WARNING] This channel is already in use, continuing "
-                        "anyway. "
-                        "Use GPIO::setwarnings(false) to disable warnings"
-                     << endl;
-            }
-        }
-
-        _export_pwm(pImpl->_ch_info);
-        _set_pwm_duty_cycle(pImpl->_ch_info, 0);
-        // Anything that doesn't match new frequency_hz
-        pImpl->_frequency_hz = -1 * frequency_hz;
-        pImpl->_reconfigure(frequency_hz, 0.0);
-        global()._channel_configuration[to_string(channel)] = HARD_PWM;
-    } catch (exception& e) {
-        _cleanup_all();
-        cerr << _error_message(e, "GPIO::PWM::PWM()");
-        terminate();
-    }
-}
-
-GPIO::PWM::~PWM()
-{
-    if (!is_in(pImpl->_ch_info.channel, global()._channel_configuration) || 
-        global()._channel_configuration.at(pImpl->_ch_info.channel) != HARD_PWM) {
-        /* The user probably ran cleanup() on the channel already, so avoid
-           attempts to repeat the cleanup operations. */
-        return;
-    }
-
-    try {
-        stop();
-        _unexport_pwm(pImpl->_ch_info);
-        global()._channel_configuration.erase(pImpl->_ch_info.channel);
-    } catch(exception& e) {
-        _cleanup_all();
-        cerr << _error_message(e, "GPIO::PWM::~PWM()");
-        terminate();
-    } 
-    catch (...) {
-        cerr << "[Exception] unknown error from GPIO::PWM::~PWM()! shut down the program." << endl;
-        _cleanup_all();
-        terminate();
-    }
-}
-
-// move construct
+// move construct & assign
 GPIO::PWM::PWM(GPIO::PWM&& other) = default;
-
-// move assign
-GPIO::PWM& GPIO::PWM::operator=(GPIO::PWM&& other)
-{
-    if (this == &other)
-        return *this;
-
-    pImpl = std::move(other.pImpl);
-    return *this;
-}
+GPIO::PWM& GPIO::PWM::operator=(GPIO::PWM&& other) = default;
 
 void GPIO::PWM::start(double duty_cycle_percent)
 {
-    try {
-        pImpl->_reconfigure(pImpl->_frequency_hz, duty_cycle_percent, true);
-    } catch (exception& e) {
-        _cleanup_all();
-        throw _error(e, "GPIO::PWM::start()");
-    }
+    pImpl->start(duty_cycle_percent);
 }
 
 void GPIO::PWM::ChangeFrequency(int frequency_hz)
 {
-    try {
-        pImpl->_reconfigure(frequency_hz, pImpl->_duty_cycle_percent);
-    } catch (exception& e) {
-        _cleanup_all();
-        throw _error(e, "GPIO::PWM::ChangeFrequency()");
-    }
+    pImpl->ChangeFrequency(frequency_hz);
 }
 
 void GPIO::PWM::ChangeDutyCycle(double duty_cycle_percent)
 {
-    try {
-        pImpl->_reconfigure(pImpl->_frequency_hz, duty_cycle_percent);
-    } catch (exception& e) {
-        _cleanup_all();
-        throw _error(e, "GPIO::PWM::ChangeDutyCycle()");
-    }
+    pImpl->ChangeDutyCycle(duty_cycle_percent);
 }
 
 void GPIO::PWM::stop()
 {
-    try {
-        if (!pImpl->_started)
-            return;
-
-        _disable_pwm(pImpl->_ch_info);
-    } catch (exception& e) {
-        _cleanup_all();
-        throw _error(e, "GPIO::PWM::stop()");
-    }
+    pImpl->stop();
 }
+
+//=======================================
 
 
 //=======================================
