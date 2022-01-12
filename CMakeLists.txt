@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.2)
 include(GNUInstallDirs)
 SET(CMAKE_CXX_STANDARD 14)
 
-SET(LIBRARY_VERSION "1.0.4")
+SET(LIBRARY_VERSION "1.1.0")
 SET(LIBRARY_SOVERSION "1")
 
 SET (UDEVRULES_INSTALL_DIR "/lib/udev/rules.d" CACHE STRING "Base directory for udev rules")
