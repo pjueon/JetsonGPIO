@@ -191,7 +191,9 @@ EntirePinData::EntirePinData()
     {
         "nvidia,p2972-0000",
         "nvidia,p2972-0006",
-        "nvidia,jetson-xavier"
+        "nvidia,jetson-xavier",
+        "nvidia,galen-industrial",
+        "nvidia,jetson-xavier-industrial"
     },
 
     JETSON_TX2_NX_PIN_DEFS
