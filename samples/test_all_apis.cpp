@@ -570,10 +570,9 @@ private:
             
             p.stop();
             
-            const auto weight = N / 100.0;
             const auto delta = 5;
-            const auto min_ct = weight * (pct - delta);
-            const auto max_ct = weight * (pct + delta);
+            const auto min_ct = N * (pct - delta) / 100.0;
+            const auto max_ct = N * (pct + delta) / 100.0;
 
             assert(min_ct <= count && count <= max_ct);
             GPIO::cleanup();
@@ -692,13 +691,14 @@ private:
         ADD_TEST(test_gpio_function_in);
         ADD_TEST(test_gpio_function_out);
 
-
+        // event
         ADD_TEST(test_wait_for_edge_rising);
         ADD_TEST(test_wait_for_edge_falling);
         ADD_TEST(test_event_detected_rising);
         ADD_TEST(test_event_detected_falling);
         ADD_TEST(test_event_detected_both);
 
+        // pwm
         if (!pin_data.all_pwms.empty())
         {
             ADD_TEST(test_pwm_multi_duty);
