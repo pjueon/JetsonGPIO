@@ -68,6 +68,8 @@ public:
     const vector<string> compats_nx;
     const vector<PinDefinition> JETSON_XAVIER_PIN_DEFS;
     const vector<string> compats_xavier;
+    const vector<PinDefinition> JETSON_TX2_NX_PIN_DEFS;
+    const vector<string> compats_tx2_nx;    
     const vector<PinDefinition> JETSON_TX2_PIN_DEFS;
     const vector<string> compats_tx2;
     const vector<PinDefinition> JETSON_TX1_PIN_DEFS;
@@ -192,6 +194,36 @@ EntirePinData::EntirePinData()
         "nvidia,jetson-xavier"
     },
 
+    JETSON_TX2_NX_PIN_DEFS
+    {
+        { "{192: 76,  140:  66}"s, "{140:  PJ.04}"s, "2200000.gpio", "7",  "4",  "GPIO09",    "AUD_MCLK",  "None",       -1 },
+        { "{64:  28,  47:   23}"s, "{47:   PW.04}"s, "c2f0000.gpio", "11", "17", "UART1_RTS", "UART3_RTS", "None",       -1 },
+        { "{192: 72,  140:  62}"s, "{140:  PJ.00}"s, "2200000.gpio", "12", "18", "I2S0_SCLK", "DAP1_SCLK", "None",       -1 },
+        { "{64:  17,  47:   12}"s, "{47:   PV.01}"s, "c2f0000.gpio", "13", "27", "SPI1_SCK",  "GPIO_SEN1", "None",       -1 },
+        { "{192: 18,  140:  16}"s, "{140:  PC.02}"s, "2200000.gpio", "15", "22", "GPIO12",    "DAP2_DOUT", "None",       -1 },
+        { "{192: 19,  140:  17}"s, "{140:  PC.03}"s, "2200000.gpio", "16", "23", "SPI1_CS1",  "DAP2_DIN",  "None",       -1 },
+        { "{64:  20,  47:   15}"s, "{47:   PV.04}"s, "c2f0000.gpio", "18", "24", "SPI1_CS0",  "GPIO_SEN4", "None",       -1 },
+        { "{192: 58,  140:  49}"s, "{140:  PH.02}"s, "2200000.gpio", "19", "10", "SPI0_MOSI", "GPIO_WAN7", "None",       -1 },
+        { "{192: 57,  140:  48}"s, "{140:  PH.01}"s, "2200000.gpio", "21", "9",  "SPI0_MISO", "GPIO_WAN6", "None",       -1 },
+        { "{64:  18,  47:   13}"s, "{47:   PV.02}"s, "c2f0000.gpio", "22", "25", "SPI1_MISO", "GPIO_SEN2", "None",       -1 },
+        { "{192: 56,  140:  47}"s, "{140:  PH.00}"s, "2200000.gpio", "23", "11", "SPI1_CLK",  "GPIO_WAN5", "None",       -1 },
+        { "{192: 59,  140:  50}"s, "{140:  PH.03}"s, "2200000.gpio", "24", "8",  "SPI0_CS0",  "GPIO_WAN8", "None",       -1 },
+        { "{192: 163, 140: 130}"s, "{140:  PY.03}"s, "2200000.gpio", "26", "7",  "SPI0_CS1",  "GPIO_MDM4", "None",       -1 },
+        { "{192: 105, 140:  86}"s, "{140:  PN.01}"s, "2200000.gpio", "29", "5",  "GPIO01",    "GPIO_CAM2", "None",       -1 },
+        { "{64:  50,  47:   41}"s, "{47:  PEE.02}"s, "c2f0000.gpio", "31", "6",  "GPIO11",    "TOUCH_CLK", "None",       -1 },
+        { "{64:  8,   47:    5}"s, "{47:   PU.00}"s, "c2f0000.gpio", "32", "12", "GPIO07",    "GPIO_DIS0", "3280000.pwm", 0 },
+        { "{64:  13,  47:   10}"s, "{47:   PU.05}"s, "c2f0000.gpio", "33", "13", "GPIO13",    "GPIO_DIS5", "32a0000.pwm", 0 },
+        { "{192: 75,  140:  65}"s, "{140:  PJ.03}"s, "2200000.gpio", "35", "19", "I2S0_FS",   "DAP1_FS",   "None",       -1 },
+        { "{64:  29,  47:   24}"s, "{47:   PW.05}"s, "c2f0000.gpio", "36", "16", "UART1_CTS", "UART3_CTS", "None",       -1 },
+        { "{64:  19,  47:   14}"s, "{47:   PV.03}"s, "c2f0000.gpio", "37", "26", "SPI1_MOSI", "GPIO_SEN3", "None",       -1 },
+        { "{192: 74,  140:  64}"s, "{140:  PJ.02}"s, "2200000.gpio", "38", "20", "I2S0_DIN",  "DAP1_DIN",  "None",       -1 },
+        { "{192: 73,  140:  63}"s, "{140:  PJ.01}"s, "2200000.gpio", "40", "21", "I2S0_DOUT", "DAP1_DOUT", "None",       -1 }       
+    },
+    compats_tx2_nx
+    {
+        "nvidia,p3509-0000+p3636-0001"
+    },
+
     JETSON_TX2_PIN_DEFS
     {
         { "{192:  76, 140:  66}"s, "{140:  PJ.04}"s, "2200000.gpio", "7", "4", "AUDIO_MCLK", "AUD_MCLK", "None", -1 },
@@ -305,6 +337,7 @@ EntirePinData::EntirePinData()
         { CLARA_AGX_XAVIER, CLARA_AGX_XAVIER_PIN_DEFS },
         { JETSON_NX, JETSON_NX_PIN_DEFS },
         { JETSON_XAVIER, JETSON_XAVIER_PIN_DEFS },
+        { JETSON_TX2_NX, JETSON_TX2_NX_PIN_DEFS },
         { JETSON_TX2, JETSON_TX2_PIN_DEFS },
         { JETSON_TX1, JETSON_TX1_PIN_DEFS },
         { JETSON_NANO, JETSON_NANO_PIN_DEFS }
@@ -314,6 +347,7 @@ EntirePinData::EntirePinData()
         { CLARA_AGX_XAVIER, {1, "16384M",  "Unknown", "CLARA_AGX_XAVIER", "NVIDIA", "ARM Carmel"} },
         { JETSON_NX, {1, "16384M", "Unknown", "Jetson NX", "NVIDIA", "ARM Carmel"} },
         { JETSON_XAVIER, {1, "16384M", "Unknown", "Jetson Xavier", "NVIDIA", "ARM Carmel"} },
+        { JETSON_TX2_NX, {1, "4096M", "Unknown", "Jetson TX2 NX", "NVIDIA", "ARM A57 + Denver"} },
         { JETSON_TX2, {1, "8192M", "Unknown", "Jetson TX2", "NVIDIA", "ARM A57 + Denver"} },
         { JETSON_TX1, {1, "4096M", "Unknown", "Jetson TX1", "NVIDIA", "ARM A57"} },
         { JETSON_NANO, {1, "4096M", "Unknown", "Jetson nano", "NVIDIA", "ARM A57"} }
@@ -416,6 +450,11 @@ PinData get_data()
         {
             model = CLARA_AGX_XAVIER;
             warn_if_not_carrier_board({"3900"s});
+        }
+        else if (matches(_DATA.compats_tx2_nx))
+        {
+            model = JETSON_TX2_NX;
+            warn_if_not_carrier_board({"3509"s});
         }
         else if (matches(_DATA.compats_xavier))
         {
