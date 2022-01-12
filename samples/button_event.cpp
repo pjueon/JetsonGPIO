@@ -23,6 +23,15 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
+/*
+EXAMPLE SETUP
+Connect a button to pin 11 and GND, a pull-up resistor connecting the button
+to 3V3 and an LED connected to pin 7. The application performs the same
+function as the button_led.py but performs a blocking wait for the button
+press event instead of continuously checking the value of the pin in order to
+reduce CPU usage.
+*/
+
 #include <signal.h>
 
 #include <chrono>
@@ -51,7 +60,7 @@ int main()
     // Pin Setup.
     GPIO::setmode(GPIO::BOARD);
 
-    // set pin as an output pin with optional initial state of HIGH
+    // set pin as an output pin with optional initial state of LOW
     GPIO::setup(led_pin, GPIO::OUT, GPIO::LOW);
     GPIO::setup(but_pin, GPIO::IN);
 
