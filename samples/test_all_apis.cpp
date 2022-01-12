@@ -181,9 +181,21 @@ private:
         if (model == "CLARA_AGX_XAVIER")
         /* Pre-test configuration, if boot-time pinmux doesn't set up PWM pins:
         Set BOARD pin 18 as mux function PWM:
-        bbusybox devmem 0x2434090 32 0x401
+        busybox devmem 0x2434090 32 0x401
         */
             return { 18, 19, 21, 22, {}, "MCLK05", "SOC_GPIO42", { 15, 18 } };    
+
+        if (model == "JETSON_TX2_NX")
+        /* Pre-test configuration, if boot-time pinmux doesn't set up PWM pins:
+        Set BOARD pin 33 as mux function PWM (func 1):
+        busybox devmem 0x0c3010a8 32 0x401
+        Set BOARD pin 32 as mux function PWM (func 2):
+        busybox devmem 0x0c301080 32 0x401
+        Board mode pins
+        */
+            return { 32, 31, 29, 26, {}, "GPIO09", "AUD_MCLK", { 32, 33 } };            
+
+
         throw std::runtime_error("invalid model");
     }
 
@@ -552,14 +564,16 @@ private:
             
             GPIO::PWM p(pin_data.out_a, 500);
             p.start(pct);
-            constexpr int N = 1000;
+            constexpr int N = 5000;
             for (int i = 0; i < N; i++)
                 count += GPIO::input(pin_data.in_a);
             
             p.stop();
             
-            auto min_ct = 10 * (pct - 5);
-            auto max_ct = 10 * (pct + 5);
+            const auto weight = N / 100.0;
+            const auto delta = 5;
+            const auto min_ct = weight * (pct - delta);
+            const auto max_ct = weight * (pct + delta);
 
             assert(min_ct <= count && count <= max_ct);
             GPIO::cleanup();

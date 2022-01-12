@@ -29,6 +29,8 @@ DEALINGS IN THE SOFTWARE.
 #include <string>
 #include <map>
 #include <vector>
+#include <fstream>
+#include <memory>
 
 #include "JetsonGPIO.h"
 #include "private/Model.h"
@@ -54,6 +56,10 @@ struct ChannelInfo
     const std::string pwm_chip_dir;
     const int pwm_id;
 
+    std::shared_ptr<std::fstream> f_direction;
+    std::shared_ptr<std::fstream> f_value;
+    std::shared_ptr<std::fstream> f_duty_cycle;
+
     ChannelInfo(const std::string &channel, const std::string &gpio_chip_dir,
                 // int chip_gpio, 
                 int gpio, const std::string& gpio_name, const std::string &pwm_chip_dir,
@@ -64,7 +70,10 @@ struct ChannelInfo
           gpio(gpio),
           gpio_name(gpio_name),
           pwm_chip_dir(pwm_chip_dir),
-          pwm_id(pwm_id)
+          pwm_id(pwm_id),
+          f_direction(std::make_shared<std::fstream>()),
+          f_value(std::make_shared<std::fstream>()),
+          f_duty_cycle(std::make_shared<std::fstream>())
     {}
 };
 

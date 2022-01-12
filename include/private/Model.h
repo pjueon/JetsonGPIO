@@ -36,7 +36,8 @@ enum class Model
     JETSON_XAVIER,
     JETSON_TX2,
     JETSON_TX1,
-    JETSON_NANO
+    JETSON_NANO,
+    JETSON_TX2_NX
 };
 
 // alias
@@ -46,5 +47,6 @@ constexpr Model JETSON_XAVIER = Model::JETSON_XAVIER;
 constexpr Model JETSON_TX2 = Model::JETSON_TX2;
 constexpr Model JETSON_TX1 = Model::JETSON_TX1;
 constexpr Model JETSON_NANO = Model::JETSON_NANO;
+constexpr Model JETSON_TX2_NX = Model::JETSON_TX2_NX;
 
 #endif

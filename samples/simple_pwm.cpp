@@ -35,7 +35,13 @@ DEALINGS IN THE SOFTWARE.
 #include <JetsonGPIO.h>
 
 using namespace std;
-const map<string, int> output_pins{{"JETSON_XAVIER", 18}, {"JETSON_NANO", 33}};
+const map<string, int> output_pins{
+	{"JETSON_XAVIER", 18}, 
+	{"JETSON_NANO", 33},
+	{"JETSON_NX", 33},
+	{"CLARA_AGX_XAVIER", 18},
+	{"JETSON_TX2_NX", 32},
+};
 
 int get_output_pin()
 {
