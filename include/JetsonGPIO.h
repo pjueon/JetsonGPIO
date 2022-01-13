@@ -157,9 +157,7 @@ namespace GPIO
    class Callback
    {
    private:
-
-      // To do: replace func_t to std::function<void(const std::string&)>;
-      using func_t = std::function<void(int)>;
+      using func_t = std::function<void(const std::string&)>;
 
       template <class T> 
       static bool comparer_impl(const func_t& A, const func_t& B)
@@ -183,7 +181,7 @@ namespace GPIO
       : function(std::forward<T>(function)),
         comparer([](const func_t& A, const func_t& B) { return comparer_impl<std::decay_t<T>>(A, B); })
       {
-         static_assert(std::is_constructible<func_t, T&&>::value, "Callback return type: void, argument type: int");
+         static_assert(std::is_constructible<func_t, T&&>::value, "Callback return type: void, argument type: const std::string&");
       }
 
       Callback(Callback&&) = default;
@@ -191,8 +189,8 @@ namespace GPIO
       Callback(const Callback&) = default;
       Callback& operator=(const Callback&) = default;
 
-      // To do: fix it to void operator()(const std::string& input) const;
       void operator()(int input) const;
+      void operator()(const std::string& input) const;
 
       friend bool operator==(const Callback& A, const Callback& B);
       friend bool operator!=(const Callback& A, const Callback& B);
@@ -239,9 +237,7 @@ namespace GPIO
       @bouncetime in milliseconds (optional)
       @timeout in milliseconds (optional)
       @returns channel for an event, 0 for a timeout */
-
-   // To do: change the return type to std::string;
-   int wait_for_edge(const std::string& channel, Edge edge, unsigned long bounce_time = 0, unsigned long timeout = 0);
+   std::string wait_for_edge(const std::string& channel, Edge edge, unsigned long bounce_time = 0, unsigned long timeout = 0);
    int wait_for_edge(int channel, Edge edge, unsigned long bounce_time = 0, unsigned long timeout = 0);
 
    //----------------------------------

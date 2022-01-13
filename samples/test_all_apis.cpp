@@ -100,7 +100,7 @@ struct TestFunc
 class TestCallback
 {
 public:
-    TestCallback(bool* flag, int target) : flag(flag), target(target){};
+    TestCallback(bool* flag, const std::string& target) : flag(flag), target(target){};
 
     TestCallback(const TestCallback&) = default;
 
@@ -109,7 +109,7 @@ public:
         return other.flag == flag && other.target == target;
     }
 
-    void operator()(int channel)
+    void operator()(const std::string& channel)
     {
         if (channel == target && flag != nullptr)
         {
@@ -119,7 +119,7 @@ public:
 
 private:
     bool* flag;
-    int target;
+    std::string target;
 };
 
 
@@ -727,7 +727,7 @@ private:
         GPIO::setup(pin_data.out_a, GPIO::OUT, init);
         GPIO::setup(pin_data.in_a, GPIO::IN);
 
-        TestCallback callback(&event_callback_occurred, pin_data.in_a);
+        TestCallback callback(&event_callback_occurred, std::to_string(pin_data.in_a));
 
         auto get_saw_event = [&]() mutable -> bool
         {
