@@ -62,8 +62,7 @@ constexpr Directions HARD_PWM = Directions::HARD_PWM;
 // different compilation units. 
 
 
-
-class GlobalVariableWrapper
+class GlobalVariablesForGPIO
 {
 public:
     // -----Global Variables----
@@ -82,12 +81,12 @@ public:
     NumberingModes _gpio_mode;
     map<string, Directions> _channel_configuration;
 
-    GlobalVariableWrapper(const GlobalVariableWrapper&) = delete;
-    GlobalVariableWrapper& operator=(const GlobalVariableWrapper&) = delete;
+    GlobalVariablesForGPIO(const GlobalVariablesForGPIO&) = delete;
+    GlobalVariablesForGPIO& operator=(const GlobalVariablesForGPIO&) = delete;
 
-    static GlobalVariableWrapper& get_instance()
+    static GlobalVariablesForGPIO& get_instance()
     {
-        static GlobalVariableWrapper singleton{};
+        static GlobalVariablesForGPIO singleton{};
         return singleton;
     }
 
@@ -128,7 +127,7 @@ public:
 
 
 private:
-    GlobalVariableWrapper()
+    GlobalVariablesForGPIO()
     : _pinData(get_data()), // Get GPIO pin data
       _model(_pinData.model),
       _JETSON_INFO(_pinData.pin_info),
@@ -158,9 +157,9 @@ private:
 
 //================================================================================
 // alias
-GlobalVariableWrapper& global()
+GlobalVariablesForGPIO& global()
 {
-    return GlobalVariableWrapper::get_instance();
+    return GlobalVariablesForGPIO::get_instance();
 }
 
 
@@ -430,7 +429,7 @@ void _cleanup_all()
 // APIs
 
 // The reason that model and JETSON_INFO are not wrapped by
-// GlobalVariableWrapper is because they belong to API
+// GlobalVariablesForGPIO is because they belong to API
 
 
 extern const string GPIO::model = global().model_name();
