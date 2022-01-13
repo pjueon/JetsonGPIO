@@ -476,7 +476,7 @@ void GPIO::setup(const string& channel, Directions direction, int initial)
 
             if (app_cfg == UNKNOWN && sysfs_cfg != UNKNOWN) {
                 cerr << "[WARNING] This channel is already in use, continuing anyway. Use GPIO::setwarnings(false) to "
-                        "disable warnings.\n";
+                        "disable warnings. channel: " << channel << endl;
             }
         }
 
@@ -787,8 +787,8 @@ struct GPIO::PWM::Impl {
                 if (app_cfg == UNKNOWN && sysfs_cfg != UNKNOWN) {
                     cerr << "[WARNING] This channel is already in use, continuing "
                             "anyway. "
-                            "Use GPIO::setwarnings(false) to disable warnings"
-                        << endl;
+                            "Use GPIO::setwarnings(false) to disable warnings. "
+                         << "channel: " << channel << endl;
                 }
             }
 
@@ -981,15 +981,14 @@ public:
             // _cleaner object will call it.
             _cleanup_all();
         } catch (exception& e) {
-            cerr << "Exception: " << e.what() << endl;
-            cerr << "Exception from destructor of _cleaner class." << endl;
+            cerr << _error_message(e, "~_cleaner()") << std::endl;
         }
     }
 };
 
 // AutoCleaner will be destructed at the end of the program, and call
 // _cleanup_all(). It COULD cause a problem because at the end of the program,
-// global._channel_configuration and global._gpio_mode MUST NOT be destructed
+// global()._channel_configuration and global()._gpio_mode MUST NOT be destructed
 // before AutoCleaner. But the static objects are destructed in the reverse
 // order of construction, and objects defined in the same compilation unit will
 // be constructed in the order of definition. So it's supposed to work properly.
