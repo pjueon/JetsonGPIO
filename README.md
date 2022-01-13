@@ -124,7 +124,7 @@ GPIO::setmode(GPIO::CVM);
 GPIO::setmode(GPIO::TEGRA_SOC);
 ```
 
-To check which mode has be set, you can call:
+To check which mode has been set, you can call:
 ```cpp
 GPIO::NumberingModes mode = GPIO::getmode();
 ```
