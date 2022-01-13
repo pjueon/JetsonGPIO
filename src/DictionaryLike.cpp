@@ -53,20 +53,20 @@ namespace GPIO
 
     void DictionaryLike::parse() const
     {
-        auto _data = strip(data);
         is_parsed = true;
         is_dictionary = false;
 
+        auto _data = strip(data);
         if (_data.size() < 2 || _data.front() != '{' || _data.back() != '}')
             return;
         
         // remove "{}"
         _data = strip(_data.substr(1, _data.size() - 2));
         
-        auto elements = split(_data, ',');
-
         std::map<std::string, std::string> _dictionary{};
-        for(std::string e : elements)
+
+        auto elements = split(_data, ',');
+        for(auto& e : elements)
         {
             auto pair = split(e, ':');    
             if(pair.size() != 2)
