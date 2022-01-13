@@ -276,7 +276,7 @@ void _unexport_gpio(const ChannelInfo& ch_info)
 void _output_one(const ChannelInfo& ch_info, const int value)
 {
     ch_info.f_value->seekg(0, std::ios::beg);
-    *ch_info.f_value << int(bool(value));
+    *ch_info.f_value << static_cast<int>(static_cast<bool>(value));
     ch_info.f_value->flush();
 }
 
