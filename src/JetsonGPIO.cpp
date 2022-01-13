@@ -659,11 +659,14 @@ void GPIO::remove_event_callback(int channel, const Callback& callback)
 
 void GPIO::add_event_detect(const std::string& channel, Edge edge, const Callback& callback, unsigned long bounce_time)
 {
+   // To do: if the numbering mode is CVM or TEGRA_SOC, the channel CANNOT be converted to integer.
     add_event_detect(std::atoi(channel.data()), edge, callback, bounce_time);
 }
 
 void GPIO::add_event_detect(int channel, Edge edge, const Callback& callback, unsigned long bounce_time)
 {
+    // To do: replace it to add_event_detect(std::to_string(channel), ...);
+
     try {
         ChannelInfo ch_info = _channel_to_info(std::to_string(channel), true);
 
@@ -710,11 +713,14 @@ void GPIO::remove_event_detect(int channel) { remove_event_detect(std::to_string
 
 int GPIO::wait_for_edge(const std::string& channel, Edge edge, uint64_t bounce_time, uint64_t timeout)
 {
+    // To do: if the numbering mode is CVM or TEGRA_SOC, the channel CANNOT be converted to integer!
     return wait_for_edge(std::atoi(channel.data()), edge, bounce_time, timeout);
 }
 
 int GPIO::wait_for_edge(int channel, Edge edge, uint64_t bounce_time, uint64_t timeout)
 {
+    // To do: replace it to return wait_for_edge(std::to_string(channel), ...);
+
     try {
         ChannelInfo ch_info = _channel_to_info(std::to_string(channel), true);
 

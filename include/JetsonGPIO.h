@@ -157,6 +157,8 @@ namespace GPIO
    class Callback
    {
    private:
+
+      // To do: replace func_t to std::function<void(const std::string&)>;
       using func_t = std::function<void(int)>;
 
       template <class T> 
@@ -189,6 +191,7 @@ namespace GPIO
       Callback(const Callback&) = default;
       Callback& operator=(const Callback&) = default;
 
+      // To do: fix it to void operator()(const std::string& input) const;
       void operator()(int input) const;
 
       friend bool operator==(const Callback& A, const Callback& B);
@@ -236,6 +239,8 @@ namespace GPIO
       @bouncetime in milliseconds (optional)
       @timeout in milliseconds (optional)
       @returns channel for an event, 0 for a timeout */
+
+   // To do: change the return type to std::string;
    int wait_for_edge(const std::string& channel, Edge edge, unsigned long bounce_time = 0, unsigned long timeout = 0);
    int wait_for_edge(int channel, Edge edge, unsigned long bounce_time = 0, unsigned long timeout = 0);
 

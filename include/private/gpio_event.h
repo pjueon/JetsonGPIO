@@ -53,11 +53,13 @@ enum class EventResultCode {
 
 extern std::map<EventResultCode, const char*> event_error_code_to_message;
 
+// to do: change channel_id to std::string 
 int _blocking_wait_for_edge(int gpio, const std::string& gpio_name, int channel_id, Edge edge, uint64_t bounce_time, uint64_t timeout);
 
 bool _edge_event_detected(int gpio);
 bool _edge_event_exists(int gpio);
 
+// to do: change channel_id to std::string 
 int _add_edge_detect(int gpio, const std::string& gpio_name, int channel_id, Edge edge, uint64_t bounce_time);
 void _remove_edge_detect(int gpio, const std::string& gpio_name);
 

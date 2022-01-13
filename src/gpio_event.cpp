@@ -75,6 +75,7 @@ struct _gpioEventObject {
     enum ModifyEvent { NONE, ADD, INITIAL_ABSCOND, REMOVE, MODIFY } _epoll_change_flag;
     struct epoll_event _epoll_event;
 
+    // to do: change to std::string
     int channel_id;
     int gpio;
     int fd;
