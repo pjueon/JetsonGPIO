@@ -38,6 +38,8 @@ namespace GPIO
 {
     bool startswith(const std::string& s, const std::string& prefix);
 
+    std::string lower(const std::string& s);
+
     std::vector<std::string> split(const std::string& s, const char d);
 
     bool os_access(const std::string& path, int mode); // os.access
@@ -58,23 +60,22 @@ namespace GPIO
         return dictionary.find(key) != dictionary.end();
     }
 
-
-    template<class key_t>
-    bool is_in(const key_t& key, const std::set<key_t>& set)
+    template<class element_t>
+    bool is_in(const element_t& element, const std::set<element_t>& set)
     {
-        return set.find(key) != set.end();
+        return set.find(element) != set.end();
     }
 
-    template<class key_t, class char_t>
-    bool is_in(const key_t& key, const std::basic_string<char_t>& str)
+    template<class element_t, class char_t>
+    bool is_in(const element_t& element, const std::basic_string<char_t>& str)
     {
-        return str.find(key) != std::basic_string<char_t>::npos;
+        return str.find(element) != std::basic_string<char_t>::npos;
     }
 
-    template<class key_t>
-    bool is_in(const key_t& key, const std::vector<key_t>& vector)
+    template<class element_t>
+    bool is_in(const element_t& element, const std::vector<element_t>& vector)
     {
-        return std::find(vector.begin(), vector.end(), key) != vector.end();
+        return std::find(vector.begin(), vector.end(), element) != vector.end();
     }
 
 

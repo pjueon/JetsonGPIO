@@ -213,16 +213,13 @@ Directions _sysfs_channel_configuration(const ChannelInfo& ch_info)
     if (!os_path_exists(gpio_dir))
         return UNKNOWN; // Originally returns None in NVIDIA's GPIO Python Library
 
-    string gpio_direction;
+    string gpio_direction{};
     { // scope for f
         ifstream f_direction(gpio_dir + "/direction");
         stringstream buffer{};
         buffer << f_direction.rdbuf();
         gpio_direction = buffer.str();
-        gpio_direction = strip(gpio_direction);
-        // lower()
-        transform(gpio_direction.begin(), gpio_direction.end(), gpio_direction.begin(),
-                  [](unsigned char c) { return tolower(c); });
+        gpio_direction = lower(strip(gpio_direction));
     } // scope ends
 
     if (gpio_direction == "in")

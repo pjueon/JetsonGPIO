@@ -26,6 +26,7 @@ DEALINGS IN THE SOFTWARE.
 #include <dirent.h>
 #include <sstream>
 #include <cctype>
+#include <algorithm>
 
 #include "private/PythonFunctions.h"
 
@@ -40,6 +41,14 @@ namespace GPIO
         
         return prefix == s.substr(0, prefix.size());
     }
+
+    std::string lower(const std::string& s)
+    {
+        auto copied = s;
+        transform(copied.begin(), copied.end(), copied.begin(), [](unsigned char c) { return tolower(c); });
+        return copied;
+    }
+
 
     vector<string> split(const string& s, const char d)
     {
