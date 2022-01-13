@@ -44,8 +44,8 @@ DEALINGS IN THE SOFTWARE.
 
 #include "JetsonGPIO.h"
 
-#define MAX_EPOLL_EVENTS 20
-#define READ_SIZE 10
+constexpr size_t MAX_EPOLL_EVENTS = 20;
+
 
 namespace GPIO
 {

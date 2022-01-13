@@ -26,102 +26,113 @@ DEALINGS IN THE SOFTWARE.
 #include <dirent.h>
 #include <sstream>
 #include <cctype>
+#include <algorithm>
 
 #include "private/PythonFunctions.h"
 
 using namespace std;
 
-bool startswith(const string& s, const string& prefix) 
+namespace GPIO
 {
-	size_t pre_size = prefix.size();
-	if (s.size() < pre_size) return false;
-	
-	return prefix == s.substr(0, prefix.size());
-}
-
-vector<string> split(const string& s, const char d)
-{
-    stringstream buffer(s);
-
-    string tmp{};
-    vector<string> outputVector{};
-
-    while (getline(buffer, tmp, d))
-        outputVector.push_back(tmp);
-
-    return outputVector;
-}
-
-bool os_access(const string& path, int mode)  // os.access
-{  
-    return access(path.c_str(), mode) == 0;
-}
-
-vector<string> os_listdir(const string& path)  // os.listdir
-{  
-    DIR *dir{};
-    struct dirent *ent{};
-    vector<string> outputVector{};
-
-    if ((dir = opendir(path.c_str())) != nullptr)
+    bool startswith(const string& s, const string& prefix) 
     {
-        while ((ent = readdir(dir)) != nullptr)
-        {
-            outputVector.emplace_back(ent->d_name);
-        }
-        closedir(dir);
+        size_t pre_size = prefix.size();
+        if (s.size() < pre_size) return false;
+        
+        return prefix == s.substr(0, prefix.size());
+    }
+
+    std::string lower(const std::string& s)
+    {
+        auto copied = s;
+        transform(copied.begin(), copied.end(), copied.begin(), [](unsigned char c) { return tolower(c); });
+        return copied;
+    }
+
+
+    vector<string> split(const string& s, const char d)
+    {
+        stringstream buffer(s);
+
+        string tmp{};
+        vector<string> outputVector{};
+
+        while (getline(buffer, tmp, d))
+            outputVector.push_back(tmp);
+
         return outputVector;
     }
-    else 
-    {
-        throw runtime_error("could not open directory: " + path);
-    }
-}
 
-
-bool os_path_isdir(const std::string& path) // os.path.isdir
-{
-    bool exists = false;
-
-    DIR *dir = opendir (path.c_str());
-    if (dir != nullptr)
-    {
-        exists = true;    
-        closedir (dir);
+    bool os_access(const string& path, int mode)  // os.access
+    {  
+        return access(path.c_str(), mode) == 0;
     }
 
-    return exists;
-}
+    vector<string> os_listdir(const string& path)  // os.listdir
+    {  
+        DIR *dir{};
+        struct dirent *ent{};
+        vector<string> outputVector{};
 
-
-bool os_path_exists(const string& path)  // os.path.exists
-{  
-    return os_access(path, F_OK);
-}
-
-string strip(const string& s)
-{
-    int start_idx = 0;
-    int total = s.size();
-    int end_idx = total - 1;
-    for (; start_idx < total; start_idx++)
-    {
-        if(!isspace(s[start_idx]))
-            break;
+        if ((dir = opendir(path.c_str())) != nullptr)
+        {
+            while ((ent = readdir(dir)) != nullptr)
+            {
+                outputVector.emplace_back(ent->d_name);
+            }
+            closedir(dir);
+            return outputVector;
+        }
+        else 
+        {
+            throw runtime_error("could not open directory: " + path);
+        }
     }
-    if(start_idx == total)
-        return "";
-    for(; end_idx > start_idx; end_idx--)
+
+
+    bool os_path_isdir(const std::string& path) // os.path.isdir
     {
-        if(!isspace(s[end_idx]))
-            break;
+        bool exists = false;
+
+        DIR *dir = opendir (path.c_str());
+        if (dir != nullptr)
+        {
+            exists = true;    
+            closedir (dir);
+        }
+
+        return exists;
     }
-    return s.substr(start_idx, end_idx - start_idx + 1);
+
+
+    bool os_path_exists(const string& path)  // os.path.exists
+    {  
+        return os_access(path, F_OK);
+    }
+
+    string strip(const string& s)
+    {
+        int start_idx = 0;
+        int total = s.size();
+        int end_idx = total - 1;
+        for (; start_idx < total; start_idx++)
+        {
+            if(!isspace(s[start_idx]))
+                break;
+        }
+        if(start_idx == total)
+            return "";
+        for(; end_idx > start_idx; end_idx--)
+        {
+            if(!isspace(s[end_idx]))
+                break;
+        }
+        return s.substr(start_idx, end_idx - start_idx + 1);
+    }
+
+
+    bool is_None(const std::string& s)
+    {
+        return s == "None";
+    }
 }
-
-
-bool is_None(const std::string& s)
-{
-    return s == "None";
-}
-

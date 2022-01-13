@@ -28,25 +28,28 @@ DEALINGS IN THE SOFTWARE.
 
 #include <string>
 
-// Jetson Models
-enum class Model
+namespace GPIO
 {
-    CLARA_AGX_XAVIER,
-    JETSON_NX,
-    JETSON_XAVIER,
-    JETSON_TX2,
-    JETSON_TX1,
-    JETSON_NANO,
-    JETSON_TX2_NX
-};
+    // Jetson Models
+    enum class Model
+    {
+        CLARA_AGX_XAVIER,
+        JETSON_NX,
+        JETSON_XAVIER,
+        JETSON_TX2,
+        JETSON_TX1,
+        JETSON_NANO,
+        JETSON_TX2_NX
+    };
 
-// alias
-constexpr Model CLARA_AGX_XAVIER = Model::CLARA_AGX_XAVIER;
-constexpr Model JETSON_NX = Model::JETSON_NX;
-constexpr Model JETSON_XAVIER = Model::JETSON_XAVIER;
-constexpr Model JETSON_TX2 = Model::JETSON_TX2;
-constexpr Model JETSON_TX1 = Model::JETSON_TX1;
-constexpr Model JETSON_NANO = Model::JETSON_NANO;
-constexpr Model JETSON_TX2_NX = Model::JETSON_TX2_NX;
+    // alias
+    constexpr Model CLARA_AGX_XAVIER = Model::CLARA_AGX_XAVIER;
+    constexpr Model JETSON_NX = Model::JETSON_NX;
+    constexpr Model JETSON_XAVIER = Model::JETSON_XAVIER;
+    constexpr Model JETSON_TX2 = Model::JETSON_TX2;
+    constexpr Model JETSON_TX1 = Model::JETSON_TX1;
+    constexpr Model JETSON_NANO = Model::JETSON_NANO;
+    constexpr Model JETSON_TX2_NX = Model::JETSON_TX2_NX;
+}
 
 #endif

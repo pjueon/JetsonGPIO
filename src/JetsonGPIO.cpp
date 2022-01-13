@@ -46,7 +46,7 @@ DEALINGS IN THE SOFTWARE.
 #include "private/PythonFunctions.h"
 #include "private/gpio_event.h"
 #include "private/gpio_pin_data.h"
-#include "private/exception_handling.h"
+#include "private/ExceptionHandling.h"
 
 using namespace GPIO;
 using namespace std;
@@ -62,8 +62,7 @@ constexpr Directions HARD_PWM = Directions::HARD_PWM;
 // different compilation units. 
 
 
-
-class GlobalVariableWrapper
+class GlobalVariablesForGPIO
 {
 public:
     // -----Global Variables----
@@ -82,12 +81,12 @@ public:
     NumberingModes _gpio_mode;
     map<string, Directions> _channel_configuration;
 
-    GlobalVariableWrapper(const GlobalVariableWrapper&) = delete;
-    GlobalVariableWrapper& operator=(const GlobalVariableWrapper&) = delete;
+    GlobalVariablesForGPIO(const GlobalVariablesForGPIO&) = delete;
+    GlobalVariablesForGPIO& operator=(const GlobalVariablesForGPIO&) = delete;
 
-    static GlobalVariableWrapper& get_instance()
+    static GlobalVariablesForGPIO& get_instance()
     {
-        static GlobalVariableWrapper singleton{};
+        static GlobalVariablesForGPIO singleton{};
         return singleton;
     }
 
@@ -128,7 +127,7 @@ public:
 
 
 private:
-    GlobalVariableWrapper()
+    GlobalVariablesForGPIO()
     : _pinData(get_data()), // Get GPIO pin data
       _model(_pinData.model),
       _JETSON_INFO(_pinData.pin_info),
@@ -158,9 +157,9 @@ private:
 
 //================================================================================
 // alias
-GlobalVariableWrapper& global()
+GlobalVariablesForGPIO& global()
 {
-    return GlobalVariableWrapper::get_instance();
+    return GlobalVariablesForGPIO::get_instance();
 }
 
 
@@ -214,16 +213,13 @@ Directions _sysfs_channel_configuration(const ChannelInfo& ch_info)
     if (!os_path_exists(gpio_dir))
         return UNKNOWN; // Originally returns None in NVIDIA's GPIO Python Library
 
-    string gpio_direction;
+    string gpio_direction{};
     { // scope for f
         ifstream f_direction(gpio_dir + "/direction");
         stringstream buffer{};
         buffer << f_direction.rdbuf();
         gpio_direction = buffer.str();
-        gpio_direction = strip(gpio_direction);
-        // lower()
-        transform(gpio_direction.begin(), gpio_direction.end(), gpio_direction.begin(),
-                  [](unsigned char c) { return tolower(c); });
+        gpio_direction = lower(strip(gpio_direction));
     } // scope ends
 
     if (gpio_direction == "in")
@@ -280,7 +276,7 @@ void _unexport_gpio(const ChannelInfo& ch_info)
 void _output_one(const ChannelInfo& ch_info, const int value)
 {
     ch_info.f_value->seekg(0, std::ios::beg);
-    *ch_info.f_value << int(bool(value));
+    *ch_info.f_value << static_cast<int>(static_cast<bool>(value));
     ch_info.f_value->flush();
 }
 
@@ -430,7 +426,7 @@ void _cleanup_all()
 // APIs
 
 // The reason that model and JETSON_INFO are not wrapped by
-// GlobalVariableWrapper is because they belong to API
+// GlobalVariablesForGPIO is because they belong to API
 
 
 extern const string GPIO::model = global().model_name();
@@ -476,7 +472,7 @@ void GPIO::setup(const string& channel, Directions direction, int initial)
 
             if (app_cfg == UNKNOWN && sysfs_cfg != UNKNOWN) {
                 cerr << "[WARNING] This channel is already in use, continuing anyway. Use GPIO::setwarnings(false) to "
-                        "disable warnings.\n";
+                        "disable warnings. channel: " << channel << endl;
             }
         }
 
@@ -787,8 +783,8 @@ struct GPIO::PWM::Impl {
                 if (app_cfg == UNKNOWN && sysfs_cfg != UNKNOWN) {
                     cerr << "[WARNING] This channel is already in use, continuing "
                             "anyway. "
-                            "Use GPIO::setwarnings(false) to disable warnings"
-                        << endl;
+                            "Use GPIO::setwarnings(false) to disable warnings. "
+                         << "channel: " << channel << endl;
                 }
             }
 
@@ -981,15 +977,14 @@ public:
             // _cleaner object will call it.
             _cleanup_all();
         } catch (exception& e) {
-            cerr << "Exception: " << e.what() << endl;
-            cerr << "Exception from destructor of _cleaner class." << endl;
+            cerr << _error_message(e, "~_cleaner()") << std::endl;
         }
     }
 };
 
 // AutoCleaner will be destructed at the end of the program, and call
 // _cleanup_all(). It COULD cause a problem because at the end of the program,
-// global._channel_configuration and global._gpio_mode MUST NOT be destructed
+// global()._channel_configuration and global()._gpio_mode MUST NOT be destructed
 // before AutoCleaner. But the static objects are destructed in the reverse
 // order of construction, and objects defined in the same compilation unit will
 // be constructed in the order of definition. So it's supposed to work properly.
