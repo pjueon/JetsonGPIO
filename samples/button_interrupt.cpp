@@ -35,9 +35,9 @@ DEALINGS IN THE SOFTWARE.
 using namespace std;
 
 // Pin Definitions
-const int led_pin_1 = 7;  // BOARD pin 7
-const int led_pin_2 = 11; // BOARD pin 11
-const int but_pin = 18;   // BOARD pin 18
+const int led_pin_1 = 12;  // BOARD pin 7
+const int led_pin_2 = 13;  // BOARD pin 11
+const int but_pin = 18;    // BOARD pin 18
 
 static bool end_this_program = false;
 
