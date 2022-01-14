@@ -1,11 +1,10 @@
-PROJECT(JetsonGPIO C CXX)
 cmake_minimum_required(VERSION 3.2)
+PROJECT(JetsonGPIO
+        VERSION 1.1.0
+        LANGUAGES C CXX)
 
 include(GNUInstallDirs)
 SET(CMAKE_CXX_STANDARD 14)
-
-SET(LIBRARY_VERSION "1.1.0")
-SET(LIBRARY_SOVERSION "1")
 
 SET (UDEVRULES_INSTALL_DIR "/lib/udev/rules.d" CACHE STRING "Base directory for udev rules")
 
@@ -28,7 +27,9 @@ set(JetsonGPIO_LIB_SRCS
 # Build a shared library
 ADD_LIBRARY(JetsonGPIO SHARED ${JetsonGPIO_LIB_SRCS})
 TARGET_LINK_LIBRARIES(JetsonGPIO Threads::Threads)
-SET_TARGET_PROPERTIES(JetsonGPIO PROPERTIES VERSION ${LIBRARY_VERSION} SOVERSION ${LIBRARY_SOVERSION})
+SET_TARGET_PROPERTIES(JetsonGPIO PROPERTIES
+                      VERSION ${PROJECT_VERSION}
+                      SOVERSION ${PROJECT_VERSION_MAJOR})
 
 # Install Library
 INSTALL(TARGETS JetsonGPIO
@@ -49,7 +50,7 @@ INSTALL(EXPORT JetsonGPIOTargets
 include(CMakePackageConfigHelpers)
 write_basic_package_version_file(
   ${CMAKE_CURRENT_BINARY_DIR}/JetsonGPIOConfigVersion.cmake
-  VERSION ${LIBRARY_VERSION}
+  VERSION ${PROJECT_VERSION}
   COMPATIBILITY AnyNewerVersion)
 
 # Generate the package configuration file
