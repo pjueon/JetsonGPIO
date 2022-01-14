@@ -24,6 +24,9 @@ set(JetsonGPIO_LIB_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gpio_event.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/DictionaryLike.cpp)
 
+# Generate a *Config.h header in the build directory
+configure_file(cmake/JetsonGPIOConfig.h.in JetsonGPIOConfig.h)
+
 # Build a shared library
 ADD_LIBRARY(JetsonGPIO SHARED ${JetsonGPIO_LIB_SRCS})
 TARGET_LINK_LIBRARIES(JetsonGPIO Threads::Threads)
@@ -40,6 +43,10 @@ INSTALL(TARGETS JetsonGPIO
 INSTALL(FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/JetsonGPIO.h
     DESTINATION include/JetsonGPIO)
+
+# Install the auto-generated configuration header
+install(FILES ${PROJECT_BINARY_DIR}/JetsonGPIOConfig.h
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/JetsonGPIO)
 
 # (Generate and) install the target import file
 INSTALL(EXPORT JetsonGPIOTargets

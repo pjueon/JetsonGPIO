@@ -32,6 +32,8 @@ DEALINGS IN THE SOFTWARE.
 #include <type_traits>
 #include <functional>
 
+#include "JetsonGPIOConfig.h"
+
 #if (__cplusplus < 201402L) 
 // if C++14 is not supported,
 
@@ -62,7 +64,7 @@ namespace std
 
 namespace GPIO
 {
-   constexpr auto VERSION = "1.1.0";
+   constexpr auto VERSION = JETSONGPIO_VERSION;
    constexpr auto _SYSFS_ROOT = "/sys/class/gpio";
 
    extern const std::string JETSON_INFO;
