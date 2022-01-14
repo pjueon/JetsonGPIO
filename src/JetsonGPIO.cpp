@@ -500,7 +500,7 @@ void GPIO::cleanup(const string& channel)
         // warn if no channel is setup
         if (global()._gpio_mode == NumberingModes::None && global()._gpio_warnings) {
             cerr << "[WARNING] No channels have been set up yet - nothing to clean up! "
-                    "Try cleaning up at the end of your program instead!";
+                    "Try cleaning up at the end of your program instead!" << endl;
             return;
         }
 
