@@ -42,11 +42,11 @@ INSTALL(TARGETS JetsonGPIO
 # Install Public Headers
 INSTALL(FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/JetsonGPIO.h
-    DESTINATION include/JetsonGPIO)
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 # Install the auto-generated configuration header
 install(FILES ${PROJECT_BINARY_DIR}/JetsonGPIOConfig.h
-        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}/JetsonGPIO)
+        DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
 # (Generate and) install the target import file
 INSTALL(EXPORT JetsonGPIOTargets
