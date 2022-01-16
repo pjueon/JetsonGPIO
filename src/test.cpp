@@ -29,6 +29,7 @@ DEALINGS IN THE SOFTWARE.
 #include <chrono>
 #include <iostream>
 #include <thread>
+#include <string>
 
 #include "JetsonGPIO.h"
 
@@ -61,19 +62,19 @@ inline void delay(int ms)
 
 void signalHandler(int s) { end_this_program = true; }
 
-void callback_fn(int button_pin)
+void callback_fn(const std::string& button_pin)
 {
     cout << "--Callback called from button_pin " << button_pin << endl;
     ++cb;
 }
 
-void callback_one(int button_pin)
+void callback_one(const std::string& button_pin)
 {
     cout << "--First Additional Callback" << endl;
     cb1 = true;
 }
 
-void callback_two(int button_pin)
+void callback_two(const std::string& button_pin)
 {
     cout << "--Second Additional Callback" << endl;
     cb2 = true;

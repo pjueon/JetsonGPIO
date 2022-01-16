@@ -659,13 +659,8 @@ void GPIO::remove_event_callback(int channel, const Callback& callback)
 
 void GPIO::add_event_detect(const std::string& channel, Edge edge, const Callback& callback, unsigned long bounce_time)
 {
-    add_event_detect(std::atoi(channel.data()), edge, callback, bounce_time);
-}
-
-void GPIO::add_event_detect(int channel, Edge edge, const Callback& callback, unsigned long bounce_time)
-{
     try {
-        ChannelInfo ch_info = _channel_to_info(std::to_string(channel), true);
+        ChannelInfo ch_info = _channel_to_info(channel, true);
 
         // channel must be setup as input
         Directions app_cfg = _app_channel_configuration(ch_info);
@@ -699,6 +694,12 @@ void GPIO::add_event_detect(int channel, Edge edge, const Callback& callback, un
     }
 }
 
+
+void GPIO::add_event_detect(int channel, Edge edge, const Callback& callback, unsigned long bounce_time)
+{
+    return add_event_detect(std::to_string(channel), edge, callback, bounce_time);
+}
+
 void GPIO::remove_event_detect(const std::string& channel)
 {
     ChannelInfo ch_info = _channel_to_info(channel, true);
@@ -708,15 +709,10 @@ void GPIO::remove_event_detect(const std::string& channel)
 
 void GPIO::remove_event_detect(int channel) { remove_event_detect(std::to_string(channel)); }
 
-int GPIO::wait_for_edge(const std::string& channel, Edge edge, uint64_t bounce_time, uint64_t timeout)
-{
-    return wait_for_edge(std::atoi(channel.data()), edge, bounce_time, timeout);
-}
-
-int GPIO::wait_for_edge(int channel, Edge edge, uint64_t bounce_time, uint64_t timeout)
+WaitResult GPIO::wait_for_edge(const std::string& channel, Edge edge, uint64_t bounce_time, uint64_t timeout)
 {
     try {
-        ChannelInfo ch_info = _channel_to_info(std::to_string(channel), true);
+        ChannelInfo ch_info = _channel_to_info(channel, true);
 
         // channel must be setup as input
         Directions app_cfg = _app_channel_configuration(ch_info);
@@ -734,7 +730,7 @@ int GPIO::wait_for_edge(int channel, Edge edge, uint64_t bounce_time, uint64_t t
         switch (result) {
         case EventResultCode::None:
             // Timeout
-            return 0;
+            return "None"s;
         case EventResultCode::EdgeDetected:
             // Event Detected
             return channel;
@@ -747,6 +743,11 @@ int GPIO::wait_for_edge(int channel, Edge edge, uint64_t bounce_time, uint64_t t
         _cleanup_all();
         throw _error(e, "GPIO::wait_for_edge()");
     }
+}
+
+WaitResult GPIO::wait_for_edge(int channel, Edge edge, uint64_t bounce_time, uint64_t timeout)
+{
+    return wait_for_edge(std::to_string(channel), edge, bounce_time, timeout);
 }
 
 //=======================================
@@ -935,11 +936,18 @@ void GPIO::PWM::stop()
 
 //=======================================
 // Callback
-void GPIO::Callback::operator()(int input) const
+void GPIO::Callback::operator()(const std::string& input) const
 {
 	if (function != nullptr)
 		function(input);
 }
+
+
+void GPIO::Callback::operator()(int input) const
+{
+    operator()(std::to_string(input));
+}
+
 
 
 bool GPIO::operator==(const GPIO::Callback& A, const GPIO::Callback& B)
@@ -953,6 +961,18 @@ bool GPIO::operator!=(const GPIO::Callback& A, const GPIO::Callback& B)
 	return !(A == B);
 }
 //=======================================
+
+//=======================================
+// WaitResult
+GPIO::WaitResult::WaitResult(const std::string& channel) : _channel(channel){}
+GPIO::WaitResult::WaitResult(const GPIO::WaitResult&) = default;
+GPIO::WaitResult::WaitResult(GPIO::WaitResult&&) = default;
+GPIO::WaitResult& GPIO::WaitResult::operator=(const GPIO::WaitResult&) = default;
+GPIO::WaitResult& GPIO::WaitResult::operator=(GPIO::WaitResult&&) = default;
+
+bool GPIO::WaitResult::is_event_detected() const { return !is_None(channel()); }
+//=======================================
+
 
 
 //=======================================

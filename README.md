@@ -236,10 +236,22 @@ The second parameter specifies the edge to be detected and can be GPIO::RISING, 
 ```cpp
 // timeout is in milliseconds__
 // debounce_time set to 10ms
-GPIO::wait_for_edge(channel, GPIO::RISING, 10, 500);
+GPIO::WaitResult result = GPIO::wait_for_edge(channel, GPIO::RISING, 10, 500);
+```
+The function returns a `GPIO::WaitResult` object that contains the channel name for which the edge was detected. 
+
+To check if the event was detected or a timeout occurred, you can use `.is_event_detected()` method of the returned object or just simply cast it to `bool` type:
+```cpp
+// returns the channel name for which the edge was detected ("None" if a timeout occurred)
+std::string eventDetectedChannel = result.channel();
+
+if(result.is_event_detected()){ /*...*/ }
+// or 
+if(result){ /*...*/ } // is equal to if(result.is_event_detected())
 ```
 
-The function returns the channel for which the edge was detected or 0 if a timeout occurred.
+
+
 
 
 __The event_detected() function__
@@ -272,7 +284,7 @@ GPIO::add_event_detect(channel, GPIO::RISING, callback_fn);
 
 Any object that satisfies the following requirements can be used as callback functions. 
 
-- Callable (argument type: int, return type: void)
+- Callable (argument type: const std::string&, return type: void)
 - Copy-constructible 
 - Equality-comparable with same type (ex> func0 == func1)  
 
@@ -286,7 +298,7 @@ public:
     MyCallback(const std::string& name) : name(name) {}
     MyCallback(const MyCallback&) = default; // Copy-constructible
 
-    void operator()(int channel) // Callable
+    void operator()(const std::string& channel) // Callable
     {
         std::cout << "A callback named " << name;
         std::cout << " called from channel " << channel << std::endl;

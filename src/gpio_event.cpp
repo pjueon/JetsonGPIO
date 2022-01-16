@@ -75,7 +75,7 @@ struct _gpioEventObject {
     enum ModifyEvent { NONE, ADD, INITIAL_ABSCOND, REMOVE, MODIFY } _epoll_change_flag;
     struct epoll_event _epoll_event;
 
-    int channel_id;
+    std::string channel_id;
     int gpio;
     int fd;
     Edge edge;
@@ -354,7 +354,7 @@ void _epoll_end_thread()
 
 //-------------- Operations -------------------- //
 
-int _blocking_wait_for_edge(int gpio, const std::string& gpio_name, int channel_id, Edge edge, uint64_t bounce_time, uint64_t timeout)
+int _blocking_wait_for_edge(int gpio, const std::string& gpio_name, const std::string& channel_id, Edge edge, uint64_t bounce_time, uint64_t timeout)
 {
     timespec timeout_time{};
     if (timeout) {
@@ -603,7 +603,7 @@ bool _edge_event_exists(int gpio)
     return false;
 }
 
-int _add_edge_detect(int gpio, const std::string& gpio_name, int channel_id, Edge edge, uint64_t bounce_time)
+int _add_edge_detect(int gpio, const std::string& gpio_name, const std::string& channel_id, Edge edge, uint64_t bounce_time)
 {
     int result{};
 

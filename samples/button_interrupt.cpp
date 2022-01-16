@@ -27,6 +27,7 @@ DEALINGS IN THE SOFTWARE.
 // for delay function.
 #include <chrono>
 #include <thread>
+#include <string>
 
 // for signal handling
 #include <JetsonGPIO.h>
@@ -45,7 +46,7 @@ inline void delayMs(int ms) { this_thread::sleep_for(chrono::milliseconds(ms)); 
 
 void signalHandler(int s) { end_this_program = true; }
 
-void blink(int channel)
+void blink(const std::string& channel)
 {
     puts("Blink LED 2");
     for (int i = 0; i < 5; ++i) {
