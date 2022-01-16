@@ -61,12 +61,12 @@ target_link_libraries(mytarget ${JetsonGPIO_LIBRARIES})
 
 ## Manual Configuration (Without CMake)
 
-The library header `JetsonGPIO.h` will be in `/usr/local/include/JetsonGPIO` by default. If you installed the library to `/usr`, it will be in `/usr/include/JetsonGPIO`.
-Because the library uses `std::thread`, you should link pthread as well when you link it to your code.  
+The library header `JetsonGPIO.h` will be installed in `/usr/local/include` by default. If you installed the library to `/usr`, it will be installed in `/usr/include`.
+When you link the library to your code, you should link pthread as well because the library uses `std::thread`.   
 
 The following simple example shows how to build your code with the library: 
 ```
-g++ -o your_program_name your_source_code.cpp -lJetsonGPIO -lpthread -I/usr/local/include/JetsonGPIO
+g++ -o your_program_name your_source_code.cpp -lJetsonGPIO -lpthread
 ```
 
 
