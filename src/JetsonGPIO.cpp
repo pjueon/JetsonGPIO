@@ -709,7 +709,7 @@ void GPIO::remove_event_detect(const std::string& channel)
 
 void GPIO::remove_event_detect(int channel) { remove_event_detect(std::to_string(channel)); }
 
-std::string GPIO::wait_for_edge(const std::string& channel, Edge edge, uint64_t bounce_time, uint64_t timeout)
+WaitResult GPIO::wait_for_edge(const std::string& channel, Edge edge, uint64_t bounce_time, uint64_t timeout)
 {
     try {
         ChannelInfo ch_info = _channel_to_info(channel, true);
@@ -730,7 +730,7 @@ std::string GPIO::wait_for_edge(const std::string& channel, Edge edge, uint64_t 
         switch (result) {
         case EventResultCode::None:
             // Timeout
-            return "";
+            return "None"s;
         case EventResultCode::EdgeDetected:
             // Event Detected
             return channel;
@@ -745,12 +745,9 @@ std::string GPIO::wait_for_edge(const std::string& channel, Edge edge, uint64_t 
     }
 }
 
-int GPIO::wait_for_edge(int channel, Edge edge, uint64_t bounce_time, uint64_t timeout)
+WaitResult GPIO::wait_for_edge(int channel, Edge edge, uint64_t bounce_time, uint64_t timeout)
 {
-    auto result = wait_for_edge(std::to_string(channel), edge, bounce_time, timeout);
-    if (result.empty())
-        return 0;
-    return std::stoi(result);
+    return wait_for_edge(std::to_string(channel), edge, bounce_time, timeout);
 }
 
 //=======================================
@@ -964,6 +961,18 @@ bool GPIO::operator!=(const GPIO::Callback& A, const GPIO::Callback& B)
 	return !(A == B);
 }
 //=======================================
+
+//=======================================
+// WaitResult
+GPIO::WaitResult::WaitResult(const std::string& channel) : _channel(channel){}
+GPIO::WaitResult::WaitResult(const GPIO::WaitResult&) = default;
+GPIO::WaitResult::WaitResult(GPIO::WaitResult&&) = default;
+GPIO::WaitResult& GPIO::WaitResult::operator=(const GPIO::WaitResult&) = default;
+GPIO::WaitResult& GPIO::WaitResult::operator=(GPIO::WaitResult&&) = default;
+
+bool GPIO::WaitResult::is_event_detected() const { return !is_None(channel()); }
+//=======================================
+
 
 
 //=======================================

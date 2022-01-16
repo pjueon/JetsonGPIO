@@ -200,6 +200,24 @@ namespace GPIO
       std::function<bool(const func_t&, const func_t&)> comparer;
    };
 
+
+   class WaitResult
+   {
+   public:
+      WaitResult(const std::string& channel);
+      WaitResult(const WaitResult&);
+      WaitResult(WaitResult&&);
+      WaitResult& operator=(const WaitResult&);
+      WaitResult& operator=(WaitResult&&);
+
+      inline const std::string& channel() const { return _channel; }
+      bool is_event_detected() const;
+      inline operator bool() const { return is_event_detected(); }
+
+   private:
+      std::string _channel;
+   };
+
    //----------------------------------
 
    /* Function used to check if an event occurred on the specified channel.
@@ -236,9 +254,9 @@ namespace GPIO
       @edge must be a member of GPIO::Edge
       @bouncetime in milliseconds (optional)
       @timeout in milliseconds (optional)
-      @returns channel for an event, 0 for a timeout */
-   std::string wait_for_edge(const std::string& channel, Edge edge, unsigned long bounce_time = 0, unsigned long timeout = 0);
-   int wait_for_edge(int channel, Edge edge, unsigned long bounce_time = 0, unsigned long timeout = 0);
+      @returns WaitResult object*/
+   WaitResult wait_for_edge(const std::string& channel, Edge edge, unsigned long bounce_time = 0, unsigned long timeout = 0);
+   WaitResult wait_for_edge(int channel, Edge edge, unsigned long bounce_time = 0, unsigned long timeout = 0);
 
    //----------------------------------
 

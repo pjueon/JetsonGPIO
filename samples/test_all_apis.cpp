@@ -445,9 +445,10 @@ private:
         GPIO::setup(pin_data.out_a, GPIO::OUT, GPIO::LOW);
         GPIO::setup(pin_data.in_a, GPIO::IN);
         auto dsc = DelayedSetChannel(pin_data.out_a, GPIO::HIGH, 0.5);
-        auto val = GPIO::wait_for_edge(pin_data.in_a, GPIO::RISING, 10, 1000);
+        auto result = GPIO::wait_for_edge(pin_data.in_a, GPIO::RISING, 10, 1000);
         dsc.wait();
-        assert(val == pin_data.in_a);
+        assert(std::stoi(result.channel()) == pin_data.in_a);
+        assert(result.is_event_detected());
         GPIO::cleanup();
     }
 
@@ -458,9 +459,10 @@ private:
         GPIO::setup(pin_data.out_a, GPIO::OUT, GPIO::HIGH);
         GPIO::setup(pin_data.in_a, GPIO::IN);
         auto dsc = DelayedSetChannel(pin_data.out_a, GPIO::LOW, 0.5);
-        auto val = GPIO::wait_for_edge(pin_data.in_a, GPIO::FALLING, 10, 1000);
+        auto result = GPIO::wait_for_edge(pin_data.in_a, GPIO::FALLING, 10, 1000);
         dsc.wait();
-        assert(val == pin_data.in_a);
+        assert(std::stoi(result.channel()) == pin_data.in_a);
+        assert(result.is_event_detected());
         GPIO::cleanup();
     }
 

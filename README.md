@@ -236,11 +236,22 @@ The second parameter specifies the edge to be detected and can be GPIO::RISING, 
 ```cpp
 // timeout is in milliseconds__
 // debounce_time set to 10ms
-GPIO::wait_for_edge(channel, GPIO::RISING, 10, 500);
+GPIO::WaitResult result = GPIO::wait_for_edge(channel, GPIO::RISING, 10, 500);
+```
+The function returns a `GPIO::WaitResult` object that contains the channel name for which the edge was detected. 
+
+To check if the event was detected or a timeout occurred, you can use `.is_event_detected()` method of the returned object or just simply cast it to `bool` type:
+```cpp
+// returns the channel name for which the edge was detected ("None" if a timeout occurred)
+std::string eventDetectedChannel = result.channel();
+
+if(result.is_event_detected()){ /*...*/ }
+// or 
+if(result){ /*...*/ } // is equal to if(result.is_event_detected())
 ```
 
-The function returns the channel for which the edge was detected. 
-If a timeout occurred, it returns 0(if the channel is int) or an empty string(if the channel is string).
+
+
 
 
 __The event_detected() function__
