@@ -276,7 +276,7 @@ This feature can be used to run a second thread for callback functions. Hence, t
 
 ```cpp
 // define callback function
-void callback_fn(int channel) {
+void callback_fn(const std::string& channel) {
     std::cout << "Callback called from channel " << channel << std::endl;
 }
 
@@ -325,11 +325,11 @@ GPIO::add_event_detect(channel, GPIO::RISING, my_callback);
 More than one callback can also be added if required as follows:
 
 ```cpp
-void callback_one(int channel) {
+void callback_one(const std::string& channel) {
     std::cout << "First Callback" << std::endl;
 }
 
-void callback_two(int channel) {
+void callback_two(const std::string& channel) {
     std::cout << "Second Callback" << std::endl;
 }
 
