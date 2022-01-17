@@ -159,7 +159,7 @@ namespace GPIO
    class Callback
    {
    private:
-      using func_t = std::function<void(int)>;
+      using func_t = std::function<void(const std::string&)>;
 
       template <class T> 
       static bool comparer_impl(const func_t& A, const func_t& B)
@@ -183,7 +183,7 @@ namespace GPIO
       : function(std::forward<T>(function)),
         comparer([](const func_t& A, const func_t& B) { return comparer_impl<std::decay_t<T>>(A, B); })
       {
-         static_assert(std::is_constructible<func_t, T&&>::value, "Callback return type: void, argument type: int");
+         static_assert(std::is_constructible<func_t, T&&>::value, "Callback return type: void, argument type: const std::string&");
       }
 
       Callback(Callback&&) = default;
@@ -192,6 +192,7 @@ namespace GPIO
       Callback& operator=(const Callback&) = default;
 
       void operator()(int input) const;
+      void operator()(const std::string& input) const;
 
       friend bool operator==(const Callback& A, const Callback& B);
       friend bool operator!=(const Callback& A, const Callback& B);
@@ -199,6 +200,24 @@ namespace GPIO
    private:
       func_t function;
       std::function<bool(const func_t&, const func_t&)> comparer;
+   };
+
+
+   class WaitResult
+   {
+   public:
+      WaitResult(const std::string& channel);
+      WaitResult(const WaitResult&);
+      WaitResult(WaitResult&&);
+      WaitResult& operator=(const WaitResult&);
+      WaitResult& operator=(WaitResult&&);
+
+      inline const std::string& channel() const { return _channel; }
+      bool is_event_detected() const;
+      inline operator bool() const { return is_event_detected(); }
+
+   private:
+      std::string _channel;
    };
 
    //----------------------------------
@@ -237,9 +256,9 @@ namespace GPIO
       @edge must be a member of GPIO::Edge
       @bouncetime in milliseconds (optional)
       @timeout in milliseconds (optional)
-      @returns channel for an event, 0 for a timeout */
-   int wait_for_edge(const std::string& channel, Edge edge, unsigned long bounce_time = 0, unsigned long timeout = 0);
-   int wait_for_edge(int channel, Edge edge, unsigned long bounce_time = 0, unsigned long timeout = 0);
+      @returns WaitResult object*/
+   WaitResult wait_for_edge(const std::string& channel, Edge edge, unsigned long bounce_time = 0, unsigned long timeout = 0);
+   WaitResult wait_for_edge(int channel, Edge edge, unsigned long bounce_time = 0, unsigned long timeout = 0);
 
    //----------------------------------
 

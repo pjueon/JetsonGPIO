@@ -27,6 +27,7 @@ DEALINGS IN THE SOFTWARE.
 // for delay function.
 #include <chrono>
 #include <thread>
+#include <string>
 
 // for signal handling
 #include <JetsonGPIO.h>
@@ -35,9 +36,9 @@ DEALINGS IN THE SOFTWARE.
 using namespace std;
 
 // Pin Definitions
-const int led_pin_1 = 7;  // BOARD pin 7
-const int led_pin_2 = 11; // BOARD pin 11
-const int but_pin = 18;   // BOARD pin 18
+const int led_pin_1 = 12;  // BOARD pin 7
+const int led_pin_2 = 13;  // BOARD pin 11
+const int but_pin = 18;    // BOARD pin 18
 
 static bool end_this_program = false;
 
@@ -45,7 +46,7 @@ inline void delayMs(int ms) { this_thread::sleep_for(chrono::milliseconds(ms)); 
 
 void signalHandler(int s) { end_this_program = true; }
 
-void blink(int channel)
+void blink(const std::string& channel)
 {
     puts("Blink LED 2");
     for (int i = 0; i < 5; ++i) {
