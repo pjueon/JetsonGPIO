@@ -18,10 +18,12 @@ mkdir build
 cd JetsonGPIO/build
 ```
 
-The following commands will build the library and install it to `/usr/local` directory by default.
-You can add `-DCMAKE_INSTALL_PREFIX=/usr` option to install it to `/usr` according to your preference.
+The following commands will build the library and install it to `/usr/local` directory by default.  
+- You can add `-DCMAKE_INSTALL_PREFIX=/usr` option to install it to `/usr` according to your preference.  
+- You can add `-DBUILD_EXAMPLES=ON` option to build example codes in `samples`.
+
 ```
-cmake ../
+cmake ..
 sudo make install
 ```
 
