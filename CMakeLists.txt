@@ -7,7 +7,7 @@ SET(CMAKE_CXX_STANDARD 14)
 SET(LIBRARY_VERSION "1.1.0")
 SET(LIBRARY_SOVERSION "1")
 
-option(BUILD_EXAMPLES "Build examples" ON)
+option(BUILD_EXAMPLES "Build examples" OFF)
 
 SET (UDEVRULES_INSTALL_DIR "/lib/udev/rules.d" CACHE STRING "Base directory for udev rules")
 
