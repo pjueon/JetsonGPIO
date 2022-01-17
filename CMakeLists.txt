@@ -7,6 +7,8 @@ SET(CMAKE_CXX_STANDARD 14)
 SET(LIBRARY_VERSION "1.1.0")
 SET(LIBRARY_SOVERSION "1")
 
+option(BUILD_EXAMPLES "Build examples" ON)
+
 SET (UDEVRULES_INSTALL_DIR "/lib/udev/rules.d" CACHE STRING "Base directory for udev rules")
 
 find_package(Threads REQUIRED)
@@ -61,3 +63,8 @@ set(test_all_apis_SRCS
 
 add_executable(test_all_apis ${test_all_apis_SRCS})
 TARGET_LINK_LIBRARIES(test_all_apis JetsonGPIO Threads::Threads)
+
+# Build examples
+if (BUILD_EXAMPLES)
+add_subdirectory(samples)
+endif()
