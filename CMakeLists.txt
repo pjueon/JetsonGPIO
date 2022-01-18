@@ -36,6 +36,8 @@ SET_TARGET_PROPERTIES(JetsonGPIO PROPERTIES
                       VERSION ${PROJECT_VERSION}
                       SOVERSION ${PROJECT_VERSION_MAJOR})
 
+add_library(JetsonGPIO::JetsonGPIO ALIAS JetsonGPIO)
+
 # Install Library
 INSTALL(TARGETS JetsonGPIO
         EXPORT JetsonGPIOTargets
