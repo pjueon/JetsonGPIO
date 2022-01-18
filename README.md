@@ -79,7 +79,7 @@ target_link_libraries(mytarget JetsonGPIO::JetsonGPIO)
 
 The code will be automatically fetched at configure time and built alongside your project.
 
-Note that with this method the file `99-gpio.rules` will *not* be installed, so you will need to install it manually
+Note that with this method the file `99-gpio.rules` will *not* be installed, so you will need to install it to `/etc/udev/rules.d/` manually
 or run your code with root permissions.
 
 ## Manual Configuration (Without CMake)
