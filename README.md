@@ -49,41 +49,47 @@ sudo udevadm control --reload-rules && sudo udevadm trigger
 
 ## Using CMake
 
-First, you need `cmake_modules/FindJetsonGPIO.cmake` file. 
-Copy this file from the repository to your project folder and place it under `cmake_modules` directory.
+Add this to your CMakeLists.txt
 
-example:
-```
-your_project
-├── CMakeLists.txt
-├── cmake_modules
-│   └── FindJetsonGPIO.cmake
-├── ...
-```
-
-And add this to your CMakeLists.txt
-
-```
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake_modules/")
-find_package(JetsonGPIO REQUIRED)
-find_package(Threads REQUIRED)
-include_directories(${JetsonGPIO_INCLUDE_DIR})
+```cmake
+find_package(JetsonGPIO)
 ```
 
 assuming you added a target called `mytarget`, then you can link it with:
 
+```cmake
+target_link_libraries(mytarget JetsonGPIO::JetsonGPIO)
 ```
-target_link_libraries(mytarget ${JetsonGPIO_LIBRARIES} Threads::Threads)
+
+### Without installation
+
+If you don't want to install the library you can add it as an external project with CMake's [`FetchContent`](https://cmake.org/cmake/help/latest/module/FetchContent.html):
+
+```cmake
+include(FetchContent)
+FetchContent_Declare(
+  JetsonGPIO 
+  GIT_REPOSITORY https://github.com/pjueon/JetsonGPIO.git 
+  GIT_TAG master
+)
+FetchContent_MakeAvailable(JetsonGPIO)
+
+target_link_libraries(mytarget JetsonGPIO::JetsonGPIO)
 ```
+
+The code will be automatically fetched at configure time and built alongside your project.
+
+Note that with this method the file `99-gpio.rules` will *not* be installed, so you will need to install it to `/etc/udev/rules.d/` manually
+or run your code with root permissions.
 
 ## Manual Configuration (Without CMake)
 
-The library header `JetsonGPIO.h` will be in `/usr/local/include/JetsonGPIO` by default. If you installed the library to `/usr`, it will be in `/usr/include/JetsonGPIO`.
-Because the library uses `std::thread`, you should link pthread as well when you link it to your code.  
+The library header `JetsonGPIO.h` will be installed in `/usr/local/include` by default. If you installed the library to `/usr`, it will be installed in `/usr/include`.
+When you link the library to your code, you should link pthread as well because the library uses `std::thread`.   
 
 The following simple example shows how to build your code with the library: 
 ```
-g++ -o your_program_name your_source_code.cpp -lJetsonGPIO -lpthread -I/usr/local/include/JetsonGPIO
+g++ -o your_program_name your_source_code.cpp -lJetsonGPIO -lpthread
 ```
 
 
