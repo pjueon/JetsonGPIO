@@ -14,8 +14,9 @@ git clone https://github.com/pjueon/JetsonGPIO
 
 Make build directory and change directory to it.
 ```
+cd JetsonGPIO
 mkdir build
-cd JetsonGPIO/build
+cd build
 ```
 
 The following commands will build the library and install it to `/usr/local` directory by default.  
