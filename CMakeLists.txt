@@ -15,9 +15,6 @@ set(THREADS_PREFER_PTHREAD_FLAG ON)
 
 ADD_DEFINITIONS(-Wall -O2 -fPIC -g)
 
-include_directories( ${CMAKE_CURRENT_BINARY_DIR})
-include_directories( ${CMAKE_CURRENT_SOURCE_DIR}/include)
-
 # Sources
 set(JetsonGPIO_LIB_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/JetsonGPIO.cpp
@@ -35,6 +32,12 @@ TARGET_LINK_LIBRARIES(JetsonGPIO Threads::Threads)
 SET_TARGET_PROPERTIES(JetsonGPIO PROPERTIES
                       VERSION ${PROJECT_VERSION}
                       SOVERSION ${PROJECT_VERSION_MAJOR})
+
+target_include_directories(
+  JetsonGPIO PUBLIC
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}>
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+  $<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>)
 
 add_library(JetsonGPIO::JetsonGPIO ALIAS JetsonGPIO)
 
