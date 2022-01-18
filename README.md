@@ -51,15 +51,36 @@ sudo udevadm control --reload-rules && sudo udevadm trigger
 
 Add this to your CMakeLists.txt
 
-```
+```cmake
 find_package(JetsonGPIO)
 ```
 
 assuming you added a target called `mytarget`, then you can link it with:
 
+```cmake
+target_link_libraries(mytarget JetsonGPIO::JetsonGPIO)
 ```
-target_link_libraries(mytarget ${JetsonGPIO_LIBRARIES})
+
+### Without installation
+
+If you don't want to install the library you can add it as an external project with CMake's [`FetchContent`](https://cmake.org/cmake/help/latest/module/FetchContent.html):
+
+```cmake
+include(FetchContent)
+FetchContent_Declare(
+  JetsonGPIO 
+  GIT_REPOSITORY https://github.com/pjueon/JetsonGPIO.git 
+  GIT_TAG master
+)
+FetchContent_MakeAvailable(JetsonGPIO)
+
+target_link_libraries(mytarget JetsonGPIO::JetsonGPIO)
 ```
+
+The code will be automatically fetched at configure time and built alongside your project.
+
+Note that with this method the file `99-gpio.rules` will *not* be installed, so you will need to install it manually
+or run your code with root permissions.
 
 ## Manual Configuration (Without CMake)
 
