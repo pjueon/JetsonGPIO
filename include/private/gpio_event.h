@@ -26,46 +26,48 @@ DEALINGS IN THE SOFTWARE.
 #ifndef GPIO_EVENT
 #define GPIO_EVENT
 
+#include "JetsonGPIO.h"
 #include <map>
 #include <string>
-#include "JetsonGPIO.h"
 
 namespace GPIO
 {
-enum class EventResultCode {
-    SysFD_EdgeOpen = -100,
-    UnallowedEdgeNone = -101,
-    IllegalEdgeArgument = -102,
-    SysFD_EdgeWrite = -103,
-    SysFD_ValueOpen = -104,
-    SysFD_ValueNonBlocking = -105,
-    ChannelAlreadyBlocked = -106,
-    ConflictingEdgeType = -107,
-    ConflictingBounceTime = -108,
-    InternalTrackingError = -109,
-    EpollFD_CreateError = -110,
-    EpollCTL_Add = -111,
-    EpollWait = -112,
-    GPIO_Event_Not_Found = -113,
-    None = 0,
-    EdgeDetected = 1,
-};
+    enum class EventResultCode
+    {
+        SysFD_EdgeOpen = -100,
+        UnallowedEdgeNone = -101,
+        IllegalEdgeArgument = -102,
+        SysFD_EdgeWrite = -103,
+        SysFD_ValueOpen = -104,
+        SysFD_ValueNonBlocking = -105,
+        ChannelAlreadyBlocked = -106,
+        ConflictingEdgeType = -107,
+        ConflictingBounceTime = -108,
+        InternalTrackingError = -109,
+        EpollFD_CreateError = -110,
+        EpollCTL_Add = -111,
+        EpollWait = -112,
+        GPIO_Event_Not_Found = -113,
+        None = 0,
+        EdgeDetected = 1,
+    };
 
-extern std::map<EventResultCode, const char*> event_error_code_to_message;
+    extern std::map<EventResultCode, const char*> event_error_code_to_message;
 
+    int _blocking_wait_for_edge(int gpio, const std::string& gpio_name, const std::string& channel_id, Edge edge,
+                                uint64_t bounce_time, uint64_t timeout);
 
-int _blocking_wait_for_edge(int gpio, const std::string& gpio_name, const std::string& channel_id, Edge edge, uint64_t bounce_time, uint64_t timeout);
+    bool _edge_event_detected(int gpio);
+    bool _edge_event_exists(int gpio);
 
-bool _edge_event_detected(int gpio);
-bool _edge_event_exists(int gpio);
+    int _add_edge_detect(int gpio, const std::string& gpio_name, const std::string& channel_id, Edge edge,
+                         uint64_t bounce_time);
+    void _remove_edge_detect(int gpio, const std::string& gpio_name);
 
-int _add_edge_detect(int gpio, const std::string& gpio_name, const std::string& channel_id, Edge edge, uint64_t bounce_time);
-void _remove_edge_detect(int gpio, const std::string& gpio_name);
+    int _add_edge_callback(int gpio, const Callback& callback);
+    void _remove_edge_callback(int gpio, const Callback& callback);
 
-int _add_edge_callback(int gpio, const Callback& callback);
-void _remove_edge_callback(int gpio, const Callback& callback);
-
-void _event_cleanup(int gpio, const std::string& gpio_name);
+    void _event_cleanup(int gpio, const std::string& gpio_name);
 } // namespace GPIO
 
 #endif /* GPIO_EVENT */

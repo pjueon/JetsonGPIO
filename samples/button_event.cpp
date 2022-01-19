@@ -54,8 +54,8 @@ int main()
     signal(SIGINT, signalHandler);
 
     // Pin Definitions
-    int led_pin = 12;  // BOARD pin 12
-    int but_pin = 18;  // BOARD pin 18
+    int led_pin = 12; // BOARD pin 12
+    int but_pin = 18; // BOARD pin 18
 
     // Pin Setup.
     GPIO::setmode(GPIO::BOARD);
@@ -66,7 +66,8 @@ int main()
 
     cout << "Starting demo now! Press CTRL+C to exit" << endl;
 
-    while (!end_this_program) {
+    while (!end_this_program)
+    {
         cout << "Waiting for button event" << endl;
         GPIO::wait_for_edge(but_pin, GPIO::Edge::FALLING);
 

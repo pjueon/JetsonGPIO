@@ -25,8 +25,8 @@ DEALINGS IN THE SOFTWARE.
 #ifndef DICTIONARY_LIKE_H
 #define DICTIONARY_LIKE_H
 
-#include <string>
 #include <map>
+#include <string>
 
 namespace GPIO
 {
@@ -39,7 +39,6 @@ namespace GPIO
         DictionaryLike(const DictionaryLike& other) = default;
         DictionaryLike(DictionaryLike&& other) = default;
 
-
     private:
         std::string data;
         mutable std::map<std::string, std::string> dictionary;
@@ -48,7 +47,6 @@ namespace GPIO
 
         void parse() const;
     };
-}
-
+} // namespace GPIO
 
 #endif

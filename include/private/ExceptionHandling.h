@@ -26,9 +26,9 @@ DEALINGS IN THE SOFTWARE.
 #ifndef EXCEPTION_HANDLING_H
 #define EXCEPTION_HANDLING_H
 
-#include <string>
-#include <stdexcept>
 #include "PythonFunctions.h"
+#include <stdexcept>
+#include <string>
 
 namespace GPIO
 {
@@ -42,7 +42,6 @@ namespace GPIO
     {
         return std::runtime_error(_error_message(e, from));
     }
-}
-
+} // namespace GPIO
 
 #endif

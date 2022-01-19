@@ -50,6 +50,6 @@ namespace GPIO
     constexpr Model JETSON_TX1 = Model::JETSON_TX1;
     constexpr Model JETSON_NANO = Model::JETSON_NANO;
     constexpr Model JETSON_TX2_NX = Model::JETSON_TX2_NX;
-}
+} // namespace GPIO
 
 #endif

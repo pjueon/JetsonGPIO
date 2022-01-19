@@ -28,8 +28,8 @@ DEALINGS IN THE SOFTWARE.
 #include <atomic>
 #include <chrono>
 #include <iostream>
-#include <thread>
 #include <string>
+#include <thread>
 
 #include "JetsonGPIO.h"
 
@@ -46,11 +46,13 @@ inline void delay(int ms)
 {
     if (!end_this_program)
         this_thread::sleep_for(chrono::milliseconds(ms));
+
     if (!end_this_program)
         return;
 
     // Cleanup and abort
-    if (wthr) {
+    if (wthr)
+    {
         ewthr = 0;
         cout << "closing wait-event-thread" << endl;
         wthr->join();
@@ -100,12 +102,16 @@ int testEvents()
     if (GPIO::wait_for_edge(button_pin, GPIO::RISING))
         cout << "--Rising Edge Detected!" << endl;
 
-    for (int i = 0; i < 3; ++i) {
+    for (int i = 0; i < 3; ++i)
+    {
         delay(1000);
         cout << endl << "Waiting for falling edge with a timeout of 2000ms (2 seconds):" << endl;
-        if (GPIO::wait_for_edge(button_pin, GPIO::FALLING, 10, 2000)) {
+        if (GPIO::wait_for_edge(button_pin, GPIO::FALLING, 10, 2000))
+        {
             cout << "--Falling Edge Detected! (try again and wait for timeout)" << endl;
-        } else {
+        }
+        else
+        {
             cout << "--Timeout Occurred!" << endl;
             break;
         }
@@ -115,7 +121,8 @@ int testEvents()
     cout << endl << "#Demo - GPIO::add_event_detect" << endl;
     cout << endl << "Waiting for rising edge:" << endl;
     GPIO::add_event_detect(button_pin, GPIO::RISING);
-    while (!GPIO::event_detected(button_pin)) {
+    while (!GPIO::event_detected(button_pin))
+    {
         delay(100);
     }
     cout << "--Rising Edge Detected!" << endl;
@@ -123,7 +130,8 @@ int testEvents()
     delay(1000);
     cout << endl << "Waiting for rising edge (using callback this time):" << endl;
     GPIO::add_event_detect(button_pin, GPIO::RISING, callback_fn);
-    while (!cb) {
+    while (!cb)
+    {
         delay(100);
     }
 
@@ -132,7 +140,8 @@ int testEvents()
     GPIO::add_event_callback(button_pin, callback_one);
     GPIO::add_event_callback(button_pin, callback_two);
     cout << endl << "Added 2 more callbacks!" << endl << "Waiting for rising edge:" << endl;
-    while (!cb && !cb1 && !cb2) {
+    while (!cb && !cb1 && !cb2)
+    {
         delay(100);
     }
 
@@ -140,7 +149,8 @@ int testEvents()
     cb = cb1 = cb2 = false;
     GPIO::remove_event_callback(button_pin, callback_one);
     cout << endl << "Removed the first additional callback." << endl << "Waiting for rising edge:" << endl;
-    while (!cb && !cb2) {
+    while (!cb && !cb2)
+    {
         delay(100);
     }
 
@@ -150,7 +160,8 @@ int testEvents()
     cb = 0;
     GPIO::add_event_detect(button_pin, GPIO::RISING, callback_fn, 3000);
     cout << "Press Button 3 times to finish events test! (--need to wait 3 seconds between events!):" << endl;
-    while (cb < 3) {
+    while (cb < 3)
+    {
         delay(100);
     }
 
@@ -162,15 +173,20 @@ int testEvents()
 void wait_thread(void)
 {
     cout << "...blocking_wait-thread begun" << endl;
-    for (; ewthr;) {
+    for (; ewthr;)
+    {
         // Theres a microsecond or too where this won't be up, but chance of that happenning is very very rare
         // This way allows proper closing of thread easily
-        try {
-            if (GPIO::wait_for_edge(button_pin, GPIO::RISING, 200, 1000)) {
+        try
+        {
+            if (GPIO::wait_for_edge(button_pin, GPIO::RISING, 200, 1000))
+            {
                 cout << "--blocking_wait-thread: Edge Event" << endl;
                 ++wb;
             }
-        } catch (exception& e) {
+        }
+        catch (exception& e)
+        {
             cerr << "[Exception] " << e.what() << " (catched from: wait_thread())" << endl;
         }
     }

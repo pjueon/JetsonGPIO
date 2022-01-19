@@ -1,7 +1,7 @@
 #include "private/DictionaryLike.h"
 #include <iostream>
-#include <vector>
 #include <map>
+#include <vector>
 
 using namespace std::string_literals;
 
@@ -16,10 +16,7 @@ int main()
         "{}"s,
     };
 
-    std::vector<std::string> keys = 
-    {
-        "224"s, "169"s, "no_such_key"s
-    };
+    std::vector<std::string> keys = {"224"s, "169"s, "no_such_key"s};
 
     std::vector<std::map<std::string, std::string>> expectedResults(testCases.size());
 
@@ -39,21 +36,20 @@ int main()
     expectedResults[3]["169"] = "None";
     expectedResults[3]["no_such_key"] = "None";
 
-
-    for(size_t i = 0; i < testCases.size(); i++)
+    for (size_t i = 0; i < testCases.size(); i++)
     {
         size_t sub_index = 0;
-        for(const auto& key : keys)
+        for (const auto& key : keys)
         {
             auto value = testCases[i].get(key);
             auto expected = expectedResults[i][key];
 
-            std::cout << "case " << i <<" - " << sub_index << ": ";
+            std::cout << "case " << i << " - " << sub_index << ": ";
             if (value == expected)
                 std::cout << "PASSED";
             else
                 std::cout << "FAILED (expected: " << expected << ", actual: " << value << ")";
-            
+
             std::cout << std::endl;
 
             sub_index++;
