@@ -26,66 +26,66 @@ DEALINGS IN THE SOFTWARE.
 #ifndef GPIO_PIN_DATA_H
 #define GPIO_PIN_DATA_H
 
-#include <string>
-#include <map>
-#include <vector>
 #include <fstream>
+#include <map>
 #include <memory>
+#include <string>
+#include <vector>
 
 #include "JetsonGPIO.h"
 #include "private/Model.h"
 
 namespace GPIO
 {
-  struct PinInfo
-  {
-      const int P1_REVISION;
-      const std::string RAM;
-      const std::string REVISION;
-      const std::string TYPE;
-      const std::string MANUFACTURER;
-      const std::string PROCESSOR;
-  };
+    struct PinInfo
+    {
+        const int P1_REVISION;
+        const std::string RAM;
+        const std::string REVISION;
+        const std::string TYPE;
+        const std::string MANUFACTURER;
+        const std::string PROCESSOR;
+    };
 
-  struct ChannelInfo
-  {
-      const std::string channel;
-      const std::string gpio_chip_dir;
-      // const int chip_gpio;
-      const int gpio;
-      const std::string gpio_name;
-      const std::string pwm_chip_dir;
-      const int pwm_id;
+    struct ChannelInfo
+    {
+        const std::string channel;
+        const std::string gpio_chip_dir;
+        // const int chip_gpio;
+        const int gpio;
+        const std::string gpio_name;
+        const std::string pwm_chip_dir;
+        const int pwm_id;
 
-      std::shared_ptr<std::fstream> f_direction;
-      std::shared_ptr<std::fstream> f_value;
-      std::shared_ptr<std::fstream> f_duty_cycle;
+        std::shared_ptr<std::fstream> f_direction;
+        std::shared_ptr<std::fstream> f_value;
+        std::shared_ptr<std::fstream> f_duty_cycle;
 
-      ChannelInfo(const std::string &channel, const std::string &gpio_chip_dir,
-                  // int chip_gpio, 
-                  int gpio, const std::string& gpio_name, const std::string &pwm_chip_dir,
-                  int pwm_id)
-          : channel(channel),
-            gpio_chip_dir(gpio_chip_dir),
+        ChannelInfo(const std::string& channel, const std::string& gpio_chip_dir,
+                    // int chip_gpio,
+                    int gpio, const std::string& gpio_name, const std::string& pwm_chip_dir, int pwm_id)
+        : channel(channel),
+          gpio_chip_dir(gpio_chip_dir),
           //   chip_gpio(chip_gpio),
-            gpio(gpio),
-            gpio_name(gpio_name),
-            pwm_chip_dir(pwm_chip_dir),
-            pwm_id(pwm_id),
-            f_direction(std::make_shared<std::fstream>()),
-            f_value(std::make_shared<std::fstream>()),
-            f_duty_cycle(std::make_shared<std::fstream>())
-      {}
-  };
+          gpio(gpio),
+          gpio_name(gpio_name),
+          pwm_chip_dir(pwm_chip_dir),
+          pwm_id(pwm_id),
+          f_direction(std::make_shared<std::fstream>()),
+          f_value(std::make_shared<std::fstream>()),
+          f_duty_cycle(std::make_shared<std::fstream>())
+        {
+        }
+    };
 
-  struct PinData
-  {
-      Model model;
-      PinInfo pin_info;
-      std::map<GPIO::NumberingModes, std::map<std::string, ChannelInfo>> channel_data;
-  };
+    struct PinData
+    {
+        Model model;
+        PinInfo pin_info;
+        std::map<GPIO::NumberingModes, std::map<std::string, ChannelInfo>> channel_data;
+    };
 
-  PinData get_data();
-}
+    PinData get_data();
+} // namespace GPIO
 
 #endif // GPIO_PIN_DATA_H

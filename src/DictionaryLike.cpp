@@ -24,13 +24,15 @@ DEALINGS IN THE SOFTWARE.
 
 #include "private/DictionaryLike.h"
 #include "private/PythonFunctions.h"
-#include <utility>
 #include <iostream>
-
+#include <utility>
 
 namespace GPIO
 {
-    DictionaryLike::DictionaryLike(const std::string& data) : data(data), dictionary{}, is_parsed(false), is_dictionary(false) {}
+    DictionaryLike::DictionaryLike(const std::string& data)
+    : data(data), dictionary{}, is_parsed(false), is_dictionary(false)
+    {
+    }
 
     std::string DictionaryLike::get(const std::string& key) const
     {
@@ -40,7 +42,7 @@ namespace GPIO
         if (is_dictionary)
         {
             auto itr = dictionary.find(key);
-            if(itr == dictionary.end())
+            if (itr == dictionary.end())
                 return "None";
 
             return itr->second;
@@ -48,8 +50,6 @@ namespace GPIO
 
         return strip(data);
     }
-
-
 
     void DictionaryLike::parse() const
     {
@@ -59,31 +59,30 @@ namespace GPIO
         auto _data = strip(data);
         if (_data.size() < 2 || _data.front() != '{' || _data.back() != '}')
             return;
-        
+
         // remove "{}"
         _data = strip(_data.substr(1, _data.size() - 2));
-        
+
         std::map<std::string, std::string> _dictionary{};
 
         auto elements = split(_data, ',');
-        for(auto& e : elements)
+        for (auto& e : elements)
         {
-            auto pair = split(e, ':');    
-            if(pair.size() != 2)
+            auto pair = split(e, ':');
+            if (pair.size() != 2)
                 return;
-            
+
             auto key = strip(pair[0]);
             auto value = strip(pair[1]);
 
-            if(key.empty() || value.empty())
+            if (key.empty() || value.empty())
                 return;
-            
+
             _dictionary[key] = value;
         }
 
         is_dictionary = true;
         dictionary = std::move(_dictionary);
     }
-
 
 } // namespace GPIO

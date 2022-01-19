@@ -22,11 +22,11 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#include <unistd.h>
+#include <algorithm>
+#include <cctype>
 #include <dirent.h>
 #include <sstream>
-#include <cctype>
-#include <algorithm>
+#include <unistd.h>
 
 #include "private/PythonFunctions.h"
 
@@ -34,11 +34,12 @@ using namespace std;
 
 namespace GPIO
 {
-    bool startswith(const string& s, const string& prefix) 
+    bool startswith(const string& s, const string& prefix)
     {
         size_t pre_size = prefix.size();
-        if (s.size() < pre_size) return false;
-        
+        if (s.size() < pre_size)
+            return false;
+
         return prefix == s.substr(0, prefix.size());
     }
 
@@ -48,7 +49,6 @@ namespace GPIO
         transform(copied.begin(), copied.end(), copied.begin(), [](unsigned char c) { return tolower(c); });
         return copied;
     }
-
 
     vector<string> split(const string& s, const char d)
     {
@@ -63,15 +63,15 @@ namespace GPIO
         return outputVector;
     }
 
-    bool os_access(const string& path, int mode)  // os.access
-    {  
+    bool os_access(const string& path, int mode) // os.access
+    {
         return access(path.c_str(), mode) == 0;
     }
 
-    vector<string> os_listdir(const string& path)  // os.listdir
-    {  
-        DIR *dir{};
-        struct dirent *ent{};
+    vector<string> os_listdir(const string& path) // os.listdir
+    {
+        DIR* dir{};
+        struct dirent* ent{};
         vector<string> outputVector{};
 
         if ((dir = opendir(path.c_str())) != nullptr)
@@ -83,30 +83,28 @@ namespace GPIO
             closedir(dir);
             return outputVector;
         }
-        else 
+        else
         {
             throw runtime_error("could not open directory: " + path);
         }
     }
 
-
     bool os_path_isdir(const std::string& path) // os.path.isdir
     {
         bool exists = false;
 
-        DIR *dir = opendir (path.c_str());
+        DIR* dir = opendir(path.c_str());
         if (dir != nullptr)
         {
-            exists = true;    
-            closedir (dir);
+            exists = true;
+            closedir(dir);
         }
 
         return exists;
     }
 
-
-    bool os_path_exists(const string& path)  // os.path.exists
-    {  
+    bool os_path_exists(const string& path) // os.path.exists
+    {
         return os_access(path, F_OK);
     }
 
@@ -117,22 +115,18 @@ namespace GPIO
         int end_idx = total - 1;
         for (; start_idx < total; start_idx++)
         {
-            if(!isspace(s[start_idx]))
+            if (!isspace(s[start_idx]))
                 break;
         }
-        if(start_idx == total)
+        if (start_idx == total)
             return "";
-        for(; end_idx > start_idx; end_idx--)
+        for (; end_idx > start_idx; end_idx--)
         {
-            if(!isspace(s[end_idx]))
+            if (!isspace(s[end_idx]))
                 break;
         }
         return s.substr(start_idx, end_idx - start_idx + 1);
     }
 
-
-    bool is_None(const std::string& s)
-    {
-        return s == "None";
-    }
-}
+    bool is_None(const std::string& s) { return s == "None"; }
+} // namespace GPIO

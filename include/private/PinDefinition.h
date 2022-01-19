@@ -27,30 +27,34 @@ DEALINGS IN THE SOFTWARE.
 #define PIN_DEFINITION_H
 
 #include "JetsonGPIO.h"
-#include "private/PythonFunctions.h"
 #include "private/DictionaryLike.h"
+#include "private/PythonFunctions.h"
 
-#include <string>
 #include <stdexcept>
+#include <string>
 
 namespace GPIO
 {
     struct PinDefinition
     {
-        const DictionaryLike LinuxPin;       // Linux GPIO pin number (within chip, not global),
-                                             // (map from chip GPIO count to value, to cater for different numbering schemes)
+        // clang-format off
 
-        const DictionaryLike ExportedName;   // Linux exported GPIO name,
-                                             // (map from chip GPIO count to value, to cater for different naming schemes)
-                                             // (entries omitted if exported filename is gpio%i)
-         
-        const std::string SysfsDir;          // GPIO chip sysfs directory
-        const std::string BoardPin;          // Pin number (BOARD mode)
-        const std::string BCMPin;            // Pin number (BCM mode)
-        const std::string CVMPin;            // Pin name (CVM mode)
-        const std::string TEGRAPin;          // Pin name (TEGRA_SOC mode)
-        const std::string PWMSysfsDir;       // PWM chip sysfs directory
-        const int PWMID;                     // PWM ID within PWM chip
+        const DictionaryLike LinuxPin;     // Linux GPIO pin number (within chip, not global),
+                                           // (map from chip GPIO count to value, to cater for different numbering schemes)
+
+        const DictionaryLike ExportedName; // Linux exported GPIO name,
+                                           // (map from chip GPIO count to value, to cater for different naming schemes)
+                                           // (entries omitted if exported filename is gpio%i)
+
+        const std::string SysfsDir;        // GPIO chip sysfs directory
+        const std::string BoardPin;        // Pin number (BOARD mode)
+        const std::string BCMPin;          // Pin number (BCM mode)
+        const std::string CVMPin;          // Pin name (CVM mode)
+        const std::string TEGRAPin;        // Pin name (TEGRA_SOC mode)
+        const std::string PWMSysfsDir;     // PWM chip sysfs directory
+        const int PWMID;                   // PWM ID within PWM chip
+
+        // clang-format on
 
         std::string PinName(NumberingModes key) const
         {
@@ -70,7 +74,6 @@ namespace GPIO
             }
         }
     };
-}
-
+} // namespace GPIO
 
 #endif

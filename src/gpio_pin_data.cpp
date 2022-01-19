@@ -22,26 +22,25 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
+#include <cctype>
+#include <fstream>
 #include <iostream>
-#include <string>
-#include <stdexcept>
-#include <vector>
 #include <map>
 #include <set>
-#include <fstream>
 #include <sstream>
-#include <cctype>
+#include <stdexcept>
+#include <string>
 #include <tuple>
+#include <vector>
 
 #include <algorithm>
 #include <iterator>
 
 #include "JetsonGPIO.h"
-#include "private/gpio_pin_data.h"
-#include "private/PythonFunctions.h"
-#include "private/PinDefinition.h"
 #include "private/ExceptionHandling.h"
-
+#include "private/PinDefinition.h"
+#include "private/PythonFunctions.h"
+#include "private/gpio_pin_data.h"
 
 using namespace std;
 using namespace std::string_literals; // enables s-suffix for std::string literals
@@ -68,7 +67,7 @@ namespace GPIO
         const vector<PinDefinition> JETSON_XAVIER_PIN_DEFS;
         const vector<string> compats_xavier;
         const vector<PinDefinition> JETSON_TX2_NX_PIN_DEFS;
-        const vector<string> compats_tx2_nx;    
+        const vector<string> compats_tx2_nx;
         const vector<PinDefinition> JETSON_TX2_PIN_DEFS;
         const vector<string> compats_tx2;
         const vector<PinDefinition> JETSON_TX1_PIN_DEFS;
@@ -79,17 +78,18 @@ namespace GPIO
         const map<Model, vector<PinDefinition>> PIN_DEFS_MAP;
         const map<Model, PinInfo> JETSON_INFO_MAP;
 
-        EntirePinData(const EntirePinData &) = delete;
-        EntirePinData &operator=(const EntirePinData &) = delete;
+        EntirePinData(const EntirePinData&) = delete;
+        EntirePinData& operator=(const EntirePinData&) = delete;
         ~EntirePinData() = default;
 
-        static EntirePinData &get_instance()
+        static EntirePinData& get_instance()
         {
             static EntirePinData singleton{};
             return singleton;
         }
     };
 
+    // clang-format off
     EntirePinData::EntirePinData()
         : 
         CLARA_AGX_XAVIER_PIN_DEFS
@@ -355,7 +355,7 @@ namespace GPIO
         }
     {};
 
-
+    // clang-format on
 
     static bool ids_warned = false;
 
@@ -381,11 +381,11 @@ namespace GPIO
                 copy(_vec_compatibles.begin(), _vec_compatibles.end(), inserter(compatibles, compatibles.end()));
             } // scope ends
 
-            auto matches = [&compatibles](const vector<string>& vals) 
+            auto matches = [&compatibles](const vector<string>& vals)
             {
-                for(const auto& v : vals)
+                for (const auto& v : vals)
                 {
-                    if(is_in(v, compatibles)) 
+                    if (is_in(v, compatibles))
                         return true;
                 }
                 return false;
@@ -395,15 +395,15 @@ namespace GPIO
             {
                 if (!os_path_exists(ids_path))
                 {
-                        if (ids_warned == false)
-                        {
-                            ids_warned = true;
-                            string msg = "WARNING: Plugin manager information missing from device tree.\n"
-                                        "WARNING: Cannot determine whether the expected Jetson board is present.";
-                            cerr << msg;
-                        }
+                    if (ids_warned == false)
+                    {
+                        ids_warned = true;
+                        string msg = "WARNING: Plugin manager information missing from device tree.\n"
+                                     "WARNING: Cannot determine whether the expected Jetson board is present.";
+                        cerr << msg;
+                    }
 
-                        return "None";
+                    return "None";
                 }
 
                 for (const auto& file : os_listdir(ids_path))
@@ -429,8 +429,8 @@ namespace GPIO
                 if (found == false)
                 {
                     string msg = "WARNING: Carrier board is not from a Jetson Developer Kit.\n"
-                                "WARNNIG: Jetson.GPIO library has not been verified with this carrier board,\n"
-                                "WARNING: and in fact is unlikely to work correctly.";
+                                 "WARNNIG: Jetson.GPIO library has not been verified with this carrier board,\n"
+                                 "WARNING: and in fact is unlikely to work correctly.";
                     cerr << msg << endl;
                 }
             };
@@ -494,13 +494,13 @@ namespace GPIO
             map<string, string> gpio_chip_ngpio{};
             map<string, string> pwm_dirs{};
 
-            vector<string> sysfs_prefixes = { "/sys/devices/", "/sys/devices/platform/" };
+            vector<string> sysfs_prefixes = {"/sys/devices/", "/sys/devices/platform/"};
 
             // Get the gpiochip offsets
             set<string> gpio_chip_names{};
             for (const auto& pin_def : pin_defs)
             {
-                if(!is_None(pin_def.SysfsDir))
+                if (!is_None(pin_def.SysfsDir))
                     gpio_chip_names.insert(pin_def.SysfsDir);
             }
 
@@ -510,7 +510,7 @@ namespace GPIO
                 for (const auto& prefix : sysfs_prefixes)
                 {
                     auto d = prefix + gpio_chip_name;
-                    if(os_path_isdir(d))
+                    if (os_path_isdir(d))
                     {
                         gpio_chip_dir = d;
                         break;
@@ -548,10 +548,11 @@ namespace GPIO
                 }
             }
 
-
-            auto global_gpio_id_name = [&gpio_chip_base, &gpio_chip_ngpio](DictionaryLike chip_relative_ids, DictionaryLike gpio_names, string gpio_chip_name) -> tuple<int, string>
+            auto global_gpio_id_name = [&gpio_chip_base, &gpio_chip_ngpio](DictionaryLike chip_relative_ids,
+                                                                           DictionaryLike gpio_names,
+                                                                           string gpio_chip_name) -> tuple<int, string>
             {
-                if(!is_in(gpio_chip_name, gpio_chip_ngpio))
+                if (!is_in(gpio_chip_name, gpio_chip_ngpio))
                     return {-1, "None"};
 
                 auto chip_gpio_ngpio = gpio_chip_ngpio[gpio_chip_name];
@@ -565,29 +566,27 @@ namespace GPIO
                 if (is_None(gpio_name))
                     gpio_name = format("gpio%i", gpio);
 
-                return { gpio, gpio_name };
+                return {gpio, gpio_name};
             };
 
-
             set<string> pwm_chip_names{};
-            for(const auto& x : pin_defs)
+            for (const auto& x : pin_defs)
             {
-                if(!is_None(x.PWMSysfsDir))
+                if (!is_None(x.PWMSysfsDir))
                     pwm_chip_names.insert(x.PWMSysfsDir);
             }
 
-            for(const auto& pwm_chip_name : pwm_chip_names)
+            for (const auto& pwm_chip_name : pwm_chip_names)
             {
                 string pwm_chip_dir = "None";
                 for (const auto& prefix : sysfs_prefixes)
                 {
                     auto d = prefix + pwm_chip_name;
-                    if(os_path_isdir(d))
+                    if (os_path_isdir(d))
                     {
                         pwm_chip_dir = d;
                         break;
                     }
-
                 }
                 /* Some PWM controllers aren't enabled in all versions of the DT. In
                 this case, just hide the PWM function on this pin, but let all other
@@ -610,59 +609,41 @@ namespace GPIO
                 }
             }
 
-
-            auto model_data = [&global_gpio_id_name, &pwm_dirs, &gpio_chip_dirs]
-                            (NumberingModes key, const auto& pin_defs)
+            auto model_data =
+                [&global_gpio_id_name, &pwm_dirs, &gpio_chip_dirs](NumberingModes key, const auto& pin_defs)
             {
                 auto get_or = [](const auto& dictionary, const string& x, const string& defaultValue) -> string
-                {
-                    return is_in(x, dictionary) ? dictionary.at(x) : defaultValue;
-                };
-
+                { return is_in(x, dictionary) ? dictionary.at(x) : defaultValue; };
 
                 map<string, ChannelInfo> ret{};
 
                 for (const auto& x : pin_defs)
                 {
                     string pinName = x.PinName(key);
-                    
-                    if(!is_in(x.SysfsDir, gpio_chip_dirs))
+
+                    if (!is_in(x.SysfsDir, gpio_chip_dirs))
                         throw std::runtime_error("[model_data]"s + x.SysfsDir + " is not in gpio_chip_dirs"s);
 
                     auto tmp = global_gpio_id_name(x.LinuxPin, x.ExportedName, x.SysfsDir);
                     auto gpio = get<0>(tmp);
                     auto gpio_name = get<1>(tmp);
 
-                    ret.insert(
-                        { 
-                            pinName,
-                            ChannelInfo
-                            { 
-                                pinName,
-                                gpio_chip_dirs.at(x.SysfsDir),
-                                gpio, gpio_name,
-                                get_or(pwm_dirs, x.PWMSysfsDir, "None"),
-                                x.PWMID 
-                            }
-                        }
-                    );
+                    ret.insert({pinName, ChannelInfo{pinName, gpio_chip_dirs.at(x.SysfsDir), gpio, gpio_name,
+                                                     get_or(pwm_dirs, x.PWMSysfsDir, "None"), x.PWMID}});
                 }
                 return ret;
             };
 
-            map<NumberingModes, map<string, ChannelInfo>> channel_data =
-            {
-                { BOARD, model_data(BOARD, pin_defs) },
-                { BCM, model_data(BCM, pin_defs) },
-                { CVM, model_data(CVM, pin_defs) },
-                { TEGRA_SOC, model_data(TEGRA_SOC, pin_defs) }
-            };
+            map<NumberingModes, map<string, ChannelInfo>> channel_data = {{BOARD, model_data(BOARD, pin_defs)},
+                                                                          {BCM, model_data(BCM, pin_defs)},
+                                                                          {CVM, model_data(CVM, pin_defs)},
+                                                                          {TEGRA_SOC, model_data(TEGRA_SOC, pin_defs)}};
 
             return {model, jetson_info, channel_data};
         }
-        catch(exception& e)
+        catch (exception& e)
         {
             throw _error(e, "GPIO::get_data()");
         }
     }
-}
+} // namespace GPIO
