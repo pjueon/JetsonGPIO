@@ -61,8 +61,7 @@ namespace std
 namespace GPIO
 {
     constexpr auto VERSION = JETSONGPIO_VERSION;
-    constexpr auto _SYSFS_ROOT = "/sys/class/gpio";
-
+    
     extern const std::string JETSON_INFO;
     extern const std::string model;
 
