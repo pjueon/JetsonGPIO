@@ -1009,11 +1009,6 @@ bool GPIO::operator!=(const GPIO::Callback& A, const GPIO::Callback& B) { return
 //=======================================
 // WaitResult
 GPIO::WaitResult::WaitResult(const std::string& channel) : _channel(channel) {}
-GPIO::WaitResult::WaitResult(const GPIO::WaitResult&) = default;
-GPIO::WaitResult::WaitResult(GPIO::WaitResult&&) = default;
-GPIO::WaitResult& GPIO::WaitResult::operator=(const GPIO::WaitResult&) = default;
-GPIO::WaitResult& GPIO::WaitResult::operator=(GPIO::WaitResult&&) = default;
-
 bool GPIO::WaitResult::is_event_detected() const { return !is_None(channel()); }
 //=======================================
 

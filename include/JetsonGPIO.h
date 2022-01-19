@@ -222,10 +222,10 @@ namespace GPIO
     {
     public:
         WaitResult(const std::string& channel);
-        WaitResult(const WaitResult&);
-        WaitResult(WaitResult&&);
-        WaitResult& operator=(const WaitResult&);
-        WaitResult& operator=(WaitResult&&);
+        WaitResult(const WaitResult&) = default;
+        WaitResult(WaitResult&&) = default;
+        WaitResult& operator=(const WaitResult&) = default;
+        WaitResult& operator=(WaitResult&&) = default;
 
         inline const std::string& channel() const { return _channel; }
         bool is_event_detected() const;
