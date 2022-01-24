@@ -1,3 +1,4 @@
+
 /*
 Copyright (c) 2012-2017 Ben Croston ben@croston.org.
 Copyright (c) 2019, NVIDIA CORPORATION.
@@ -23,7 +24,17 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
+#pragma once
+#ifndef _MACRO_SYSFS_ROOT
+#define _MACRO_SYSFS_ROOT "/sys/class/gpio"
+
 namespace GPIO
 {
-    constexpr auto _SYSFS_ROOT = "/sys/class/gpio";
-}
+    constexpr auto _SYSFS_ROOT = _MACRO_SYSFS_ROOT;
+    constexpr auto _export_dir() { return _MACRO_SYSFS_ROOT "/export"; }
+    constexpr auto _unexport_dir() { return _MACRO_SYSFS_ROOT "/unexport"; }
+
+} // namespace GPIO
+
+#undef _MACRO_SYSFS_ROOT
+#endif

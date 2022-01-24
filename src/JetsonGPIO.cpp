@@ -67,16 +67,6 @@ string _gpio_dir(const ChannelInfo& ch_info)
     return format("%s/%s", _SYSFS_ROOT, ch_info.gpio_name.c_str());
 }
 
-string _export_dir()
-{
-    return format("%s/export", _SYSFS_ROOT);
-}
-
-string _unexport_dir()
-{
-    return format("%s/unexport", _SYSFS_ROOT);
-}
-
 class GlobalVariablesForGPIO
 {
 public:
