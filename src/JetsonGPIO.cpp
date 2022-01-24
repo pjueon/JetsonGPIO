@@ -62,6 +62,21 @@ constexpr Directions HARD_PWM = Directions::HARD_PWM;
 // in order to avoid initialization order problem among global variables in
 // different compilation units.
 
+string _gpio_dir(const ChannelInfo& ch_info)
+{
+    return format("%s/%s", _SYSFS_ROOT, ch_info.gpio_name.c_str());
+}
+
+string _export_dir()
+{
+    return format("%s/export", _SYSFS_ROOT);
+}
+
+string _unexport_dir()
+{
+    return format("%s/unexport", _SYSFS_ROOT);
+}
+
 class GlobalVariablesForGPIO
 {
 public:
@@ -140,9 +155,7 @@ private:
 
     void _check_permission() const
     {
-        string export_path = format("%s/export", _SYSFS_ROOT);
-        string unexport_path = format("%s/unexport", _SYSFS_ROOT);
-        if (!os_access(export_path, W_OK) || !os_access(unexport_path, W_OK))
+        if (!os_access(_export_dir(), W_OK) || !os_access(_unexport_dir(), W_OK))
         {
             cerr << "[ERROR] The current user does not have permissions set to access the library functionalites. "
                     "Please configure permissions or use the root user to run this."
@@ -157,6 +170,8 @@ private:
 //================================================================================
 // alias
 GlobalVariablesForGPIO& global() { return GlobalVariablesForGPIO::get_instance(); }
+
+
 
 void _validate_mode_set()
 {
@@ -195,6 +210,8 @@ vector<ChannelInfo> _channels_to_infos(const vector<string>& channels, bool need
     return ch_infos;
 }
 
+
+
 /* Return the current configuration of a channel as reported by sysfs.
    Any of IN, OUT, HARD_PWM, or UNKNOWN may be returned. */
 Directions _sysfs_channel_configuration(const ChannelInfo& ch_info)
@@ -206,7 +223,7 @@ Directions _sysfs_channel_configuration(const ChannelInfo& ch_info)
             return HARD_PWM;
     }
 
-    string gpio_dir = format("%s/%s", _SYSFS_ROOT, ch_info.gpio_name.c_str());
+    string gpio_dir = _gpio_dir(ch_info);
     if (!os_path_exists(gpio_dir))
         return UNKNOWN; // Originally returns None in NVIDIA's GPIO Python Library
 
@@ -236,13 +253,15 @@ Directions _app_channel_configuration(const ChannelInfo& ch_info)
     return global()._channel_configuration[ch_info.channel];
 }
 
+
+
 void _export_gpio(const ChannelInfo& ch_info)
 {
-    string gpio_dir = format("%s/%s", _SYSFS_ROOT, ch_info.gpio_name.c_str());
+    string gpio_dir = _gpio_dir(ch_info);
 
     if (!os_path_exists(gpio_dir))
     { // scope for f_export
-        ofstream f_export(format("%s/export", _SYSFS_ROOT));
+        ofstream f_export(_export_dir());
         f_export << ch_info.gpio;
     } // scope ends
 
@@ -265,12 +284,12 @@ void _unexport_gpio(const ChannelInfo& ch_info)
 {
     ch_info.f_direction->close();
     ch_info.f_value->close();
-    string gpio_dir = format("%s/%s", _SYSFS_ROOT, ch_info.gpio_name.c_str());
+    string gpio_dir = _gpio_dir(ch_info);
 
     if (!os_path_exists(gpio_dir))
         return;
 
-    ofstream f_unexport(format("%s/unexport", _SYSFS_ROOT));
+    ofstream f_unexport(_unexport_dir());
     f_unexport << ch_info.gpio;
 }
 
