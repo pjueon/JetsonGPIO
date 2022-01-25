@@ -349,21 +349,6 @@ int main()
     cout << "lib version: " << GPIO::VERSION << endl;
     cout << GPIO::JETSON_INFO << endl;
 
-    int output_pin = 7;
-    GPIO::setmode(GPIO::BOARD);
-    GPIO::setup(output_pin, GPIO::OUT, GPIO::HIGH);
-
-    cout << "BOARD " << output_pin << "pin, set to OUTPUT, HIGH" << endl;
-    cout << "Press Enter to Continue";
-    cin.ignore();
-
-    GPIO::output(output_pin, GPIO::LOW);
-    cout << output_pin << "pin, set to LOW now" << endl;
-    cout << "Press Enter to Continue";
-    cin.ignore();
-
-    GPIO::cleanup(output_pin);
-
     // When CTRL+C pressed, signalHandler will be called
     signal(SIGINT, signalHandler);
 

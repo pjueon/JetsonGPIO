@@ -89,26 +89,8 @@ install(FILES
 # Install Udev rules
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/99-gpio.rules DESTINATION ${UDEVRULES_INSTALL_DIR})
 
-# Build Test
-set(JetsonGPIO_test_SRCS
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/test.cpp )
-
-add_executable(jetsongpio_test ${JetsonGPIO_test_SRCS})
-TARGET_LINK_LIBRARIES(jetsongpio_test JetsonGPIO Threads::Threads)
-
-# Build Test for DictionaryLike
-set(DictionaryLike_test_SRCS
-   ${CMAKE_CURRENT_SOURCE_DIR}/src/TestForDictionaryLike.cpp)
-
-add_executable(dictionarylike_test ${DictionaryLike_test_SRCS})
-TARGET_LINK_LIBRARIES(dictionarylike_test JetsonGPIO Threads::Threads)
-
-# Build Test all APIs
-set(test_all_apis_SRCS
-   ${CMAKE_CURRENT_SOURCE_DIR}/samples/test_all_apis.cpp )
-
-add_executable(test_all_apis ${test_all_apis_SRCS})
-TARGET_LINK_LIBRARIES(test_all_apis JetsonGPIO Threads::Threads)
+# Build test codes 
+add_subdirectory(tests)
 
 # Build examples
 if (BUILD_EXAMPLES)
