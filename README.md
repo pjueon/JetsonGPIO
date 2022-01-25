@@ -3,6 +3,14 @@ JetsonGPIO(C++) is a C++ port of the **NVIDIA's Jetson.GPIO Python library**(htt
 
 Jetson TX1, TX2, AGX Xavier, and Nano development boards contain a 40 pin GPIO header, similar to the 40 pin header in the Raspberry Pi. These GPIOs can be controlled for digital input and output using this library. The library provides almost same APIs as the Jetson.GPIO Python library.
   
+This document walks through what is contained in The Jetson GPIO library package, how to configure the system and compile the provided sample applications, and the library API.
+  
+# Package Components
+In addition to this document, the JetsonGPIO library package contains the following:
+1. The `src` and `include` subdirectories contain the C++ codes that implement all library functionality. The `JetsonGPIO.h` file in the `include` subdirectory is the only header file that should be included into an application and provides the needed APIs. 
+2. The `samples` subdirectory contains sample applications to help in getting familiar with the library API and getting started on an application. 
+3. The `tests` subdirectory contains test codes to test the library APIs and private utilities that are used to implement the library. Some test codes require specific setups. Check the required setups from the codes before you run them. 
+
 
 # Installation
 ### 1. Clone the repository.
@@ -10,21 +18,23 @@ Jetson TX1, TX2, AGX Xavier, and Nano development boards contain a 40 pin GPIO h
 git clone https://github.com/pjueon/JetsonGPIO
 ```
 
-### 2. Build and install the library. 
+### 2. Make build directory and change directory to it. 
 
-Make build directory and change directory to it.
 ```
 cd JetsonGPIO
-mkdir build
-cd build
+mkdir build && cd build
 ```
 
-The following commands will build the library and install it to `/usr/local` directory by default.  
-- You can add `-DCMAKE_INSTALL_PREFIX=/usr` option to install it to `/usr` according to your preference.  
-- You can add `-DBUILD_EXAMPLES=ON` option to build example codes in `samples`.
-
+### 3. Configure the cmake
 ```
 cmake ..
+```
+You can add
+- `-DCMAKE_INSTALL_PREFIX=/usr` option to install it to `/usr` according to your preference. (The default installation directory is `/usr/local`)
+- `-DBUILD_EXAMPLES=ON` option to build example codes in `samples`.
+
+### 4. Build and Install the library
+```
 sudo make install
 ```
 
@@ -83,15 +93,24 @@ The code will be automatically fetched at configure time and built alongside you
 Note that with this method the file `99-gpio.rules` will *not* be installed, so you will need to install it to `/etc/udev/rules.d/` manually
 or run your code with root permissions.
 
-## Manual Configuration (Without CMake)
+## Without CMake
+- The library name is `JetsonGPIO`.
+- The library header files is installed in `/usr/local/include` by default.
+- The library has dependency on `pthread` (the library uses `std::thread`)
 
-The library header `JetsonGPIO.h` will be installed in `/usr/local/include` by default. If you installed the library to `/usr`, it will be installed in `/usr/include`.
-When you link the library to your code, you should link pthread as well because the library uses `std::thread`.   
+The following example shows how to compile your code with the library: 
+```
+g++ -o your_program_name [your_source_codes...] -lJetsonGPIO -lpthread
+```
 
-The following simple example shows how to build your code with the library: 
+# Compiling the sample codes 
+As mentioned in [Installation](#installation), you can add cmake option `-DBUILD_EXAMPLES=ON` to build example codes in `samples`.
+Assuming you are in the `JetsonGPIO/build` directory:
 ```
-g++ -o your_program_name your_source_code.cpp -lJetsonGPIO -lpthread
+cmake .. -DBUILD_EXAMPLES=ON
+make examples 
 ```
+You can find the compiled results in `JetsonGPIO/build/samples`.
 
 
 # Library API
