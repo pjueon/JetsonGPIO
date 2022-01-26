@@ -25,6 +25,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include "private/gpio_event.h"
 #include "private/PythonFunctions.h"
+#include "private/sysfs_root.h"
 
 #include <fcntl.h>
 #include <sys/epoll.h>

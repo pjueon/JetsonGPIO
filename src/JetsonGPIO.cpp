@@ -47,6 +47,7 @@ DEALINGS IN THE SOFTWARE.
 #include "private/PythonFunctions.h"
 #include "private/gpio_event.h"
 #include "private/gpio_pin_data.h"
+#include "private/sysfs_root.h"
 
 using namespace GPIO;
 using namespace std;
@@ -60,6 +61,11 @@ constexpr Directions HARD_PWM = Directions::HARD_PWM;
 // All global variables are wrapped in a singleton class except for public APIs,
 // in order to avoid initialization order problem among global variables in
 // different compilation units.
+
+string _gpio_dir(const ChannelInfo& ch_info)
+{
+    return format("%s/%s", _SYSFS_ROOT, ch_info.gpio_name.c_str());
+}
 
 class GlobalVariablesForGPIO
 {
@@ -139,9 +145,7 @@ private:
 
     void _check_permission() const
     {
-        string path1 = _SYSFS_ROOT + "/export"s;
-        string path2 = _SYSFS_ROOT + "/unexport"s;
-        if (!os_access(path1, W_OK) || !os_access(path2, W_OK))
+        if (!os_access(_export_dir(), W_OK) || !os_access(_unexport_dir(), W_OK))
         {
             cerr << "[ERROR] The current user does not have permissions set to access the library functionalites. "
                     "Please configure permissions or use the root user to run this."
@@ -156,6 +160,8 @@ private:
 //================================================================================
 // alias
 GlobalVariablesForGPIO& global() { return GlobalVariablesForGPIO::get_instance(); }
+
+
 
 void _validate_mode_set()
 {
@@ -194,6 +200,8 @@ vector<ChannelInfo> _channels_to_infos(const vector<string>& channels, bool need
     return ch_infos;
 }
 
+
+
 /* Return the current configuration of a channel as reported by sysfs.
    Any of IN, OUT, HARD_PWM, or UNKNOWN may be returned. */
 Directions _sysfs_channel_configuration(const ChannelInfo& ch_info)
@@ -205,13 +213,13 @@ Directions _sysfs_channel_configuration(const ChannelInfo& ch_info)
             return HARD_PWM;
     }
 
-    string gpio_dir = _SYSFS_ROOT + "/"s + ch_info.gpio_name;
+    string gpio_dir = _gpio_dir(ch_info);
     if (!os_path_exists(gpio_dir))
         return UNKNOWN; // Originally returns None in NVIDIA's GPIO Python Library
 
     string gpio_direction{};
     { // scope for f
-        ifstream f_direction(gpio_dir + "/direction");
+        ifstream f_direction(format("%s/direction", gpio_dir.c_str()));
         stringstream buffer{};
         buffer << f_direction.rdbuf();
         gpio_direction = buffer.str();
@@ -235,15 +243,19 @@ Directions _app_channel_configuration(const ChannelInfo& ch_info)
     return global()._channel_configuration[ch_info.channel];
 }
 
+
+
 void _export_gpio(const ChannelInfo& ch_info)
 {
-    if (!os_path_exists(_SYSFS_ROOT + "/"s + ch_info.gpio_name))
+    string gpio_dir = _gpio_dir(ch_info);
+
+    if (!os_path_exists(gpio_dir))
     { // scope for f_export
-        ofstream f_export(_SYSFS_ROOT + "/export"s);
+        ofstream f_export(_export_dir());
         f_export << ch_info.gpio;
     } // scope ends
 
-    string value_path = _SYSFS_ROOT + "/"s + ch_info.gpio_name + "/value"s;
+    string value_path = format("%s/value", gpio_dir.c_str());
 
     int time_count = 0;
     while (!os_access(value_path, R_OK | W_OK))
@@ -254,7 +266,7 @@ void _export_gpio(const ChannelInfo& ch_info)
                                 "\n Please configure permissions or use the root user to run this.");
     }
 
-    ch_info.f_direction->open(_SYSFS_ROOT + "/"s + ch_info.gpio_name + "/direction", std::ios::out);
+    ch_info.f_direction->open(format("%s/direction", gpio_dir.c_str()), std::ios::out);
     ch_info.f_value->open(value_path, std::ios::in | std::ios::out);
 }
 
@@ -262,11 +274,12 @@ void _unexport_gpio(const ChannelInfo& ch_info)
 {
     ch_info.f_direction->close();
     ch_info.f_value->close();
+    string gpio_dir = _gpio_dir(ch_info);
 
-    if (!os_path_exists(_SYSFS_ROOT + "/"s + ch_info.gpio_name))
+    if (!os_path_exists(gpio_dir))
         return;
 
-    ofstream f_unexport(_SYSFS_ROOT + "/unexport"s);
+    ofstream f_unexport(_unexport_dir());
     f_unexport << ch_info.gpio;
 }
 
@@ -302,17 +315,32 @@ void _setup_single_in(const ChannelInfo& ch_info)
     global()._channel_configuration[ch_info.channel] = IN;
 }
 
-string _pwm_path(const ChannelInfo& ch_info) { return ch_info.pwm_chip_dir + "/pwm" + to_string(ch_info.pwm_id); }
+string _pwm_path(const ChannelInfo& ch_info)
+{
+    return format("%s/pwm%i", ch_info.pwm_chip_dir.c_str(), ch_info.pwm_id);
+}
 
-string _pwm_export_path(const ChannelInfo& ch_info) { return ch_info.pwm_chip_dir + "/export"; }
+string _pwm_export_path(const ChannelInfo& ch_info) { return format("%s/export", ch_info.pwm_chip_dir.c_str()); }
 
-string _pwm_unexport_path(const ChannelInfo& ch_info) { return ch_info.pwm_chip_dir + "/unexport"; }
+string _pwm_unexport_path(const ChannelInfo& ch_info) { return format("%s/unexport", ch_info.pwm_chip_dir.c_str()); }
 
-string _pwm_period_path(const ChannelInfo& ch_info) { return _pwm_path(ch_info) + "/period"; }
+string _pwm_period_path(const ChannelInfo& ch_info)
+{
+    auto pwm_path = _pwm_path(ch_info);
+    return format("%s/period", pwm_path.c_str());
+}
 
-string _pwm_duty_cycle_path(const ChannelInfo& ch_info) { return _pwm_path(ch_info) + "/duty_cycle"; }
+string _pwm_duty_cycle_path(const ChannelInfo& ch_info)
+{
+    auto pwm_path = _pwm_path(ch_info);
+    return format("%s/duty_cycle", pwm_path.c_str());
+}
 
-string _pwm_enable_path(const ChannelInfo& ch_info) { return _pwm_path(ch_info) + "/enable"; }
+string _pwm_enable_path(const ChannelInfo& ch_info) 
+{
+    auto pwm_path = _pwm_path(ch_info);
+    return format("%s/enable", pwm_path.c_str());
+}
 
 void _export_pwm(const ChannelInfo& ch_info)
 {
@@ -1009,11 +1037,6 @@ bool GPIO::operator!=(const GPIO::Callback& A, const GPIO::Callback& B) { return
 //=======================================
 // WaitResult
 GPIO::WaitResult::WaitResult(const std::string& channel) : _channel(channel) {}
-GPIO::WaitResult::WaitResult(const GPIO::WaitResult&) = default;
-GPIO::WaitResult::WaitResult(GPIO::WaitResult&&) = default;
-GPIO::WaitResult& GPIO::WaitResult::operator=(const GPIO::WaitResult&) = default;
-GPIO::WaitResult& GPIO::WaitResult::operator=(GPIO::WaitResult&&) = default;
-
 bool GPIO::WaitResult::is_event_detected() const { return !is_None(channel()); }
 //=======================================
 

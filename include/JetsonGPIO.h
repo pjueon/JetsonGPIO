@@ -34,34 +34,34 @@ DEALINGS IN THE SOFTWARE.
 
 #include "JetsonGPIOConfig.h"
 
-#if (__cplusplus < 201402L)
-// if C++14 is not supported,
+#if (__cplusplus >= 201402L) && !defined(CPP14_SUPPORTED)
+#define CPP14_SUPPORTED
+#endif
 
-// define std::decay_t, std::enable_if_t
+#if (__cplusplus >= 201703L) && !defined(CPP17_SUPPORTED)
+#define CPP17_SUPPORTED
+#endif
+
+#ifndef CPP14_SUPPORTED
+// define C++14 features
 namespace std
 {
     template <class T> using decay_t = typename decay<T>::type;
-
     template <bool B, class T = void> using enable_if_t = typename enable_if<B, T>::type;
-} // namespace std
-
+}
 #endif
 
-#if (__cplusplus < 201703L)
-// if C++17 is not supported,
-// define std::void_t (std::void_t is C++17 feature)
-
+#ifndef CPP17_SUPPORTED
+// define C++17 features
 namespace std
 {
     template <class...> using void_t = void;
 }
-
 #endif
 
 namespace GPIO
 {
     constexpr auto VERSION = JETSONGPIO_VERSION;
-    constexpr auto _SYSFS_ROOT = "/sys/class/gpio";
 
     extern const std::string JETSON_INFO;
     extern const std::string model;
@@ -222,10 +222,10 @@ namespace GPIO
     {
     public:
         WaitResult(const std::string& channel);
-        WaitResult(const WaitResult&);
-        WaitResult(WaitResult&&);
-        WaitResult& operator=(const WaitResult&);
-        WaitResult& operator=(WaitResult&&);
+        WaitResult(const WaitResult&) = default;
+        WaitResult(WaitResult&&) = default;
+        WaitResult& operator=(const WaitResult&) = default;
+        WaitResult& operator=(WaitResult&&) = default;
 
         inline const std::string& channel() const { return _channel; }
         bool is_event_detected() const;
