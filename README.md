@@ -83,7 +83,7 @@ sudo bash ../post_install.sh
 
 ## Without CMake
 - The library name is `JetsonGPIO`.
-- The library header files is installed in `/usr/local/include` by default.
+- The library header files are installed in `/usr/local/include` by default.
 - The library has dependency on `pthread` (the library uses `std::thread`)
 
 The following example shows how to compile your code with the library: 
@@ -93,12 +93,12 @@ g++ -o your_program_name [your_source_codes...] -lJetsonGPIO -lpthread
 
 # Compiling the sample codes 
 As mentioned in [Installation](#installation), you can add cmake option `-DBUILD_EXAMPLES=ON` to build example codes in `samples`.
-Assuming you are in the `JetsonGPIO/build` directory:
+Assuming you are in `build` directory:
 ```
 cmake .. -DBUILD_EXAMPLES=ON
 make examples 
 ```
-You can find the compiled results in `JetsonGPIO/build/samples`.
+You can find the compiled results in `build/samples`.
 
 
 # Library API
