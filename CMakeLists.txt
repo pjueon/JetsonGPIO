@@ -7,6 +7,7 @@ include(GNUInstallDirs)
 SET(CMAKE_CXX_STANDARD 14)
 
 option(BUILD_EXAMPLES "Build examples" OFF)
+option(POST_INSTALL "Create gpio group and reload udev rules" ON)
 
 SET (UDEVRULES_INSTALL_DIR "/lib/udev/rules.d" CACHE STRING "Base directory for udev rules")
 
@@ -85,9 +86,13 @@ install(FILES
         ${CMAKE_CURRENT_LIST_DIR}/LICENSE.txt
         DESTINATION ${CMAKE_INSTALL_DATADIR}/JetsonGPIO)
 
-
 # Install Udev rules
 install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/99-gpio.rules DESTINATION ${UDEVRULES_INSTALL_DIR})
+
+# Run post installation script
+if (POST_INSTALL)
+install (CODE "execute_process(COMMAND bash ./post_install.sh WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})")
+endif()
 
 # Build test codes 
 add_subdirectory(tests)

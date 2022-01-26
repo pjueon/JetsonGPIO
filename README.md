@@ -38,24 +38,6 @@ You can add
 sudo make install
 ```
 
-# Setting User Permissions
-
-In order to use the Jetson GPIO Library, the correct user permissions/groups must
-be set first. Or you have to run your program with root permission.
-
-Create a new gpio user group. Then add your user to the newly created group.
-```
-sudo groupadd -f -r gpio
-sudo usermod -a -G gpio your_user_name
-```
-
-A udev rules file 99-gpio.rules is installed. For the new rule to take place, you either need to reboot or reload the udev
-rules by running:
-```
-sudo udevadm control --reload-rules && sudo udevadm trigger
-```
-
-
 # Linking the Library 
 
 ## Using CMake
@@ -90,8 +72,14 @@ target_link_libraries(mytarget JetsonGPIO::JetsonGPIO)
 
 The code will be automatically fetched at configure time and built alongside your project.
 
-Note that with this method the file `99-gpio.rules` will *not* be installed, so you will need to install it to `/etc/udev/rules.d/` manually
-or run your code with root permissions.
+Note that with this method will *not* set user permissions, so you will need to set user permissions manually or run your code with root permissions.
+
+To set user permissions, run `post_install.sh` script. 
+Assuming you are in `build` directory:
+```
+sudo bash ../post_install.sh
+```
+
 
 ## Without CMake
 - The library name is `JetsonGPIO`.
