@@ -92,7 +92,7 @@ install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/99-gpio.rules DESTINATION ${UDEVRULES
 
 # Run post installation script
 if (POST_INSTALL)
-install (CODE "execute_process(COMMAND ./post_install.sh WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})")
+install (CODE "execute_process(COMMAND bash ./post_install.sh WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})")
 endif()
 
 # Build Test
