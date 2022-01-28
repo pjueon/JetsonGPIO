@@ -56,7 +56,7 @@ target_link_libraries(mytarget JetsonGPIO::JetsonGPIO)
 
 ### Without installation
 
-If you don't want to install the library you can add it as an external project with CMake's [`FetchContent`](https://cmake.org/cmake/help/latest/module/FetchContent.html):
+If you don't want to install the library you can add it as an external project with CMake's [`FetchContent`](https://cmake.org/cmake/help/latest/module/FetchContent.html)(cmake 3.11 or higher is required):
 
 ```cmake
 include(FetchContent)
