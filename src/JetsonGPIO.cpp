@@ -438,14 +438,19 @@ void _cleanup_one(const ChannelInfo& ch_info)
     global()._channel_configuration.erase(ch_info.channel);
 }
 
+void _cleanup_one(const std::string& channel)
+{
+    ChannelInfo ch_info = _channel_to_info(channel);
+    _cleanup_one(ch_info);
+}
+
 void _cleanup_all()
 {
     auto copied = global()._channel_configuration;
     for (const auto& _pair : copied)
     {
         const auto& channel = _pair.first;
-        ChannelInfo ch_info = _channel_to_info(channel);
-        _cleanup_one(ch_info);
+        _cleanup_one(channel);
     }
     global()._gpio_mode = NumberingModes::None;
 }
@@ -480,7 +485,6 @@ void GPIO::setmode(NumberingModes mode)
     }
     catch (exception& e)
     {
-        _cleanup_all();
         throw _error(e, "GPIO::setmode()");
     }
 }
@@ -525,7 +529,6 @@ void GPIO::setup(const string& channel, Directions direction, int initial)
     }
     catch (exception& e)
     {
-        _cleanup_all();
         throw _error(e, "GPIO::setup()");
     }
 }
@@ -562,7 +565,6 @@ void GPIO::cleanup(const string& channel)
     }
     catch (exception& e)
     {
-        _cleanup_all();
         throw _error(e, "GPIO::cleanup()");
     }
 }
@@ -593,7 +595,6 @@ int GPIO::input(const string& channel)
     }
     catch (exception& e)
     {
-        _cleanup_all();
         throw _error(e, "GPIO::input()");
     }
 }
@@ -614,7 +615,6 @@ void GPIO::output(const string& channel, int value)
     }
     catch (exception& e)
     {
-        _cleanup_all();
         throw _error(e, "GPIO::output()");
     }
 }
@@ -632,7 +632,6 @@ Directions GPIO::gpio_function(const string& channel)
     }
     catch (exception& e)
     {
-        _cleanup_all();
         throw _error(e, "GPIO::gpio_function()");
     }
 }
@@ -655,7 +654,6 @@ bool GPIO::event_detected(const std::string& channel)
     }
     catch (exception& e)
     {
-        _cleanup_all();
         throw _error(e, "GPIO::event_detected()");
     }
 }
@@ -700,7 +698,6 @@ void GPIO::add_event_callback(const std::string& channel, const Callback& callba
     }
     catch (exception& e)
     {
-        _cleanup_all();
         throw _error(e, "GPIO::add_event_callback()");
     }
 }
@@ -762,7 +759,6 @@ void GPIO::add_event_detect(const std::string& channel, Edge edge, const Callbac
     }
     catch (exception& e)
     {
-        _cleanup_all();
         throw _error(e, "GPIO::add_event_detect()");
     }
 }
@@ -818,7 +814,6 @@ WaitResult GPIO::wait_for_edge(const std::string& channel, Edge edge, uint64_t b
     }
     catch (exception& e)
     {
-        _cleanup_all();
         throw _error(e, "GPIO::wait_for_edge()");
     }
 }
@@ -879,7 +874,6 @@ struct GPIO::PWM::Impl
         }
         catch (exception& e)
         {
-            _cleanup_all();
             throw _error(e, "GPIO::PWM::PWM()");
         }
     }
@@ -922,7 +916,6 @@ struct GPIO::PWM::Impl
         }
         catch (exception& e)
         {
-            _cleanup_all();
             throw _error(e, "GPIO::PWM::start()");
         }
     }
@@ -935,7 +928,6 @@ struct GPIO::PWM::Impl
         }
         catch (exception& e)
         {
-            _cleanup_all();
             throw _error(e, "GPIO::PWM::ChangeFrequency()");
         }
     }
@@ -948,7 +940,6 @@ struct GPIO::PWM::Impl
         }
         catch (exception& e)
         {
-            _cleanup_all();
             throw _error(e, "GPIO::PWM::ChangeDutyCycle()");
         }
     }
@@ -964,7 +955,6 @@ struct GPIO::PWM::Impl
         }
         catch (exception& e)
         {
-            _cleanup_all();
             throw _error(e, "GPIO::PWM::stop()");
         }
     }
