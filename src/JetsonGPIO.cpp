@@ -980,9 +980,13 @@ struct GPIO::PWM::Impl
             _set_pwm_period(_ch_info, _period_ns);
         }
 
-        _duty_cycle_percent = duty_cycle_percent;
-        _duty_cycle_ns = int(_period_ns * (duty_cycle_percent / 100.0));
-        _set_pwm_duty_cycle(_ch_info, _duty_cycle_ns);
+        bool duty_cycle_change = _duty_cycle_percent != duty_cycle_percent;
+        if(duty_cycle_change || start || stop)
+        {
+            _duty_cycle_percent = duty_cycle_percent;
+            _duty_cycle_ns = int(_period_ns * (duty_cycle_percent / 100.0));
+            _set_pwm_duty_cycle(_ch_info, _duty_cycle_ns);
+        }
 
         if (stop || start)
         {
