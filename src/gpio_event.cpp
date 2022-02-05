@@ -809,6 +809,7 @@ namespace GPIO
                 // -- At least remove all callbacks right now
                 geo->callbacks.clear();
                 return;
+                
             }
 
             if (_auth_event_channel_count == 0 && _epoll_fd_thread)
