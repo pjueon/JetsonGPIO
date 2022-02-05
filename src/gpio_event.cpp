@@ -790,7 +790,7 @@ namespace GPIO
         return 0;
     }
 
-    void _remove_edge_detect(int gpio, const std::string& gpio_name)
+    void _remove_edge_detect(int gpio, const std::string& gpio_name  __attribute__((unused))) 
     {
         // Enter Mutex
         std::unique_lock<std::recursive_mutex> mutex_lock(_epmutex);
