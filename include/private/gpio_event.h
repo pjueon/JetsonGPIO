@@ -62,7 +62,7 @@ namespace GPIO
 
     int _add_edge_detect(int gpio, const std::string& gpio_name, const std::string& channel_id, Edge edge,
                          uint64_t bounce_time);
-    void _remove_edge_detect(int gpio, const std::string& gpio_name);
+    void _remove_edge_detect(int gpio);
 
     int _add_edge_callback(int gpio, const Callback& callback);
     void _remove_edge_callback(int gpio, const Callback& callback);
