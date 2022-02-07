@@ -563,7 +563,7 @@ namespace GPIO
                     else
                     {
                         // Set for removal from the concurrent epoll-thread
-                        _remove_edge_detect(gpio, gpio_name);
+                        _remove_edge_detect(gpio);
                     }
                 }
             }
@@ -790,7 +790,7 @@ namespace GPIO
         return 0;
     }
 
-    void _remove_edge_detect(int gpio, const std::string& gpio_name  __attribute__((unused))) 
+    void _remove_edge_detect(int gpio) 
     {
         // Enter Mutex
         std::unique_lock<std::recursive_mutex> mutex_lock(_epmutex);
@@ -862,6 +862,6 @@ namespace GPIO
         }
     }
 
-    void _event_cleanup(int gpio, const std::string& gpio_name) { _remove_edge_detect(gpio, gpio_name); }
+    void _event_cleanup(int gpio, const std::string& gpio_name) { _remove_edge_detect(gpio); }
 
 } // namespace GPIO
