@@ -353,7 +353,7 @@ namespace GPIO
             { JETSON_TX1, {1, "4096M", "Unknown", "Jetson TX1", "NVIDIA", "ARM A57"} },
             { JETSON_NANO, {1, "4096M", "Unknown", "Jetson nano", "NVIDIA", "ARM A57"} }
         }
-    {};
+    {}
 
     // clang-format on
 

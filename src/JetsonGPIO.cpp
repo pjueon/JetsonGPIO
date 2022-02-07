@@ -772,7 +772,7 @@ void GPIO::remove_event_detect(const std::string& channel)
 {
     ChannelInfo ch_info = _channel_to_info(channel, true);
 
-    _remove_edge_detect(ch_info.gpio, ch_info.gpio_name);
+    _remove_edge_detect(ch_info.gpio);
 }
 
 void GPIO::remove_event_detect(int channel) { remove_event_detect(std::to_string(channel)); }

@@ -62,7 +62,7 @@ inline void delay(int ms)
     exit(0);
 }
 
-void signalHandler(int s) { end_this_program = true; }
+void signalHandler(int s __attribute__((unused))) { end_this_program = true; }
 
 void callback_fn(const std::string& button_pin)
 {
@@ -70,13 +70,13 @@ void callback_fn(const std::string& button_pin)
     ++cb;
 }
 
-void callback_one(const std::string& button_pin)
+void callback_one(const std::string& button_pin __attribute__((unused)))
 {
     cout << "--First Additional Callback" << endl;
     cb1 = true;
 }
 
-void callback_two(const std::string& button_pin)
+void callback_two(const std::string& button_pin __attribute__((unused)))
 {
     cout << "--Second Additional Callback" << endl;
     cb2 = true;
