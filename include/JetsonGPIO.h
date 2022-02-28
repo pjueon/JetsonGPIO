@@ -173,30 +173,40 @@ namespace GPIO
     bool operator==(const Callback& A, const Callback& B);
     bool operator!=(const Callback& A, const Callback& B);
 
+    namespace details
+    {
+        template <class arg_t> 
+        struct CallbackCompare
+        {
+            using func_t = std::function<void(arg_t)>;
+
+            template <class T> static bool Compare(const func_t& A, const func_t& B) 
+            {
+                static_assert(is_equality_comparable_v<const T&>,
+                              "Callback function MUST be equality comparable. ex> f0 == f1");
+
+                if (A == nullptr && B == nullptr)
+                    return true;
+
+                const T* targetA = A.template target<T>();
+                const T* targetB = B.template target<T>();
+
+                return targetA != nullptr && targetB != nullptr && *targetA == *targetB;
+            }
+        };
+    } // namespace details
+
     class Callback
     {
     private:
         using func_t = std::function<void(const std::string&)>;
-
-        template <class T> static bool comparer_impl(const func_t& A, const func_t& B)
-        {
-            static_assert(is_equality_comparable_v<const T&>,
-                          "Callback function MUST be equality comparable. ex> f0 == f1");
-
-            if (A == nullptr && B == nullptr)
-                return true;
-
-            const T* targetA = A.target<T>();
-            const T* targetB = B.target<T>();
-
-            return targetA != nullptr && targetB != nullptr && *targetA == *targetB;
-        }
+        using comparer_impl = details::CallbackCompare<const std::string&>;
 
     public:
         template <class T, class = std::enable_if_t<!std::is_same<std::decay_t<T>, Callback>::value>>
         Callback(T&& function)
         : function(std::forward<T>(function)),
-          comparer([](const func_t& A, const func_t& B) { return comparer_impl<std::decay_t<T>>(A, B); })
+          comparer(comparer_impl::Compare<std::decay_t<T>>)
         {
             static_assert(std::is_constructible<func_t, T&&>::value,
                           "Callback return type: void, argument type: const std::string&");
