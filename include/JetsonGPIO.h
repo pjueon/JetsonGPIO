@@ -175,12 +175,11 @@ namespace GPIO
 
     namespace details
     {
-        template <class arg_t> 
-        struct CallbackCompare
+        template <class arg_t> struct CallbackCompare
         {
-            using func_t = std::function<void(arg_t)>;
+            using func_t = std::function<arg_t>;
 
-            template <class T> static bool Compare(const func_t& A, const func_t& B) 
+            template <class T> static bool Compare(const func_t& A, const func_t& B)
             {
                 static_assert(is_equality_comparable_v<const T&>,
                               "Callback function MUST be equality comparable. ex> f0 == f1");
@@ -194,16 +193,56 @@ namespace GPIO
                 return targetA != nullptr && targetB != nullptr && *targetA == *targetB;
             }
         };
+
+        class NoArgCallback
+        {
+        private:
+            using func_t = std::function<void()>;
+            using comparer_impl = details::CallbackCompare<void()>;
+
+        public:
+            NoArgCallback(const NoArgCallback&) = default;
+            NoArgCallback(NoArgCallback&&) = default;
+
+            template <class T>
+            NoArgCallback(T&& function)
+            : function(std::forward<T>(function)),
+            comparer(comparer_impl::Compare<std::decay_t<T>>)
+            {}
+
+            NoArgCallback& operator=(const NoArgCallback&) = default;
+            NoArgCallback& operator=(NoArgCallback&&) = default;
+
+            bool operator==(const NoArgCallback& other) const
+            {
+                return comparer(function, other.function);
+            }
+
+            bool operator!=(const NoArgCallback& other) const
+            {
+                return !(*this == other);
+            }
+
+            void operator()(const std::string&) const { function(); }
+
+        private:
+            func_t function;
+            std::function<bool(const func_t&, const func_t&)> comparer;
+        };
     } // namespace details
 
     class Callback
     {
     private:
         using func_t = std::function<void(const std::string&)>;
-        using comparer_impl = details::CallbackCompare<const std::string&>;
+        using comparer_impl = details::CallbackCompare<void(const std::string&)>;
 
     public:
-        template <class T, class = std::enable_if_t<!std::is_same<std::decay_t<T>, Callback>::value>>
+        Callback(const Callback&) = default;
+        Callback(Callback&&) = default;
+
+        // template <class T, class = std::enable_if_t<!std::is_same<std::decay_t<T>, Callback>::value>>
+        template <class T>
         Callback(T&& function)
         : function(std::forward<T>(function)),
           comparer(comparer_impl::Compare<std::decay_t<T>>)
@@ -212,10 +251,8 @@ namespace GPIO
                           "Callback return type: void, argument type: const std::string&");
         }
 
-        Callback(Callback&&) = default;
-        Callback& operator=(Callback&&) = default;
-        Callback(const Callback&) = default;
         Callback& operator=(const Callback&) = default;
+        Callback& operator=(Callback&&) = default;
 
         void operator()(int input) const;
         void operator()(const std::string& input) const;
