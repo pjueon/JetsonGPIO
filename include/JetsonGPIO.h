@@ -48,7 +48,7 @@ namespace std
 {
     template <class T> using decay_t = typename decay<T>::type;
     template <bool B, class T = void> using enable_if_t = typename enable_if<B, T>::type;
-}
+} // namespace std
 #endif
 
 #ifndef CPP17_SUPPORTED
@@ -155,18 +155,6 @@ namespace GPIO
     Directions gpio_function(int channel);
 
     //----------------------------------
-    // type traits
-    template <class T, class = void> struct is_equality_comparable : std::false_type
-    {
-    };
-
-    template <class T>
-    struct is_equality_comparable<T, std::void_t<decltype(std::declval<T>() == std::declval<T>())>>
-    : std::is_convertible<decltype(std::declval<T>() == std::declval<T>()), bool>
-    {
-    };
-
-    template <class T> constexpr bool is_equality_comparable_v = is_equality_comparable<T>::value;
 
     // Callback definition
     class Callback;
@@ -175,6 +163,39 @@ namespace GPIO
 
     namespace details
     {
+        class NoArgCallback;
+
+        // type traits
+        enum class CallbackType
+        {
+            Normal,
+            NoArg
+        };
+
+        template <CallbackType e> struct CallbackConstructorOverload
+        {
+        };
+
+        template <class T, class = void> struct is_equality_comparable : std::false_type
+        {
+        };
+
+        template <class T>
+        struct is_equality_comparable<T, std::void_t<decltype(std::declval<T>() == std::declval<T>())>>
+        : std::is_convertible<decltype(std::declval<T>() == std::declval<T>()), bool>
+        {
+        };
+
+        template <class T> constexpr bool is_equality_comparable_v = is_equality_comparable<T>::value;
+
+        template <class T> constexpr CallbackType CallbackTypeSelctor()
+        {
+            constexpr bool is_no_argument_callback = !std::is_same<std::decay_t<T>, NoArgCallback>::value &&
+                                                     std::is_constructible<NoArgCallback, T&&>::value;
+
+            return is_no_argument_callback ? CallbackType::NoArg : CallbackType::Normal;
+        }
+
         template <class arg_t> struct CallbackCompare
         {
             using func_t = std::function<arg_t>;
@@ -204,24 +225,18 @@ namespace GPIO
             NoArgCallback(const NoArgCallback&) = default;
             NoArgCallback(NoArgCallback&&) = default;
 
-            template <class T>
+            template <class T, class = std::enable_if_t<!std::is_same<std::decay_t<T>, nullptr_t>::value &&
+                                                        std::is_constructible<func_t, T&&>::value>>
             NoArgCallback(T&& function)
-            : function(std::forward<T>(function)),
-            comparer(comparer_impl::Compare<std::decay_t<T>>)
-            {}
+            : function(std::forward<T>(function)), comparer(comparer_impl::Compare<std::decay_t<T>>)
+            {
+            }
 
             NoArgCallback& operator=(const NoArgCallback&) = default;
             NoArgCallback& operator=(NoArgCallback&&) = default;
 
-            bool operator==(const NoArgCallback& other) const
-            {
-                return comparer(function, other.function);
-            }
-
-            bool operator!=(const NoArgCallback& other) const
-            {
-                return !(*this == other);
-            }
+            bool operator==(const NoArgCallback& other) const { return comparer(function, other.function); }
+            bool operator!=(const NoArgCallback& other) const { return !(*this == other); }
 
             void operator()(const std::string&) const { function(); }
 
@@ -229,6 +244,7 @@ namespace GPIO
             func_t function;
             std::function<bool(const func_t&, const func_t&)> comparer;
         };
+
     } // namespace details
 
     class Callback
@@ -237,24 +253,34 @@ namespace GPIO
         using func_t = std::function<void(const std::string&)>;
         using comparer_impl = details::CallbackCompare<void(const std::string&)>;
 
-    public:
-        Callback(const Callback&) = default;
-        Callback(Callback&&) = default;
-
-        // template <class T, class = std::enable_if_t<!std::is_same<std::decay_t<T>, Callback>::value>>
         template <class T>
-        Callback(T&& function)
-        : function(std::forward<T>(function)),
-          comparer(comparer_impl::Compare<std::decay_t<T>>)
+        Callback(T&& function, details::CallbackConstructorOverload<details::CallbackType::Normal>)
+        : function(std::forward<T>(function)), comparer(comparer_impl::Compare<std::decay_t<T>>)
         {
             static_assert(std::is_constructible<func_t, T&&>::value,
                           "Callback return type: void, argument type: const std::string&");
         }
 
+        template <class T>
+        Callback(T&& noArgFunction, details::CallbackConstructorOverload<details::CallbackType::NoArg>)
+        : function(details::NoArgCallback(std::forward<T>(noArgFunction))),
+          comparer(comparer_impl::Compare<details::NoArgCallback>)
+        {
+        }
+
+    public:
+        Callback(const Callback&) = default;
+        Callback(Callback&&) = default;
+
+        template <class T>
+        Callback(T&& function)
+        : Callback(std::forward<T>(function), details::CallbackConstructorOverload<details::CallbackTypeSelctor<T>()>{})
+        {
+        }
+
         Callback& operator=(const Callback&) = default;
         Callback& operator=(Callback&&) = default;
 
-        void operator()(int input) const;
         void operator()(const std::string& input) const;
 
         friend bool operator==(const Callback& A, const Callback& B);

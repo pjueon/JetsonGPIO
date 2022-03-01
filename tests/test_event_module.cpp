@@ -70,15 +70,15 @@ void callback_fn(const std::string& button_pin)
     ++cb;
 }
 
-void callback_one(const std::string& button_pin __attribute__((unused)))
+void callback_one()
 {
     cout << "--First Additional Callback" << endl;
     cb1 = true;
 }
 
-void callback_two(const std::string& button_pin __attribute__((unused)))
+void callback_two(const std::string& button_pin)
 {
-    cout << "--Second Additional Callback" << endl;
+    cout << "--Second Additional Callback (channel: " << button_pin << ")" << endl;
     cb2 = true;
 }
 
