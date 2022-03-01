@@ -298,9 +298,9 @@ void callback_fn(const std::string& channel) {
 GPIO::add_event_detect(channel, GPIO::RISING, callback_fn);
 ```
 
-Any object that satisfies the following requirements can be used as callback functions. 
+Any object that satisfies the following requirements can be used as a callback function. 
 
-- Callable (argument type: const std::string&, return type: void)
+- Callable with a `const std::string&` type argument (for the channel name) **OR** without any argument. The return type must be `void`.
 - Copy-constructible 
 - Equality-comparable with same type (ex> func0 == func1)  
 
@@ -343,7 +343,7 @@ void callback_one(const std::string& channel) {
     std::cout << "First Callback" << std::endl;
 }
 
-void callback_two(const std::string& channel) {
+void callback_two() {   // you can also use callbacks witout any argument
     std::cout << "Second Callback" << std::endl;
 }
 
