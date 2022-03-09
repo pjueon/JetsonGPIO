@@ -193,7 +193,17 @@ namespace GPIO
             constexpr bool is_no_argument_callback = !std::is_same<std::decay_t<T>, NoArgCallback>::value &&
                                                      std::is_constructible<NoArgCallback, T&&>::value;
 
-            return is_no_argument_callback ? CallbackType::NoArg : CallbackType::Normal;
+            constexpr bool is_string_argument_callback =
+                std::is_constructible<std::function<void(const std::string&)>, T&&>::value;
+
+            static_assert(std::is_copy_constructible<std::decay_t<T>>::value, "Callback must be copy-constructible");
+
+            static_assert(is_no_argument_callback || is_string_argument_callback, "Callback must be callable");
+
+            static_assert(is_equality_comparable_v<const T&>,
+                          "Callback function MUST be equality comparable. ex> f0 == f1");
+
+            return is_string_argument_callback ? CallbackType::Normal : CallbackType::NoArg;
         }
 
         template <class arg_t> struct CallbackCompare
@@ -202,9 +212,6 @@ namespace GPIO
 
             template <class T> static bool Compare(const func_t& A, const func_t& B)
             {
-                static_assert(is_equality_comparable_v<const T&>,
-                              "Callback function MUST be equality comparable. ex> f0 == f1");
-
                 if (A == nullptr && B == nullptr)
                     return true;
 
