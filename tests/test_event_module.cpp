@@ -62,7 +62,7 @@ inline void delay(int ms)
     exit(0);
 }
 
-void signalHandler(int s __attribute__((unused))) { end_this_program = true; }
+void signalHandler(int) { end_this_program = true; }
 
 void callback_fn(const std::string& button_pin)
 {
