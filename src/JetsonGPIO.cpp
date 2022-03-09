@@ -1021,8 +1021,6 @@ void GPIO::Callback::operator()(const std::string& input) const
         function(input);
 }
 
-void GPIO::Callback::operator()(int input) const { operator()(std::to_string(input)); }
-
 bool GPIO::operator==(const GPIO::Callback& A, const GPIO::Callback& B) { return A.comparer(A.function, B.function); }
 
 bool GPIO::operator!=(const GPIO::Callback& A, const GPIO::Callback& B) { return !(A == B); }

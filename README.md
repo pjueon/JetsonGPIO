@@ -266,10 +266,6 @@ if(result.is_event_detected()){ /*...*/ }
 if(result){ /*...*/ } // is equal to if(result.is_event_detected())
 ```
 
-
-
-
-
 __The event_detected() function__
 
 This function can be used to periodically check if an event occurred since the last call. The function can be set up and called as follows:
@@ -290,7 +286,8 @@ This feature can be used to run a second thread for callback functions. Hence, t
 
 ```cpp
 // define callback function
-void callback_fn(const std::string& channel) {
+void callback_fn(const std::string& channel) 
+{
     std::cout << "Callback called from channel " << channel << std::endl;
 }
 
@@ -298,9 +295,11 @@ void callback_fn(const std::string& channel) {
 GPIO::add_event_detect(channel, GPIO::RISING, callback_fn);
 ```
 
-Any object that satisfies the following requirements can be used as callback functions. 
+Any object that satisfies the following requirements can be used as a callback function. 
 
-- Callable (argument type: const std::string&, return type: void)
+- Callable with a `const std::string&` type argument (for the channel name) **OR** without any argument. The return type must be `void`.
+  - *Note*: If the callback object is **not only** callable with a `const std::string&` type argument **but also** callable without any argument,
+  the method with a `const std::string&` type argument will be used as a callback function. 
 - Copy-constructible 
 - Equality-comparable with same type (ex> func0 == func1)  
 
@@ -314,7 +313,7 @@ public:
     MyCallback(const std::string& name) : name(name) {}
     MyCallback(const MyCallback&) = default; // Copy-constructible
 
-    void operator()(const std::string& channel) // Callable
+    void operator()(const std::string& channel) // Callable with one string type argument
     {
         std::cout << "A callback named " << name;
         std::cout << " called from channel " << channel << std::endl;
@@ -339,11 +338,14 @@ GPIO::add_event_detect(channel, GPIO::RISING, my_callback);
 More than one callback can also be added if required as follows:
 
 ```cpp
-void callback_one(const std::string& channel) {
+// you can also use callbacks witout any argument
+void callback_one() 
+{
     std::cout << "First Callback" << std::endl;
 }
 
-void callback_two(const std::string& channel) {
+void callback_two() 
+{
     std::cout << "Second Callback" << std::endl;
 }
 
