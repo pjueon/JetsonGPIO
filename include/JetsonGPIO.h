@@ -188,22 +188,24 @@ namespace GPIO
 
         template <class T> constexpr bool is_equality_comparable_v = is_equality_comparable<T>::value;
 
-        template <class T> constexpr CallbackType CallbackTypeSelctor()
+        template <class T>
+        constexpr bool is_no_argument_callback =
+            !std::is_same<std::decay_t<T>, NoArgCallback>::value && std::is_constructible<NoArgCallback, T&&>::value;
+
+        template <class T>
+        constexpr bool is_string_argument_callback =
+            std::is_constructible<std::function<void(const std::string&)>, T&&>::value;
+
+        template <class T> constexpr CallbackType CallbackTypeSelector()
         {
-            constexpr bool is_no_argument_callback = !std::is_same<std::decay_t<T>, NoArgCallback>::value &&
-                                                     std::is_constructible<NoArgCallback, T&&>::value;
-
-            constexpr bool is_string_argument_callback =
-                std::is_constructible<std::function<void(const std::string&)>, T&&>::value;
-
             static_assert(std::is_copy_constructible<std::decay_t<T>>::value, "Callback must be copy-constructible");
 
-            static_assert(is_no_argument_callback || is_string_argument_callback, "Callback must be callable");
+            static_assert(is_no_argument_callback<T> || is_string_argument_callback<T>, "Callback must be callable");
 
             static_assert(is_equality_comparable_v<const T&>,
                           "Callback function MUST be equality comparable. ex> f0 == f1");
 
-            return is_string_argument_callback ? CallbackType::Normal : CallbackType::NoArg;
+            return is_string_argument_callback<T> ? CallbackType::Normal : CallbackType::NoArg;
         }
 
         template <class arg_t> struct CallbackCompare
@@ -281,7 +283,8 @@ namespace GPIO
 
         template <class T>
         Callback(T&& function)
-        : Callback(std::forward<T>(function), details::CallbackConstructorOverload<details::CallbackTypeSelctor<T>()>{})
+        : Callback(std::forward<T>(function),
+                   details::CallbackConstructorOverload<details::CallbackTypeSelector<T>()>{})
         {
         }
 
