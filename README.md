@@ -39,6 +39,7 @@ sudo make install
 ```
 
 # Linking the Library 
+**Note**: To build your code with JetsonGPIO, C++11 or above is required.
 
 ## Using CMake
 
