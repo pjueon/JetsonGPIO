@@ -188,7 +188,7 @@ namespace GPIO
 
         template <class T> constexpr bool is_equality_comparable_v = is_equality_comparable<T>::value;
 
-        template <class T> constexpr CallbackType CallbackTypeSelctor()
+        template <class T> constexpr CallbackType CallbackTypeSelector()
         {
             constexpr bool is_no_argument_callback = !std::is_same<std::decay_t<T>, NoArgCallback>::value &&
                                                      std::is_constructible<NoArgCallback, T&&>::value;
@@ -281,7 +281,8 @@ namespace GPIO
 
         template <class T>
         Callback(T&& function)
-        : Callback(std::forward<T>(function), details::CallbackConstructorOverload<details::CallbackTypeSelctor<T>()>{})
+        : Callback(std::forward<T>(function),
+                   details::CallbackConstructorOverload<details::CallbackTypeSelector<T>()>{})
         {
         }
 
