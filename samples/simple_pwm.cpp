@@ -50,7 +50,7 @@ int get_output_pin()
     return output_pins.at(GPIO::model);
 }
 
-inline void delay(int s) { this_thread::sleep_for(chrono::seconds(s)); }
+inline void delay(double s) { this_thread::sleep_for(std::chrono::duration<double>(s)); }
 
 static bool end_this_program = false;
 
@@ -72,13 +72,20 @@ int main()
     GPIO::setup(output_pin, GPIO::OUT, GPIO::HIGH);
     GPIO::PWM p(output_pin, 50);
     auto val = 25.0;
+    auto incr = 5.0;
     p.start(val);
 
     cout << "PWM running. Press CTRL+C to exit." << endl;
 
     while (!end_this_program)
     {
-        delay(1);
+        delay(0.25);
+        if (val >= 100)
+            incr = -incr;
+        if (val <= 0)
+            incr = -incr;
+        val += incr;
+        p.ChangeDutyCycle(val);
     }
 
     p.stop();
