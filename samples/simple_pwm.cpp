@@ -36,7 +36,8 @@ DEALINGS IN THE SOFTWARE.
 
 using namespace std;
 const map<string, int> output_pins{
-    {"JETSON_XAVIER", 18}, {"JETSON_NANO", 33}, {"JETSON_NX", 33}, {"CLARA_AGX_XAVIER", 18}, {"JETSON_TX2_NX", 32},
+    {"JETSON_XAVIER", 18},    {"JETSON_NANO", 33},   {"JETSON_NX", 33},
+    {"CLARA_AGX_XAVIER", 18}, {"JETSON_TX2_NX", 32}, {"JETSON_ORIN", 18},
 };
 
 int get_output_pin()

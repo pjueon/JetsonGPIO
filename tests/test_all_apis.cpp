@@ -64,7 +64,7 @@ private:
 
 std::future<void> DelayedSetChannel(int channel, int value, double delay)
 {
-    auto run = [=]()
+    auto run = [=]() 
     {
         sleep(delay);
         GPIO::output(channel, value);
@@ -123,10 +123,19 @@ class APITests
 private:
     static TestPinData get_test_pin_data(const std::string& model)
     {
+        if (model == "JETSON_ORIN")
+            /* Pre-test configuration, if boot-time pinmux doesn't set up PWM pins:
+            Set BOARD pin 15 as mux function PWM:
+            busybox devmem 0x02440020 32 0x400
+            Set BOARD pin 18 as mux function PWM:
+            busybox devmem 0x02434040 32 0x401
+            Board mode pins */
+            return {18, 19, 11, 13, {}, "GPIO40", "GP66", {15, 18}};
+
         if (model == "JETSON_XAVIER")
             /* Pre-test configuration, if boot-time pinmux doesn't set up PWM pins:
             Set BOARD pin 18 as mux function PWM:
-            busybox devmem 0x2434090 32 0x401*/
+            busybox devmem 0x2434090 32 0x401 */
             return {18, 19, 21, 22, {}, "MCLK05", "SOC_GPIO42", {13, 15, 18}};
 
         if (model == "JETSON_TX2")
@@ -140,8 +149,7 @@ private:
             Set BOARD pin 32 as mux function PWM (set bits 1:0 to 1 not 3):
             sudo busybox devmem 0x700031fc 32 0x45
             Set BOARD pin 32 as SFIO (clear bit 0):
-            sudo busybox devmem 0x6000d504 32 0x2
-            */
+            sudo busybox devmem 0x6000d504 32 0x2 */
             return {32, 31, 29, 26, {}, "GPIO9", "AUD_MCLK", {32, 33}};
 
         if (model == "JETSON_NX")
@@ -149,15 +157,13 @@ private:
             Set BOARD pin 32 as mux function PWM (func 1):
             busybox devmem 0x2430040 32 0x401
             Set BOARD pin 33 as mux function PWM (func 2):
-            busybox devmem 0x2440020 32 0x402
-            */
+            busybox devmem 0x2440020 32 0x402 */
             return {32, 31, 29, 26, {}, "GPIO09", "AUD_MCLK", {32, 33}};
 
         if (model == "CLARA_AGX_XAVIER")
             /* Pre-test configuration, if boot-time pinmux doesn't set up PWM pins:
             Set BOARD pin 18 as mux function PWM:
-            busybox devmem 0x2434090 32 0x401
-            */
+            busybox devmem 0x2434090 32 0x401 */
             return {18, 19, 21, 22, {}, "MCLK05", "SOC_GPIO42", {15, 18}};
 
         if (model == "JETSON_TX2_NX")
@@ -166,8 +172,7 @@ private:
             busybox devmem 0x0c3010a8 32 0x401
             Set BOARD pin 32 as mux function PWM (func 2):
             busybox devmem 0x0c301080 32 0x401
-            Board mode pins
-            */
+            Board mode pins */
             return {32, 31, 29, 26, {}, "GPIO09", "AUD_MCLK", {32, 33}};
 
         throw std::runtime_error("invalid model");
@@ -704,7 +709,7 @@ private:
 
         TestCallback callback(&event_callback_occurred, std::to_string(pin_data.in_a));
 
-        auto get_saw_event = [&]() mutable -> bool
+        auto get_saw_event = [&]() mutable -> bool 
         {
             if (specify_callback || use_add_callback)
             {

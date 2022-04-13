@@ -60,6 +60,8 @@ namespace GPIO
         /* These vectors contain all the relevant GPIO data for each Jetson Platform.
         The values are use to generate dictionaries that map the corresponding pin
         mode numbers to the Linux GPIO pin number and GPIO chip directory */
+        const vector<PinDefinition> JETSON_ORIN_PIN_DEFS;
+        const vector<string> compats_jetson_orins;
         const vector<PinDefinition> CLARA_AGX_XAVIER_PIN_DEFS;
         const vector<string> compats_clara_agx_xavier;
         const vector<PinDefinition> JETSON_NX_PIN_DEFS;
@@ -92,9 +94,40 @@ namespace GPIO
     // clang-format off
     EntirePinData::EntirePinData()
         : 
+        JETSON_ORIN_PIN_DEFS
+        {
+            { "{164: 106}"s, "{164:  PQ.06}"s, "2200000.gpio", "7",  "4",  "GPIO40",     "GP66",             "None",       -1 },
+            // Output-only (due to base board)       
+            { "{164: 112}"s, "{164:  PR.04}"s, "2200000.gpio", "11", "17", "UART1_RTS",  "GP72_UART1_RTS_N", "None",       -1 },
+            { "{164:  50}"s, "{164:  PH.07}"s, "2200000.gpio", "12", "18", "I2S2_CLK",   "GP122",            "None",       -1 },
+            { "{164: 108}"s, "{164:  PR.00}"s, "2200000.gpio", "13", "27", "GPIO32",     "GP58",             "None",       -1 },
+            { "{164:  85}"s, "{164:  PN.01}"s, "2200000.gpio", "15", "22", "GPIO27",     "GP88_PWM1",        "3280000.pwm", 0 },
+            { "{ 32:   9}"s, "{ 32: PBB.01}"s, "c2f0000.gpio", "16", "23", "GPIO8",      "GP25",             "None",       -1 },
+            { "{164:  43}"s, "{164:  PH.00}"s, "2200000.gpio", "18", "24", "GPIO35",     "GP115",            "32c0000.pwm", 0 },
+            { "{164: 135}"s, "{164:  PZ.05}"s, "2200000.gpio", "19", "10", "SPI1_MOSI",  "GP49_SPI1_MOSI",   "None",       -1 },
+            { "{164: 134}"s, "{164:  PZ.04}"s, "2200000.gpio", "21", "9",  "SPI1_MISO",  "GP48_SPI1_MISO",   "None",       -1 },
+            { "{164:  96}"s, "{164:  PP.04}"s, "2200000.gpio", "22", "25", "GPIO17",     "GP56",             "None",       -1 },
+            { "{164: 133}"s, "{164:  PZ.03}"s, "2200000.gpio", "23", "11", "SPI1_CLK",   "GP47_SPI1_CLK",    "None",       -1 },
+            { "{164: 136}"s, "{164:  PZ.06}"s, "2200000.gpio", "24", "8",  "SPI1_CS0_N", "GP50_SPI1_CS0_N",  "None",       -1 },
+            { "{164: 137}"s, "{164:  PZ.07}"s, "2200000.gpio", "26", "7",  "SPI1_CS1_N", "GP51_SPI1_CS1_N",  "None",       -1 },
+            { "{ 32:   1}"s, "{ 32: PAA.01}"s, "c2f0000.gpio", "29", "5",  "CAN0_DIN",   "GP18_CAN0_DIN",    "None",       -1 },
+            { "{ 32:   0}"s, "{ 32: PAA.00}"s, "c2f0000.gpio", "31", "6",  "CAN0_DOUT",  "GP17_CAN0_DOUT",   "None",       -1 },
+            { "{ 32:   8}"s, "{ 32: PBB.00}"s, "c2f0000.gpio", "32", "12", "GPIO9",      "GP26",             "None",       -1 },
+            { "{ 32:   2}"s, "{ 32: PAA.02}"s, "c2f0000.gpio", "33", "13", "CAN1_DOUT",  "GP19_CAN1_DOUT",   "None",       -1 },
+            { "{164:  53}"s, "{164:  PI.02}"s, "2200000.gpio", "35", "19", "I2S2_FS",    "GP125",            "None",       -1 },
+            { "{164: 113}"s, "{164:  PR.05}"s, "2200000.gpio", "36", "16", "UART1_CTS",  "GP73_UART1_CTS_N", "None",       -1 },
+            { "{ 32:   3}"s, "{ 32: PAA.03}"s, "c2f0000.gpio", "37", "26", "CAN1_DIN",   "GP20_CAN1_DIN",    "None",       -1 },
+            { "{164:  52}"s, "{164:  PI.01}"s, "2200000.gpio", "38", "20", "I2S2_DIN",   "GP124",            "None",       -1 },
+            { "{164:  51}"s, "{164:  PI.00}"s, "2200000.gpio", "40", "21", "I2S2_DOUT",  "GP123",            "None",       -1 }            
+        },
+        compats_jetson_orins
+        {
+            "nvidia,p3737-0000+p3701-0000"
+        },
+
         CLARA_AGX_XAVIER_PIN_DEFS
         {
-            { "{224: 134, 169: 106}"s, "{169:  PQ.06}"s, "2200000.gpio", "7",  "4",   "MCLK05"s,    "SOC_GPIO42", "None",       -1 },
+            { "{224: 134, 169: 106}"s, "{169:  PQ.06}"s, "2200000.gpio", "7",  "4",   "MCLK05",     "SOC_GPIO42", "None",       -1 },
             { "{224: 140, 169: 112}"s, "{169:  PR.04}"s, "2200000.gpio", "11", "17",  "UART1_RTS",  "UART1_RTS",  "None",       -1 },
             { "{224:  63, 169:  51}"s, "{169:  PH.07}"s, "2200000.gpio", "12", "18",  "I2S2_CLK",   "DAP2_SCLK",  "None",       -1 },
             { "{224: 124, 169:  96}"s, "{169:  PP.04}"s, "2200000.gpio", "13", "27",  "GPIO32",     "SOC_GPIO04", "None",       -1 },
@@ -335,6 +368,7 @@ namespace GPIO
 
         PIN_DEFS_MAP
         {
+            { JETSON_ORIN, JETSON_ORIN_PIN_DEFS },
             { CLARA_AGX_XAVIER, CLARA_AGX_XAVIER_PIN_DEFS },
             { JETSON_NX, JETSON_NX_PIN_DEFS },
             { JETSON_XAVIER, JETSON_XAVIER_PIN_DEFS },
@@ -345,6 +379,7 @@ namespace GPIO
         },
         JETSON_INFO_MAP
         {
+            { JETSON_ORIN, {1, "32768M",  "Unknown", "JETSON_ORIN", "NVIDIA", "A78AE"} },
             { CLARA_AGX_XAVIER, {1, "16384M",  "Unknown", "CLARA_AGX_XAVIER", "NVIDIA", "ARM Carmel"} },
             { JETSON_NX, {1, "16384M", "Unknown", "Jetson NX", "NVIDIA", "ARM Carmel"} },
             { JETSON_XAVIER, {1, "16384M", "Unknown", "Jetson Xavier", "NVIDIA", "ARM Carmel"} },
@@ -367,6 +402,7 @@ namespace GPIO
 
             const string compatible_path = "/proc/device-tree/compatible";
             const string ids_path = "/proc/device-tree/chosen/plugin-manager/ids";
+            const string ids_path_k510 = "/proc/device-tree/chosen/ids";
 
             set<string> compatibles{};
 
@@ -381,7 +417,7 @@ namespace GPIO
                 copy(_vec_compatibles.begin(), _vec_compatibles.end(), inserter(compatibles, compatibles.end()));
             } // scope ends
 
-            auto matches = [&compatibles](const vector<string>& vals)
+            auto matches = [&compatibles](const vector<string>& vals) 
             {
                 for (const auto& v : vals)
                 {
@@ -391,9 +427,27 @@ namespace GPIO
                 return false;
             };
 
-            auto find_pmgr_board = [&](const string& prefix) -> string
+            auto find_pmgr_board = [&](const string& prefix) -> string 
             {
-                if (!os_path_exists(ids_path))
+                if (os_path_exists(ids_path))
+                {
+                    for (const auto& file : os_listdir(ids_path))
+                    {
+                        if (startswith(file, prefix))
+                            return file;
+                    }
+                }
+                else if (os_path_exists(ids_path_k510))
+                {
+                    std::ifstream f(ids_path_k510);
+                    std::string s{};
+                    while (f >> s)
+                    {
+                        if (startswith(s, prefix))
+                            return s; // could be wrong. see https://github.com/NVIDIA/jetson-gpio/issues/68
+                    }
+                }
+                else
                 {
                     if (ids_warned == false)
                     {
@@ -406,16 +460,10 @@ namespace GPIO
                     return "None";
                 }
 
-                for (const auto& file : os_listdir(ids_path))
-                {
-                    if (startswith(file, prefix))
-                        return file;
-                }
-
                 return "None";
             };
 
-            auto warn_if_not_carrier_board = [&find_pmgr_board](const vector<string>& carrier_boards)
+            auto warn_if_not_carrier_board = [&find_pmgr_board](const vector<string>& carrier_boards) 
             {
                 auto found = false;
 
@@ -480,6 +528,11 @@ namespace GPIO
             {
                 model = JETSON_NX;
                 warn_if_not_carrier_board({"3509"s, "3449"s});
+            }
+            else if (matches(_DATA.compats_jetson_orins))
+            {
+                model = JETSON_ORIN;
+                warn_if_not_carrier_board({"3737"s, "0000"s});
             }
             else
             {
