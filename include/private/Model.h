@@ -39,7 +39,8 @@ namespace GPIO
         JETSON_TX2,
         JETSON_TX1,
         JETSON_NANO,
-        JETSON_TX2_NX
+        JETSON_TX2_NX,
+        JETSON_ORIN
     };
 
     // alias
@@ -50,6 +51,7 @@ namespace GPIO
     constexpr Model JETSON_TX1 = Model::JETSON_TX1;
     constexpr Model JETSON_NANO = Model::JETSON_NANO;
     constexpr Model JETSON_TX2_NX = Model::JETSON_TX2_NX;
+    constexpr Model JETSON_ORIN = Model::JETSON_ORIN;
 } // namespace GPIO
 
 #endif
