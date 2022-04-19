@@ -158,7 +158,7 @@ private:
             busybox devmem 0x2430040 32 0x401
             Set BOARD pin 33 as mux function PWM (func 2):
             busybox devmem 0x2440020 32 0x402 */
-            return {32, 31, 29, 26, {}, "GPIO09", "AUD_MCLK", {32, 33}};
+            return {32, 31, 29, 26, {}, "GPIO09", "AUD_MCLK", {15, 32, 33}};
 
         if (model == "CLARA_AGX_XAVIER")
             /* Pre-test configuration, if boot-time pinmux doesn't set up PWM pins:
