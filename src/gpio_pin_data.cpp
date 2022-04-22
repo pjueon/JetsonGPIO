@@ -188,7 +188,8 @@ namespace GPIO
             "nvidia,p3509-0000+p3668-0000",
             "nvidia,p3509-0000+p3668-0001",
             "nvidia,p3449-0000+p3668-0000",
-            "nvidia,p3449-0000+p3668-0001"
+            "nvidia,p3449-0000+p3668-0001",
+            "nvidia,p3449-0000+p3668-0003",
         },
 
         JETSON_XAVIER_PIN_DEFS
@@ -381,12 +382,12 @@ namespace GPIO
         {
             { JETSON_ORIN, {1, "32768M",  "Unknown", "JETSON_ORIN", "NVIDIA", "A78AE"} },
             { CLARA_AGX_XAVIER, {1, "16384M",  "Unknown", "CLARA_AGX_XAVIER", "NVIDIA", "ARM Carmel"} },
-            { JETSON_NX, {1, "16384M", "Unknown", "Jetson NX", "NVIDIA", "ARM Carmel"} },
-            { JETSON_XAVIER, {1, "16384M", "Unknown", "Jetson Xavier", "NVIDIA", "ARM Carmel"} },
+            { JETSON_NX, {1, "16384M, 8192M", "Unknown", "Jetson NX", "NVIDIA", "ARM Carmel"} },
+            { JETSON_XAVIER, {1, "65536M, 32768M, 16384M, 8192M", "Unknown", "Jetson Xavier", "NVIDIA", "ARM Carmel"} },
             { JETSON_TX2_NX, {1, "4096M", "Unknown", "Jetson TX2 NX", "NVIDIA", "ARM A57 + Denver"} },
-            { JETSON_TX2, {1, "8192M", "Unknown", "Jetson TX2", "NVIDIA", "ARM A57 + Denver"} },
+            { JETSON_TX2, {1, "8192M, 4096M", "Unknown", "Jetson TX2", "NVIDIA", "ARM A57 + Denver"} },
             { JETSON_TX1, {1, "4096M", "Unknown", "Jetson TX1", "NVIDIA", "ARM A57"} },
-            { JETSON_NANO, {1, "4096M", "Unknown", "Jetson nano", "NVIDIA", "ARM A57"} }
+            { JETSON_NANO, {1, "4096M, 2048M", "Unknown", "Jetson nano", "NVIDIA", "ARM A57"} }
         }
     {}
 
