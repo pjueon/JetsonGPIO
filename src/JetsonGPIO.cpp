@@ -977,6 +977,9 @@ struct GPIO::PWM::Impl
         {
             _frequency_hz = frequency_hz;
             _period_ns = int(1000000000.0 / frequency_hz);
+            // Reset duty cycle period incase the previous duty
+            // cycle is higher than the period
+            _set_pwm_duty_cycle(_ch_info, 0);
             _set_pwm_period(_ch_info, _period_ns);
         }
 
