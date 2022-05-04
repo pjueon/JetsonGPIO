@@ -19,6 +19,7 @@ ADD_DEFINITIONS(-Wall -O2 -fPIC -g)
 # Sources
 set(JetsonGPIO_LIB_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/JetsonGPIO.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/JetsonGPIO_C_Wrapper.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/PythonFunctions.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gpio_pin_data.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gpio_event.cpp
