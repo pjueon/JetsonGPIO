@@ -39,17 +39,17 @@ extern "C"
 
     // Function used to set the pin mumbering mode.
     // Possible mode values are BOARD, BCM, TEGRA_SOC and CVM
-    int setmode(GPIO::NumberingModes mode);
+    int setmode(NumberingModes mode);
 
     // Function used to get the currently set pin numbering mode
-    GPIO::NumberingModes getmode();
+    NumberingModes getmode();
 
     /* Function used to setup individual pins as Input or Output.
        direction must be IN or OUT, initial must be
        HIGH or LOW and is only valid when direction is OUT
        @returns 0 on success -1 on failure
        */
-    int setup(int channel, GPIO::Directions direction, int initial = -1);
+    int setup(int channel, Directions direction, int initial = -1);
 
     /* Function used to cleanup channels at the end of the program.
        If no channel is provided, all channels are cleaned
@@ -87,11 +87,11 @@ extern "C"
 
     /* Function used to add threaded event detection for a specified gpio channel.
        @gpio must be an integer specifying the channel
-       @edge must be a member of GPIO::Edge
+       @edge must be a member of Edge
        @callback (optional) may be a callback function to be called when the event is detected (or nullptr)
        @bouncetime (optional) a button-bounce signal ignore time (in milliseconds, default=none)
        @return 0 on success -1 on failure*/
-    int add_event_detect(int channel, GPIO::Edge edge, void (*callback)(), unsigned long bounce_time = 0);
+    int add_event_detect(int channel, Edge edge, void (*callback)(), unsigned long bounce_time = 0);
 
     /* Function used to remove event detection for channel */
     void remove_event_detect(int channel);
@@ -99,11 +99,11 @@ extern "C"
     /* Function used to perform a blocking wait until the specified edge event is detected within the specified
        timeout period. Returns the channel if an event is detected or 0 if a timeout has occurred.
        @channel is an integer specifying the channel
-       @edge must be a member of GPIO::Edge
+       @edge must be a member of Edge
        @bouncetime in milliseconds (optional)
        @timeout in milliseconds (optional)
        @returns channel number if detected, 0 on timeout, -1 on failure*/
-    int wait_for_edge(int channel, GPIO::Edge edge, unsigned long bounce_time = 0, unsigned long timeout = 0);
+    int wait_for_edge(int channel, Edge edge, unsigned long bounce_time = 0, unsigned long timeout = 0);
 
 #ifdef __cplusplus
 }

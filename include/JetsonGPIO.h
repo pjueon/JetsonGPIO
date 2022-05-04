@@ -33,7 +33,10 @@ DEALINGS IN THE SOFTWARE.
 #include <type_traits>
 
 #include "JetsonGPIOConfig.h"
+namespace GPIO
+{
 #include "private/typedefinitions.h"
+}
 
 #if (__cplusplus >= 201402L) && !defined(CPP14_SUPPORTED)
 #define CPP14_SUPPORTED
@@ -66,7 +69,6 @@ namespace GPIO
 
     extern const std::string JETSON_INFO;
     extern const std::string model;
-
 
     // GPIO::BOARD, GPIO::BCM, GPIO::TEGRA_SOC, GPIO::CVM
     constexpr NumberingModes BOARD = NumberingModes::BOARD;

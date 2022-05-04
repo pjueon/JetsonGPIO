@@ -24,12 +24,9 @@ Permission is hereby granted, free of charge, to any person obtaining a
         DEALINGS IN THE SOFTWARE.
             */
 
-#ifndef TYPEDEFINITIONS_H_
-#define TYPEDEFINITIONS_H_
 
 // Pin Numbering Modes
-namespace GPIO
-{
+
     enum class NumberingModes
     {
         BOARD,
@@ -60,5 +57,4 @@ namespace GPIO
         FALLING,
         BOTH
     };
-}
-#endif // TYPEDEFINITIONS_H_
+

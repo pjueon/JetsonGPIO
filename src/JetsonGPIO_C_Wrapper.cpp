@@ -35,11 +35,11 @@ extern "C"
 
     void setwarnings(bool state) { GPIO::setwarnings(state); }
 
-    int setmode(GPIO::NumberingModes mode)
+    int setmode(NumberingModes mode)
     {
         try
         {
-            GPIO::setmode(mode);
+            GPIO::setmode(static_cast<GPIO::NumberingModes>(mode));
             return 0;
         }
         catch (std::exception& e)
@@ -49,13 +49,13 @@ extern "C"
         }
     }
 
-    GPIO::NumberingModes getmode() { return GPIO::getmode(); }
+    NumberingModes getmode() { return static_cast<NumberingModes>(GPIO::getmode()); }
 
-    int setup(int channel, GPIO::Directions direction, int initial)
+    int setup(int channel, Directions direction, int initial)
     {
         try
         {
-            GPIO::setup(channel, direction, initial);
+            GPIO::setup(channel, static_cast<GPIO::Directions>(direction), initial);
             return 0;
         }
         catch (std::exception& e)
@@ -160,11 +160,11 @@ extern "C"
         }
     }
 
-    int add_event_detect(int channel, GPIO::Edge edge, void (*callback)(), unsigned long bounce_time)
+    int add_event_detect(int channel, Edge edge, void (*callback)(), unsigned long bounce_time)
     {
         try
         {
-            GPIO::add_event_detect(channel, edge, callback, bounce_time);
+            GPIO::add_event_detect(channel, static_cast<GPIO::Edge>(edge), callback, bounce_time);
             return 0;
         }
         catch (std::exception& e)
@@ -176,11 +176,11 @@ extern "C"
 
     void remove_event_detect(int channel) { GPIO::remove_event_detect(channel); }
 
-    int wait_for_edge(int channel, GPIO::Edge edge, unsigned long bounce_time, unsigned long timeout)
+    int wait_for_edge(int channel, Edge edge, unsigned long bounce_time, unsigned long timeout)
     {
         try
         {
-            auto wait_result = GPIO::wait_for_edge(channel, edge, bounce_time, timeout);
+            auto wait_result = GPIO::wait_for_edge(channel, static_cast<GPIO::Edge>(edge), bounce_time, timeout);
             if (wait_result.is_event_detected())
             {
                 return std::stoi(wait_result.channel());
