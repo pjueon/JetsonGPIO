@@ -25,6 +25,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include "JetsonGPIO_C_Wrapper.h"
+#include "JetsonGPIO.h"
 #include <iostream>
 
 #ifdef __cplusplus

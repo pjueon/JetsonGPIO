@@ -27,10 +27,11 @@ DEALINGS IN THE SOFTWARE.
 #ifndef JETSON_GPIO_C_WRAPPER_H
 #define JETSON_GPIO_C_WRAPPER_H
 
-#include "JetsonGPIO.h"
+#include "private/typedefinitions.h"
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
     // Function used to enable/disable warnings during setup and cleanup.
@@ -69,7 +70,6 @@ extern "C" {
        returns -1 on failure*/
     int gpio_function(int channel);
 
-
     /* Function used to check if an event occurred on the specified channel.
        Param channel must be an integer.
        This function return True or False
@@ -104,7 +104,6 @@ extern "C" {
        @timeout in milliseconds (optional)
        @returns channel number if detected, 0 on timeout, -1 on failure*/
     int wait_for_edge(int channel, GPIO::Edge edge, unsigned long bounce_time = 0, unsigned long timeout = 0);
-
 
 #ifdef __cplusplus
 }
