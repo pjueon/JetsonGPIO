@@ -33,9 +33,9 @@ extern "C"
 {
 #endif
 
-    void setwarnings(bool state) { GPIO::setwarnings(state); }
+    void gpio_setwarnings(bool state) { GPIO::setwarnings(state); }
 
-    int setmode(int mode)
+    int gpio_setmode(int mode)
     {
         try
         {
@@ -49,9 +49,9 @@ extern "C"
         }
     }
 
-    int getmode() { return static_cast<int>(GPIO::getmode()); }
+    int gpio_getmode() { return static_cast<int>(GPIO::getmode()); }
 
-    int setup(int channel, int direction, int initial)
+    int gpio_setup(int channel, int direction, int initial)
     {
         try
         {
@@ -65,7 +65,7 @@ extern "C"
         }
     }
 
-    int cleanup(int channel)
+    int gpio_cleanup(int channel)
     {
         try
         {
@@ -79,7 +79,7 @@ extern "C"
         }
     }
 
-    int input(int channel)
+    int gpio_input(int channel)
     {
         try
         {
@@ -92,7 +92,7 @@ extern "C"
         }
     }
 
-    int output(int channel, int value)
+    int gpio_output(int channel, int value)
     {
         try
         {
@@ -106,7 +106,7 @@ extern "C"
         }
     }
 
-    int gpio_function(int channel)
+    int gpio_gpio_function(int channel)
     {
         try
         {
@@ -119,7 +119,7 @@ extern "C"
         }
     }
 
-    int event_detected(int channel)
+    int gpio_event_detected(int channel)
     {
         try
         {
@@ -132,7 +132,7 @@ extern "C"
         }
     }
 
-    int add_event_callback(int channel, void (*callback)())
+    int gpio_add_event_callback(int channel, void (*callback)())
     {
         try
         {
@@ -146,7 +146,7 @@ extern "C"
         }
     }
 
-    int remove_event_callback(int channel, void (*callback)())
+    int gpio_remove_event_callback(int channel, void (*callback)())
     {
         try
         {
@@ -160,7 +160,7 @@ extern "C"
         }
     }
 
-    int add_event_detect(int channel, int edge, void (*callback)(), unsigned long bounce_time)
+    int gpio_add_event_detect(int channel, int edge, void (*callback)(), unsigned long bounce_time)
     {
         try
         {
@@ -174,9 +174,9 @@ extern "C"
         }
     }
 
-    void remove_event_detect(int channel) { GPIO::remove_event_detect(channel); }
+    void gpio_remove_event_detect(int channel) { GPIO::remove_event_detect(channel); }
 
-    int wait_for_edge(int channel, int edge, unsigned long bounce_time, unsigned long timeout)
+    int gpio_wait_for_edge(int channel, int edge, unsigned long bounce_time, unsigned long timeout)
     {
         try
         {
