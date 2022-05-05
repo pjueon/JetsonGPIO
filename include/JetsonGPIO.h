@@ -3,6 +3,7 @@ Copyright (c) 2012-2017 Ben Croston ben@croston.org.
 Copyright (c) 2019, NVIDIA CORPORATION.
 Copyright (c) 2019 Jueon Park(pjueon) bluegbg@gmail.com.
 Copyright (c) 2021 Adam Rasburn blackforestcheesecake@protonmail.ch
+Copyright (c) 2022 Matthias Ludwig (ma-ludw)
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -67,14 +68,14 @@ namespace GPIO
     extern const std::string model;
 
     // Pin Numbering Modes
-
     enum class NumberingModes
     {
         BOARD,
         BCM,
         TEGRA_SOC,
         CVM,
-        None
+        None,
+        SIZE // has to be in here for checking if enum is changed in c header, needs to be last element
     };
 
     // GPIO::BOARD, GPIO::BCM, GPIO::TEGRA_SOC, GPIO::CVM
@@ -98,7 +99,8 @@ namespace GPIO
         UNKNOWN,
         OUT,
         IN,
-        HARD_PWM
+        HARD_PWM,
+        SIZE // has to be in here for checking if enum is changed in c header, needs to be last element
     };
 
     // GPIO::IN, GPIO::OUT
@@ -112,7 +114,8 @@ namespace GPIO
         NONE,
         RISING,
         FALLING,
-        BOTH
+        BOTH,
+        SIZE // has to be in here for checking if enum is changed in c header, needs to be last element
     };
 
     constexpr Edge NO_EDGE = Edge::NONE;

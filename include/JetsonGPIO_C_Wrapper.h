@@ -32,23 +32,50 @@ DEALINGS IN THE SOFTWARE.
 extern "C"
 {
 #endif
+    enum GPIONumberingModes
+    {
+        GPIO_NUMBERING_MODES_BOARD,
+        GPIO_NUMBERING_MODES_BCM,
+        GPIO_NUMBERING_MODES_TEGRA_SOC,
+        GPIO_NUMBERING_MODES_CVM,
+        GPIO_NUMBERING_MODES_None,
+        GPIO_NUMBERING_MODES_SIZE // has to be in here for checking if enum is changed in c header, needs to be last element
+    };
+
+    enum GPIODirections
+    {
+        GPIO_DIRECTIONS_UNKNOWN,
+        GPIO_DIRECTIONS_OUT,
+        GPIO_DIRECTIONS_IN,
+        GPIO_DIRECTIONS_HARD_PWM,
+        GPIO_DIRECTIONS_SIZE // has to be in here for checking if enum is changed in c header, needs to be last element
+    };
+    enum GPIOEdge
+    {
+        GPIO_EDGE_UNKNOWN,
+        GPIO_EDGE_NONE,
+        GPIO_EDGE_RISING,
+        GPIO_EDGE_FALLING,
+        GPIO_EDGE_BOTH,
+        GPIO_EDGE_SIZE // has to be in here for checking if enum is changed in c header, needs to be last element
+    };
 
     // Function used to enable/disable warnings during setup and cleanup.
     void gpio_setwarnings(bool state);
 
-    // Function used to set the pin mumbering mode.
+    // Function used to set the pin numbering mode.
     // Possible mode values are BOARD, BCM, TEGRA_SOC and CVM
-    int gpio_setmode(int mode);
+    int gpio_setmode(GPIONumberingModes mode);
 
     // Function used to get the currently set pin numbering mode
-    int gpio_getmode();
+    GPIONumberingModes gpio_getmode();
 
     /* Function used to setup individual pins as Input or Output.
        direction must be IN or OUT, initial must be
        HIGH or LOW and is only valid when direction is OUT
        @returns 0 on success -1 on failure
        */
-    int gpio_setup(int channel, int direction, int initial);
+    int gpio_setup(int channel, GPIODirections direction, int initial);
 
     /* Function used to cleanup channels at the end of the program.
        If no channel is provided, all channels are cleaned
@@ -90,7 +117,7 @@ extern "C"
        @callback (optional) may be a callback function to be called when the event is detected (or nullptr)
        @bouncetime (optional) a button-bounce signal ignore time (in milliseconds, default=none)
        @return 0 on success -1 on failure*/
-    int gpio_add_event_detect(int channel, int edge, void (*callback)(), unsigned long bounce_time);
+    int gpio_add_event_detect(int channel, GPIOEdge edge, void (*callback)(), unsigned long bounce_time);
 
     /* Function used to remove event detection for channel */
     void gpio_remove_event_detect(int channel);
@@ -98,11 +125,11 @@ extern "C"
     /* Function used to perform a blocking wait until the specified edge event is detected within the specified
        timeout period. Returns the channel if an event is detected or 0 if a timeout has occurred.
        @channel is an integer specifying the channel
-       @edge must be a member of Edge
+       @edge must be a member of GPIOEdge
        @bouncetime in milliseconds (optional)
        @timeout in milliseconds (optional)
        @returns channel number if detected, 0 on timeout, -1 on failure*/
-    int gpio_wait_for_edge(int channel, int edge, unsigned long bounce_time, unsigned long timeout);
+    int gpio_wait_for_edge(int channel, GPIOEdge edge, unsigned long bounce_time, unsigned long timeout);
 
 #ifdef __cplusplus
 }

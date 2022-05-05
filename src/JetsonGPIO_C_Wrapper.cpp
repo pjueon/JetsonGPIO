@@ -33,9 +33,20 @@ extern "C"
 {
 #endif
 
+    // check if enum size of c wrapper and the cpp code has the same length at compile time
+    __attribute__((unused)) void check_enum_equality(){
+        static_assert(static_cast<GPIONumberingModes>(GPIO::NumberingModes::SIZE) == GPIO_NUMBERING_MODES_SIZE,
+                      "c wrapper enum  must be equal to c++ enum");
+        static_assert(static_cast<GPIODirections>(GPIO::Directions::SIZE) == GPIO_DIRECTIONS_SIZE,
+                      "c wrapper enum  must be equal to c++ enum");
+        static_assert(static_cast<GPIOEdge>(GPIO::Edge::SIZE) == GPIO_EDGE_SIZE,
+                      "c wrapper enum  must be equal to c++ enum");
+    }
+
+
     void gpio_setwarnings(bool state) { GPIO::setwarnings(state); }
 
-    int gpio_setmode(int mode)
+    int gpio_setmode(GPIONumberingModes mode)
     {
         try
         {
@@ -49,9 +60,9 @@ extern "C"
         }
     }
 
-    int gpio_getmode() { return static_cast<int>(GPIO::getmode()); }
+    GPIONumberingModes gpio_getmode() { return static_cast<GPIONumberingModes>(GPIO::getmode()); }
 
-    int gpio_setup(int channel, int direction, int initial)
+    int gpio_setup(int channel, GPIODirections direction, int initial)
     {
         try
         {
@@ -160,7 +171,7 @@ extern "C"
         }
     }
 
-    int gpio_add_event_detect(int channel, int edge, void (*callback)(), unsigned long bounce_time)
+    int gpio_add_event_detect(int channel, GPIOEdge edge, void (*callback)(), unsigned long bounce_time)
     {
         try
         {
@@ -176,7 +187,7 @@ extern "C"
 
     void gpio_remove_event_detect(int channel) { GPIO::remove_event_detect(channel); }
 
-    int gpio_wait_for_edge(int channel, int edge, unsigned long bounce_time, unsigned long timeout)
+    int gpio_wait_for_edge(int channel, GPIOEdge edge, unsigned long bounce_time, unsigned long timeout)
     {
         try
         {
