@@ -33,10 +33,6 @@ DEALINGS IN THE SOFTWARE.
 #include <type_traits>
 
 #include "JetsonGPIOConfig.h"
-namespace GPIO
-{
-#include "private/typedefinitions.h"
-}
 
 #if (__cplusplus >= 201402L) && !defined(CPP14_SUPPORTED)
 #define CPP14_SUPPORTED
@@ -70,6 +66,17 @@ namespace GPIO
     extern const std::string JETSON_INFO;
     extern const std::string model;
 
+    // Pin Numbering Modes
+
+    enum class NumberingModes
+    {
+        BOARD,
+        BCM,
+        TEGRA_SOC,
+        CVM,
+        None
+    };
+
     // GPIO::BOARD, GPIO::BCM, GPIO::TEGRA_SOC, GPIO::CVM
     constexpr NumberingModes BOARD = NumberingModes::BOARD;
     constexpr NumberingModes BCM = NumberingModes::BCM;
@@ -82,9 +89,31 @@ namespace GPIO
     constexpr int HIGH = 1;
     constexpr int LOW = 0;
 
+    // GPIO directions.
+    // UNKNOWN constant is for gpios that are not yet setup
+    // If the user uses UNKNOWN or HARD_PWM as a parameter to GPIO::setmode function,
+    // An exception will occur
+    enum class Directions
+    {
+        UNKNOWN,
+        OUT,
+        IN,
+        HARD_PWM
+    };
+
     // GPIO::IN, GPIO::OUT
     constexpr Directions IN = Directions::IN;
     constexpr Directions OUT = Directions::OUT;
+
+    // GPIO Event Types
+    enum class Edge
+    {
+        UNKNOWN,
+        NONE,
+        RISING,
+        FALLING,
+        BOTH
+    };
 
     constexpr Edge NO_EDGE = Edge::NONE;
     constexpr Edge RISING = Edge::RISING;

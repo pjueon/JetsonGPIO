@@ -35,7 +35,7 @@ extern "C"
 
     void setwarnings(bool state) { GPIO::setwarnings(state); }
 
-    int setmode(NumberingModes mode)
+    int setmode(int mode)
     {
         try
         {
@@ -49,9 +49,9 @@ extern "C"
         }
     }
 
-    NumberingModes getmode() { return static_cast<NumberingModes>(GPIO::getmode()); }
+    int getmode() { return static_cast<int>(GPIO::getmode()); }
 
-    int setup(int channel, Directions direction, int initial)
+    int setup(int channel, int direction, int initial)
     {
         try
         {
@@ -160,7 +160,7 @@ extern "C"
         }
     }
 
-    int add_event_detect(int channel, Edge edge, void (*callback)(), unsigned long bounce_time)
+    int add_event_detect(int channel, int edge, void (*callback)(), unsigned long bounce_time)
     {
         try
         {
@@ -176,7 +176,7 @@ extern "C"
 
     void remove_event_detect(int channel) { GPIO::remove_event_detect(channel); }
 
-    int wait_for_edge(int channel, Edge edge, unsigned long bounce_time, unsigned long timeout)
+    int wait_for_edge(int channel, int edge, unsigned long bounce_time, unsigned long timeout)
     {
         try
         {

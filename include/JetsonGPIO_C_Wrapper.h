@@ -27,7 +27,6 @@ DEALINGS IN THE SOFTWARE.
 #ifndef JETSON_GPIO_C_WRAPPER_H
 #define JETSON_GPIO_C_WRAPPER_H
 
-#include "private/typedefinitions.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -39,17 +38,17 @@ extern "C"
 
     // Function used to set the pin mumbering mode.
     // Possible mode values are BOARD, BCM, TEGRA_SOC and CVM
-    int setmode(NumberingModes mode);
+    int setmode(int mode);
 
     // Function used to get the currently set pin numbering mode
-    NumberingModes getmode();
+    int getmode();
 
     /* Function used to setup individual pins as Input or Output.
        direction must be IN or OUT, initial must be
        HIGH or LOW and is only valid when direction is OUT
        @returns 0 on success -1 on failure
        */
-    int setup(int channel, Directions direction, int initial = -1);
+    int setup(int channel, int direction, int initial = -1);
 
     /* Function used to cleanup channels at the end of the program.
        If no channel is provided, all channels are cleaned
@@ -91,7 +90,7 @@ extern "C"
        @callback (optional) may be a callback function to be called when the event is detected (or nullptr)
        @bouncetime (optional) a button-bounce signal ignore time (in milliseconds, default=none)
        @return 0 on success -1 on failure*/
-    int add_event_detect(int channel, Edge edge, void (*callback)(), unsigned long bounce_time = 0);
+    int add_event_detect(int channel, int edge, void (*callback)(), unsigned long bounce_time = 0);
 
     /* Function used to remove event detection for channel */
     void remove_event_detect(int channel);
@@ -103,7 +102,7 @@ extern "C"
        @bouncetime in milliseconds (optional)
        @timeout in milliseconds (optional)
        @returns channel number if detected, 0 on timeout, -1 on failure*/
-    int wait_for_edge(int channel, Edge edge, unsigned long bounce_time = 0, unsigned long timeout = 0);
+    int wait_for_edge(int channel, int edge, unsigned long bounce_time = 0, unsigned long timeout = 0);
 
 #ifdef __cplusplus
 }
