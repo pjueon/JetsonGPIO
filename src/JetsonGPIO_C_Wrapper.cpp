@@ -34,7 +34,8 @@ extern "C"
 #endif
 
     // check if enum size of c wrapper and the cpp code has the same length at compile time
-    __attribute__((unused)) void check_enum_equality(){
+    __attribute__((unused)) void check_enum_equality()
+    {
         static_assert(static_cast<GPIONumberingModes>(GPIO::NumberingModes::SIZE) == GPIO_NUMBERING_MODES_SIZE,
                       "c wrapper enum  must be equal to c++ enum");
         static_assert(static_cast<GPIODirections>(GPIO::Directions::SIZE) == GPIO_DIRECTIONS_SIZE,
@@ -42,7 +43,6 @@ extern "C"
         static_assert(static_cast<GPIOEdge>(GPIO::Edge::SIZE) == GPIO_EDGE_SIZE,
                       "c wrapper enum  must be equal to c++ enum");
     }
-
 
     void gpio_setwarnings(bool state) { GPIO::setwarnings(state); }
 

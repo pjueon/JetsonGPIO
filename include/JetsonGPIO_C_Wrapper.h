@@ -27,6 +27,7 @@ DEALINGS IN THE SOFTWARE.
 #ifndef JETSON_GPIO_C_WRAPPER_H
 #define JETSON_GPIO_C_WRAPPER_H
 
+#include "stdbool.h"
 
 #ifdef __cplusplus
 extern "C"
@@ -39,7 +40,8 @@ extern "C"
         GPIO_NUMBERING_MODES_TEGRA_SOC,
         GPIO_NUMBERING_MODES_CVM,
         GPIO_NUMBERING_MODES_None,
-        GPIO_NUMBERING_MODES_SIZE // has to be in here for checking if enum is changed in c header, needs to be last element
+        GPIO_NUMBERING_MODES_SIZE // has to be in here for checking if enum is changed in c header, needs to be last
+                                  // element
     };
 
     enum GPIODirections
@@ -65,17 +67,17 @@ extern "C"
 
     // Function used to set the pin numbering mode.
     // Possible mode values are BOARD, BCM, TEGRA_SOC and CVM
-    int gpio_setmode(GPIONumberingModes mode);
+    int gpio_setmode(enum GPIONumberingModes mode);
 
     // Function used to get the currently set pin numbering mode
-    GPIONumberingModes gpio_getmode();
+    enum GPIONumberingModes gpio_getmode();
 
     /* Function used to setup individual pins as Input or Output.
        direction must be IN or OUT, initial must be
        HIGH or LOW and is only valid when direction is OUT
        @returns 0 on success -1 on failure
        */
-    int gpio_setup(int channel, GPIODirections direction, int initial);
+    int gpio_setup(int channel, enum GPIODirections direction, int initial);
 
     /* Function used to cleanup channels at the end of the program.
        If no channel is provided, all channels are cleaned
@@ -117,7 +119,7 @@ extern "C"
        @callback (optional) may be a callback function to be called when the event is detected (or nullptr)
        @bouncetime (optional) a button-bounce signal ignore time (in milliseconds, default=none)
        @return 0 on success -1 on failure*/
-    int gpio_add_event_detect(int channel, GPIOEdge edge, void (*callback)(), unsigned long bounce_time);
+    int gpio_add_event_detect(int channel, enum GPIOEdge edge, void (*callback)(), unsigned long bounce_time);
 
     /* Function used to remove event detection for channel */
     void gpio_remove_event_detect(int channel);
@@ -129,7 +131,7 @@ extern "C"
        @bouncetime in milliseconds (optional)
        @timeout in milliseconds (optional)
        @returns channel number if detected, 0 on timeout, -1 on failure*/
-    int gpio_wait_for_edge(int channel, GPIOEdge edge, unsigned long bounce_time, unsigned long timeout);
+    int gpio_wait_for_edge(int channel, enum GPIOEdge edge, unsigned long bounce_time, unsigned long timeout);
 
 #ifdef __cplusplus
 }
