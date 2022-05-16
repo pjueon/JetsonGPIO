@@ -64,7 +64,7 @@ private:
 
 std::future<void> DelayedSetChannel(int channel, int value, double delay)
 {
-    auto run = [=]() 
+    auto run = [=]()
     {
         sleep(delay);
         GPIO::output(channel, value);
@@ -269,6 +269,21 @@ private:
         GPIO::setup(pin_data.tegra_soc_pin, GPIO::IN);
         GPIO::cleanup();
         assert(GPIO::getmode() == GPIO::NumberingModes::None);
+    }
+
+    void test_setup_twice()
+    {
+        GPIO::setmode(GPIO::BOARD);
+        GPIO::setup(pin_data.out_a, GPIO::OUT, GPIO::HIGH);
+        GPIO::setup(pin_data.out_a, GPIO::OUT, GPIO::HIGH);
+
+        GPIO::setup(pin_data.in_a, GPIO::IN);
+        GPIO::setup(pin_data.in_a, GPIO::IN);
+
+        auto val = GPIO::input(pin_data.in_a);
+        assert(val == GPIO::HIGH);
+
+        GPIO::cleanup();
     }
 
     void test_setup_one_out_no_init()
@@ -655,6 +670,7 @@ private:
         ADD_TEST(test_setup_one_bcm);
         ADD_TEST(test_setup_one_cvm);
         ADD_TEST(test_setup_one_tegra_soc);
+        ADD_TEST(test_setup_twice);
         ADD_TEST(test_setup_one_out_no_init);
         ADD_TEST(test_setup_one_out_high);
         ADD_TEST(test_setup_one_out_low);
@@ -709,7 +725,7 @@ private:
 
         TestCallback callback(&event_callback_occurred, std::to_string(pin_data.in_a));
 
-        auto get_saw_event = [&]() mutable -> bool 
+        auto get_saw_event = [&]() mutable -> bool
         {
             if (specify_callback || use_add_callback)
             {
