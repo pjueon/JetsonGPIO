@@ -57,6 +57,8 @@ using namespace std;
 constexpr Directions UNKNOWN = Directions::UNKNOWN;
 constexpr Directions HARD_PWM = Directions::HARD_PWM;
 
+void _cleanup_all();
+
 //================================================================================
 // All global variables are wrapped in a singleton class except for public APIs,
 // in order to avoid initialization order problem among global variables in
@@ -85,6 +87,19 @@ public:
 
     GlobalVariablesForGPIO(const GlobalVariablesForGPIO&) = delete;
     GlobalVariablesForGPIO& operator=(const GlobalVariablesForGPIO&) = delete;
+
+    ~GlobalVariablesForGPIO()
+    {
+        try
+        {
+            // In case the user forgot to call cleanup() at the end of the program.
+            _cleanup_all();
+        }
+        catch (exception& e)
+        {
+            cerr << _error_message(e, "~_cleaner()") << std::endl;
+        }
+    }
 
     static GlobalVariablesForGPIO& get_instance()
     {
@@ -449,11 +464,8 @@ void _cleanup_all()
 //==================================================================================
 // APIs
 
-// The reason that model and JETSON_INFO are not wrapped by
-// GlobalVariablesForGPIO is because they belong to API
-
-extern const string GPIO::model = global().model_name();
-extern const string GPIO::JETSON_INFO = global().JETSON_INFO();
+string GPIO::model() { return global().model_name(); };
+string GPIO::JETSON_INFO() { return global().JETSON_INFO(); };
 
 /* Function used to enable/disable warnings during setup and cleanup. */
 void GPIO::setwarnings(bool state) { global()._gpio_warnings = state; }
@@ -1028,44 +1040,3 @@ bool GPIO::operator!=(const GPIO::Callback& A, const GPIO::Callback& B) { return
 GPIO::WaitResult::WaitResult(const std::string& channel) : _channel(channel) {}
 bool GPIO::WaitResult::is_event_detected() const { return !is_None(channel()); }
 //=======================================
-
-//=======================================
-struct _cleaner
-{
-private:
-    _cleaner() = default;
-
-public:
-    _cleaner(const _cleaner&) = delete;
-    _cleaner& operator=(const _cleaner&) = delete;
-
-    static _cleaner& get_instance()
-    {
-        static _cleaner singleton;
-        return singleton;
-    }
-
-    ~_cleaner()
-    {
-        try
-        {
-            // When the user forgot to call cleanup() at the end of the program,
-            // _cleaner object will call it.
-            _cleanup_all();
-        }
-        catch (exception& e)
-        {
-            cerr << _error_message(e, "~_cleaner()") << std::endl;
-        }
-    }
-};
-
-// AutoCleaner will be destructed at the end of the program, and call
-// _cleanup_all(). It COULD cause a problem because at the end of the program,
-// global()._channel_configuration and global()._gpio_mode MUST NOT be destructed
-// before AutoCleaner. But the static objects are destructed in the reverse
-// order of construction, and objects defined in the same compilation unit will
-// be constructed in the order of definition. So it's supposed to work properly.
-_cleaner& AutoCleaner = _cleaner::get_instance();
-
-//=========================================================================
