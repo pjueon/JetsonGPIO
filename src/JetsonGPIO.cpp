@@ -62,10 +62,7 @@ constexpr Directions HARD_PWM = Directions::HARD_PWM;
 // in order to avoid initialization order problem among global variables in
 // different compilation units.
 
-string _gpio_dir(const ChannelInfo& ch_info)
-{
-    return format("%s/%s", _SYSFS_ROOT, ch_info.gpio_name.c_str());
-}
+string _gpio_dir(const ChannelInfo& ch_info) { return format("%s/%s", _SYSFS_ROOT, ch_info.gpio_name.c_str()); }
 
 class GlobalVariablesForGPIO
 {
@@ -161,8 +158,6 @@ private:
 // alias
 GlobalVariablesForGPIO& global() { return GlobalVariablesForGPIO::get_instance(); }
 
-
-
 void _validate_mode_set()
 {
     if (global()._gpio_mode == NumberingModes::None)
@@ -199,8 +194,6 @@ vector<ChannelInfo> _channels_to_infos(const vector<string>& channels, bool need
     }
     return ch_infos;
 }
-
-
 
 /* Return the current configuration of a channel as reported by sysfs.
    Any of IN, OUT, HARD_PWM, or UNKNOWN may be returned. */
@@ -242,8 +235,6 @@ Directions _app_channel_configuration(const ChannelInfo& ch_info)
         return UNKNOWN; // Originally returns None in NVIDIA's GPIO Python Library
     return global()._channel_configuration[ch_info.channel];
 }
-
-
 
 void _export_gpio(const ChannelInfo& ch_info)
 {
@@ -336,7 +327,7 @@ string _pwm_duty_cycle_path(const ChannelInfo& ch_info)
     return format("%s/duty_cycle", pwm_path.c_str());
 }
 
-string _pwm_enable_path(const ChannelInfo& ch_info) 
+string _pwm_enable_path(const ChannelInfo& ch_info)
 {
     auto pwm_path = _pwm_path(ch_info);
     return format("%s/enable", pwm_path.c_str());
@@ -513,6 +504,9 @@ void GPIO::setup(const string& channel, Directions direction, int initial)
                      << channel << endl;
             }
         }
+
+        if (is_in(ch_info.channel, global()._channel_configuration))
+            _cleanup_one(ch_info);
 
         if (direction == OUT)
         {
@@ -984,7 +978,7 @@ struct GPIO::PWM::Impl
         }
 
         bool duty_cycle_change = _duty_cycle_percent != duty_cycle_percent;
-        if(duty_cycle_change || start || stop)
+        if (duty_cycle_change || start || stop)
         {
             _duty_cycle_percent = duty_cycle_percent;
             _duty_cycle_ns = int(_period_ns * (duty_cycle_percent / 100.0));
