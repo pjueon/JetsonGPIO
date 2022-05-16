@@ -220,13 +220,13 @@ GPIO::cleanup(chan1); // cleanup only chan1
 To get information about the Jetson module, use/read:
 
 ```cpp
-std::string info = GPIO::JETSON_INFO;
+std::string info = GPIO::JETSON_INFO();
 ```
 
 To get the model name of your Jetson device, use/read:
 
 ```cpp
-std::string model = GPIO::model;
+std::string model = GPIO::model();
 ```
 
 To get information about the library version, use/read:

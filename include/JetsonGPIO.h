@@ -63,8 +63,8 @@ namespace GPIO
 {
     constexpr auto VERSION = JETSONGPIO_VERSION;
 
-    extern const std::string JETSON_INFO;
-    extern const std::string model;
+    std::string JETSON_INFO();
+    std::string model();
 
     // Pin Numbering Modes
     enum class NumberingModes
