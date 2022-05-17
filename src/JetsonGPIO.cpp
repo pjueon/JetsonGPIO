@@ -66,16 +66,13 @@ void _cleanup_all();
 
 string _gpio_dir(const ChannelInfo& ch_info) { return format("%s/%s", _SYSFS_ROOT, ch_info.gpio_name.c_str()); }
 
-class GlobalVariablesForGPIO
+class MainModule
 {
 public:
-    // -----Global Variables----
     // NOTE: DON'T change the declaration order of fields.
     // declaration order == initialization order
 
     PinData _pinData;
-    const Model _model;
-    const PinInfo _JETSON_INFO;
     const map<GPIO::NumberingModes, map<string, ChannelInfo>> _channel_data_by_mode;
 
     // A map used as lookup tables for pin to linux gpio mapping
@@ -85,10 +82,10 @@ public:
     NumberingModes _gpio_mode;
     map<string, Directions> _channel_configuration;
 
-    GlobalVariablesForGPIO(const GlobalVariablesForGPIO&) = delete;
-    GlobalVariablesForGPIO& operator=(const GlobalVariablesForGPIO&) = delete;
+    MainModule(const MainModule&) = delete;
+    MainModule& operator=(const MainModule&) = delete;
 
-    ~GlobalVariablesForGPIO()
+    ~MainModule()
     {
         try
         {
@@ -101,15 +98,15 @@ public:
         }
     }
 
-    static GlobalVariablesForGPIO& get_instance()
+    static MainModule& get_instance()
     {
-        static GlobalVariablesForGPIO singleton{};
+        static MainModule singleton{};
         return singleton;
     }
 
     std::string model_name() const
     {
-        switch (_model)
+        switch (_pinData.model)
         {
         case CLARA_AGX_XAVIER:
             return "CLARA_AGX_XAVIER";
@@ -132,22 +129,22 @@ public:
 
     string JETSON_INFO() const
     {
+        const auto& info = _pinData.pin_info;
+
         stringstream ss{};
         ss << "[JETSON_INFO]\n";
-        ss << "P1_REVISION: " << _JETSON_INFO.P1_REVISION << endl;
-        ss << "RAM: " << _JETSON_INFO.RAM << endl;
-        ss << "REVISION: " << _JETSON_INFO.REVISION << endl;
-        ss << "TYPE: " << _JETSON_INFO.TYPE << endl;
-        ss << "MANUFACTURER: " << _JETSON_INFO.MANUFACTURER << endl;
-        ss << "PROCESSOR: " << _JETSON_INFO.PROCESSOR << endl;
+        ss << "P1_REVISION: " << info.P1_REVISION << endl;
+        ss << "RAM: " << info.RAM << endl;
+        ss << "REVISION: " << info.REVISION << endl;
+        ss << "TYPE: " << info.TYPE << endl;
+        ss << "MANUFACTURER: " << info.MANUFACTURER << endl;
+        ss << "PROCESSOR: " << info.PROCESSOR << endl;
         return ss.str();
     }
 
 private:
-    GlobalVariablesForGPIO()
+    MainModule()
     : _pinData(get_data()), // Get GPIO pin data
-      _model(_pinData.model),
-      _JETSON_INFO(_pinData.pin_info),
       _channel_data_by_mode(_pinData.channel_data),
       _gpio_warnings(true),
       _gpio_mode(NumberingModes::None)
@@ -171,7 +168,7 @@ private:
 
 //================================================================================
 // alias
-GlobalVariablesForGPIO& global() { return GlobalVariablesForGPIO::get_instance(); }
+MainModule& global() { return MainModule::get_instance(); }
 
 void _validate_mode_set()
 {
