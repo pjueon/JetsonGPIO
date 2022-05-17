@@ -418,7 +418,7 @@ namespace GPIO
                 copy(_vec_compatibles.begin(), _vec_compatibles.end(), inserter(compatibles, compatibles.end()));
             } // scope ends
 
-            auto matches = [&compatibles](const vector<string>& vals) 
+            auto matches = [&compatibles](const vector<string>& vals)
             {
                 for (const auto& v : vals)
                 {
@@ -428,7 +428,7 @@ namespace GPIO
                 return false;
             };
 
-            auto find_pmgr_board = [&](const string& prefix) -> string 
+            auto find_pmgr_board = [&](const string& prefix) -> string
             {
                 if (os_path_exists(ids_path))
                 {
@@ -445,7 +445,7 @@ namespace GPIO
                     while (f >> s)
                     {
                         if (startswith(s, prefix))
-                            return s; // could be wrong. see https://github.com/NVIDIA/jetson-gpio/issues/68
+                            return s;
                     }
                 }
                 else
@@ -464,7 +464,7 @@ namespace GPIO
                 return "None";
             };
 
-            auto warn_if_not_carrier_board = [&find_pmgr_board](const vector<string>& carrier_boards) 
+            auto warn_if_not_carrier_board = [&find_pmgr_board](const vector<string>& carrier_boards)
             {
                 auto found = false;
 
