@@ -841,7 +841,7 @@ struct GPIO::PWM::Impl
     double _duty_cycle_percent = 0;
     int _duty_cycle_ns = 0;
 
-    Impl(int channel, int frequency_hz) : _ch_info(global()._channel_to_info(to_string(channel), false, true))
+    Impl(const std::string& channel, int frequency_hz) : _ch_info(global()._channel_to_info(channel, false, true))
     {
         try
         {
@@ -876,13 +876,15 @@ struct GPIO::PWM::Impl
             // Anything that doesn't match new frequency_hz
             _frequency_hz = -1 * frequency_hz;
             _reconfigure(frequency_hz, 0.0);
-            global()._channel_configuration[to_string(channel)] = HARD_PWM;
+            global()._channel_configuration[channel] = HARD_PWM;
         }
         catch (exception& e)
         {
             throw _error(e, "GPIO::PWM::PWM()");
         }
     }
+
+    Impl(int channel, int frequency_hz) : Impl(to_string(channel), frequency_hz) {}
 
     ~Impl()
     {
@@ -1005,6 +1007,7 @@ struct GPIO::PWM::Impl
     }
 };
 
+GPIO::PWM::PWM(const std::string& channel, int frequency_hz) : pImpl(make_unique<Impl>(channel, frequency_hz)) {}
 GPIO::PWM::PWM(int channel, int frequency_hz) : pImpl(make_unique<Impl>(channel, frequency_hz)) {}
 GPIO::PWM::~PWM() = default;
 

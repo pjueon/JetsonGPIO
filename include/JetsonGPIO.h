@@ -364,6 +364,7 @@ namespace GPIO
     class PWM
     {
     public:
+        PWM(const std::string& channel, int frequency_hz);
         PWM(int channel, int frequency_hz);
         PWM(PWM&& other);
         PWM& operator=(PWM&& other);
