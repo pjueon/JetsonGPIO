@@ -467,11 +467,8 @@ MainModule& global() { return MainModule::get_instance(); }
 string GPIO::model() { return global().model(); };
 string GPIO::JETSON_INFO() { return global().JETSON_INFO(); };
 
-/* Function used to enable/disable warnings during setup and cleanup. */
 void GPIO::setwarnings(bool state) { global()._gpio_warnings = state; }
 
-// Function used to set the pin mumbering mode.
-// Possible mode values are BOARD, BCM, TEGRA_SOC and CVM
 void GPIO::setmode(NumberingModes mode)
 {
     try
@@ -492,12 +489,8 @@ void GPIO::setmode(NumberingModes mode)
     }
 }
 
-// Function used to get the currently set pin numbering mode
 NumberingModes GPIO::getmode() { return global()._gpio_mode; }
 
-/* Function used to setup individual pins or lists/tuples of pins as
-   Input or Output. direction must be IN or OUT, initial must be
-   HIGH or LOW and is only valid when direction is OUT  */
 void GPIO::setup(const string& channel, Directions direction, int initial)
 {
     try
@@ -541,8 +534,6 @@ void GPIO::setup(const string& channel, Directions direction, int initial)
 
 void GPIO::setup(int channel, Directions direction, int initial) { setup(to_string(channel), direction, initial); }
 
-/* Function used to cleanup channels at the end of the program.
-   If no channel is provided, all channels are cleaned */
 void GPIO::cleanup(const string& channel)
 {
     try
@@ -581,8 +572,6 @@ void GPIO::cleanup(int channel)
     cleanup(str_channel);
 }
 
-/* Function used to return the current value of the specified channel.
-   Function returns either HIGH or LOW */
 int GPIO::input(const string& channel)
 {
     try
@@ -627,8 +616,6 @@ void GPIO::output(const string& channel, int value)
 
 void GPIO::output(int channel, int value) { output(to_string(channel), value); }
 
-/* Function used to check the currently set function of the channel specified.
- */
 Directions GPIO::gpio_function(const string& channel)
 {
     try
