@@ -393,6 +393,19 @@ namespace GPIO
 
     // clang-format on
 
+    std::string PinInfo::JETSON_INFO() const
+    {
+        stringstream ss{};
+        ss << "[JETSON_INFO]\n";
+        ss << "P1_REVISION: " << P1_REVISION << endl;
+        ss << "RAM: " << RAM << endl;
+        ss << "REVISION: " << REVISION << endl;
+        ss << "TYPE: " << TYPE << endl;
+        ss << "MANUFACTURER: " << MANUFACTURER << endl;
+        ss << "PROCESSOR: " << PROCESSOR << endl;
+        return ss.str();
+    }
+
     static bool ids_warned = false;
 
     PinData get_data()

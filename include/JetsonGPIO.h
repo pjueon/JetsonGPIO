@@ -76,7 +76,7 @@ namespace GPIO
         None
     };
 
-    // GPIO::BOARD, GPIO::BCM, GPIO::TEGRA_SOC, GPIO::CVM
+    // alias for GPIO::NumberingModes
     constexpr NumberingModes BOARD = NumberingModes::BOARD;
     constexpr NumberingModes BCM = NumberingModes::BCM;
     constexpr NumberingModes TEGRA_SOC = NumberingModes::TEGRA_SOC;
@@ -100,7 +100,7 @@ namespace GPIO
         HARD_PWM
     };
 
-    // GPIO::IN, GPIO::OUT
+    // alias for GPIO::Directions
     constexpr Directions IN = Directions::IN;
     constexpr Directions OUT = Directions::OUT;
 
@@ -114,6 +114,7 @@ namespace GPIO
         BOTH
     };
 
+    // alias for GPIO::Edge
     constexpr Edge NO_EDGE = Edge::NONE;
     constexpr Edge RISING = Edge::RISING;
     constexpr Edge FALLING = Edge::FALLING;
@@ -122,16 +123,16 @@ namespace GPIO
     // Function used to enable/disable warnings during setup and cleanup.
     void setwarnings(bool state);
 
-    // Function used to set the pin mumbering mode.
-    // Possible mode values are BOARD, BCM, TEGRA_SOC and CVM
+    /* Function used to set the pin mumbering mode.
+       @mode must be one of BOARD, BCM, TEGRA_SOC or CV */
     void setmode(NumberingModes mode);
 
     // Function used to get the currently set pin numbering mode
     NumberingModes getmode();
 
     /* Function used to setup individual pins as Input or Output.
-       direction must be IN or OUT, initial must be
-       HIGH or LOW and is only valid when direction is OUT  */
+       @direction must be IN or OUT
+       @initial must be HIGH, LOW or -1 and is only valid when direction is OUT  */
     void setup(const std::string& channel, Directions direction, int initial = -1);
     void setup(int channel, Directions direction, int initial = -1);
 
@@ -141,12 +142,12 @@ namespace GPIO
     void cleanup(int channel);
 
     /* Function used to return the current value of the specified channel.
-       Function returns either HIGH or LOW */
+       @returns either HIGH or LOW */
     int input(const std::string& channel);
     int input(int channel);
 
     /* Function used to set a value to a channel.
-       Values must be either HIGH or LOW */
+       @value must be either HIGH or LOW */
     void output(const std::string& channel, int value);
     void output(int channel, int value);
 
@@ -321,7 +322,7 @@ namespace GPIO
     //----------------------------------
 
     /* Function used to check if an event occurred on the specified channel.
-       Param channel must be an integer.
+       Param channel must be an integer or a string.
        This function return True or False */
     bool event_detected(const std::string& channel);
     bool event_detected(int channel);
@@ -336,7 +337,7 @@ namespace GPIO
     void remove_event_callback(int channel, const Callback& callback);
 
     /* Function used to add threaded event detection for a specified gpio channel.
-       @gpio must be an integer specifying the channel
+       @channel is an integer or a string specifying the channel
        @edge must be a member of GPIO::Edge
        @callback (optional) may be a callback function to be called when the event is detected (or nullptr)
        @bouncetime (optional) a button-bounce signal ignore time (in milliseconds, default=none) */
@@ -350,11 +351,11 @@ namespace GPIO
 
     /* Function used to perform a blocking wait until the specified edge event is detected within the specified
        timeout period. Returns the channel if an event is detected or 0 if a timeout has occurred.
-       @channel is an integer specifying the channel
+       @channel is an integer or a string specifying the channel
        @edge must be a member of GPIO::Edge
        @bouncetime in milliseconds (optional)
        @timeout in milliseconds (optional)
-       @returns WaitResult object*/
+       @returns WaitResult object */
     WaitResult wait_for_edge(const std::string& channel, Edge edge, unsigned long bounce_time = 0,
                              unsigned long timeout = 0);
     WaitResult wait_for_edge(int channel, Edge edge, unsigned long bounce_time = 0, unsigned long timeout = 0);
@@ -364,6 +365,7 @@ namespace GPIO
     class PWM
     {
     public:
+        PWM(const std::string& channel, int frequency_hz);
         PWM(int channel, int frequency_hz);
         PWM(PWM&& other);
         PWM& operator=(PWM&& other);

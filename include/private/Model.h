@@ -52,6 +52,9 @@ namespace GPIO
     constexpr Model JETSON_NANO = Model::JETSON_NANO;
     constexpr Model JETSON_TX2_NX = Model::JETSON_TX2_NX;
     constexpr Model JETSON_ORIN = Model::JETSON_ORIN;
+
+    std::string model_name(Model model);
+
 } // namespace GPIO
 
 #endif

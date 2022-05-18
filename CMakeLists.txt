@@ -22,7 +22,8 @@ set(JetsonGPIO_LIB_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/PythonFunctions.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gpio_pin_data.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gpio_event.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/DictionaryLike.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/DictionaryLike.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Model.cpp)
 
 # Generate a *Config.h header in the build directory
 configure_file(cmake/JetsonGPIOConfig.h.in JetsonGPIOConfig.h)
