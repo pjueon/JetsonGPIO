@@ -68,6 +68,8 @@ class MainModule
     // declaration order == initialization order
 private:
     PinData _pinData;
+    std::string _model;
+    std::string _JETSON_INFO;
     string _gpio_dir(const ChannelInfo& ch_info) { return format("%s/%s", _SYSFS_ROOT, ch_info.gpio_name.c_str()); }
 
 public:
@@ -395,49 +397,15 @@ public:
         _gpio_mode = NumberingModes::None;
     }
 
-    std::string model() const
-    {
-        switch (_pinData.model)
-        {
-        case CLARA_AGX_XAVIER:
-            return "CLARA_AGX_XAVIER";
-        case JETSON_NX:
-            return "JETSON_NX";
-        case JETSON_XAVIER:
-            return "JETSON_XAVIER";
-        case JETSON_TX1:
-            return "JETSON_TX1";
-        case JETSON_TX2:
-            return "JETSON_TX2";
-        case JETSON_NANO:
-            return "JETSON_NANO";
-        case JETSON_TX2_NX:
-            return "JETSON_TX2_NX";
-        case JETSON_ORIN:
-            return  "JETSON_ORIN";
-        default:
-            throw std::runtime_error("_model error");
-        }
-    }
+    const std::string& model() const { return _model; }
 
-    string JETSON_INFO() const
-    {
-        const auto& info = _pinData.pin_info;
-
-        stringstream ss{};
-        ss << "[JETSON_INFO]\n";
-        ss << "P1_REVISION: " << info.P1_REVISION << endl;
-        ss << "RAM: " << info.RAM << endl;
-        ss << "REVISION: " << info.REVISION << endl;
-        ss << "TYPE: " << info.TYPE << endl;
-        ss << "MANUFACTURER: " << info.MANUFACTURER << endl;
-        ss << "PROCESSOR: " << info.PROCESSOR << endl;
-        return ss.str();
-    }
+    const std::string& JETSON_INFO() const { return _JETSON_INFO; }
 
 private:
     MainModule()
     : _pinData(get_data()), // Get GPIO pin data
+      _model(model_name(_pinData.model)),
+      _JETSON_INFO(_pinData.pin_info.JETSON_INFO()),
       _channel_data_by_mode(_pinData.channel_data),
       _gpio_warnings(true),
       _gpio_mode(NumberingModes::None)
