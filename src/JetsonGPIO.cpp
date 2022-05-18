@@ -413,6 +413,8 @@ public:
             return "JETSON_NANO";
         case JETSON_TX2_NX:
             return "JETSON_TX2_NX";
+        case JETSON_ORIN:
+            return  "JETSON_ORIN";
         default:
             throw std::runtime_error("_model error");
         }
