@@ -638,6 +638,24 @@ private:
         }
     }
 
+    void test_add_callback_before_add_event_detect()
+    {
+        GPIO::setmode(GPIO::BOARD);
+        GPIO::setup(pin_data.in_a, GPIO::IN);
+
+        bool event_callback_occurred = false;
+        TestCallback callback(&event_callback_occurred, std::to_string(pin_data.in_a));
+
+        auto invalid_operation = [this, &callback]()
+        {
+            // must thorw an exception
+            GPIO::add_event_callback(pin_data.in_a, callback);
+        };
+
+        expect_exception(invalid_operation);
+        GPIO::cleanup();
+    }
+
     void print_info()
     {
         const auto line = "==========================";
@@ -692,6 +710,7 @@ private:
         ADD_TEST(test_event_detected_rising);
         ADD_TEST(test_event_detected_falling);
         ADD_TEST(test_event_detected_both);
+        ADD_TEST(test_add_callback_before_add_event_detect);
 
         // pwm
         if (!pin_data.all_pwms.empty())
@@ -712,6 +731,22 @@ private:
     {
         if (b == false)
             throw std::runtime_error("assert fail");
+    }
+
+    void expect_exception(std::function<void(void)> work) const
+    {
+        bool exception_occured = false;
+
+        try
+        {
+            work();
+        }
+        catch(...)
+        {
+            exception_occured = true;
+        }
+
+        assert(exception_occured);
     }
 
     void _test_events(int init, GPIO::Edge edge, const std::vector<std::pair<int, bool>>& tests, bool specify_callback,
