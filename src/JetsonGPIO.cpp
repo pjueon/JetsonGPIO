@@ -643,7 +643,7 @@ void GPIO::add_event_callback(const std::string& channel, const Callback& callba
         }
 
         // edge event must already exist
-        if (_edge_event_exists(ch_info.gpio))
+        if (!_edge_event_exists(ch_info.gpio))
             throw runtime_error("The edge event must have been set via add_event_detect()");
 
         // Execute
