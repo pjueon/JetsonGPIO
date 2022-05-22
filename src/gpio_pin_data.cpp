@@ -461,17 +461,12 @@ namespace GPIO
                             return s;
                     }
                 }
-                else
+                else if (ids_warned == false)
                 {
-                    if (ids_warned == false)
-                    {
-                        ids_warned = true;
-                        string msg = "WARNING: Plugin manager information missing from device tree.\n"
-                                     "WARNING: Cannot determine whether the expected Jetson board is present.";
-                        cerr << msg;
-                    }
-
-                    return "None";
+                    ids_warned = true;
+                    string msg = "WARNING: Plugin manager information missing from device tree.\n"
+                                 "WARNING: Cannot determine whether the expected Jetson board is present.";
+                    cerr << msg;
                 }
 
                 return "None";
