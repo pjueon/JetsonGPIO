@@ -63,8 +63,35 @@ namespace GPIO
 {
     constexpr auto VERSION = JETSONGPIO_VERSION;
 
-    std::string JETSON_INFO();
-    std::string model();
+    class LazyString // lazily evaluated string object
+    {
+    public:
+        LazyString(const std::function<std::string(void)>& func);
+        LazyString(const std::string& str);
+        LazyString(const char* str);
+
+        LazyString(const LazyString&) = default;
+        LazyString(LazyString&&) = default;
+
+        LazyString& operator=(const LazyString&) = default;
+        LazyString& operator=(LazyString&&) = default;
+
+        operator const char*() const;
+        operator std::string() const;
+        const std::string& operator()() const;
+
+    private:
+        mutable std::string buffer;
+        mutable bool is_cached;
+        std::function<std::string(void)> func;
+        void Evaluate() const;
+    };
+
+    bool operator==(const LazyString& a, const LazyString& b);
+    bool operator!=(const LazyString& a, const LazyString& b);
+
+    extern LazyString JETSON_INFO;
+    extern LazyString model;
 
     // Pin Numbering Modes
     enum class NumberingModes

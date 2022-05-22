@@ -178,7 +178,7 @@ private:
         throw std::runtime_error("invalid model");
     }
 
-    TestPinData pin_data = get_test_pin_data(GPIO::model());
+    TestPinData pin_data = get_test_pin_data(GPIO::model);
     std::vector<int> all_board_pins = {7,  11, 12, 13, 15, 16, 18, 19, 21, 22, 23,
                                        24, 26, 29, 31, 32, 33, 35, 36, 37, 38, 40};
     int bcm_pin = 4;
@@ -662,8 +662,8 @@ private:
 
         std::cout << line << std::endl;
         std::cout << "[Library Version] " << GPIO::VERSION << std::endl;
-        std::cout << "[Model] " << GPIO::model() << std::endl;
-        std::cout << GPIO::JETSON_INFO();
+        std::cout << "[Model] " << GPIO::model << std::endl;
+        std::cout << GPIO::JETSON_INFO;
         std::cout << line << std::endl;
 
         std::cout << "[NOTE]" << std::endl;

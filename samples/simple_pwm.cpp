@@ -42,13 +42,13 @@ const map<string, int> output_pins{
 
 int get_output_pin()
 {
-    if (output_pins.find(GPIO::model()) == output_pins.end())
+    if (output_pins.find(GPIO::model) == output_pins.end())
     {
         cerr << "PWM not supported on this board\n";
         terminate();
     }
 
-    return output_pins.at(GPIO::model());
+    return output_pins.at(GPIO::model);
 }
 
 inline void delay(double s) { this_thread::sleep_for(std::chrono::duration<double>(s)); }

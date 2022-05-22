@@ -345,9 +345,9 @@ void testEventsConcurrency()
 
 int main()
 {
-    cout << "model: " << GPIO::model() << endl;
+    cout << "model: " << GPIO::model << endl;
     cout << "lib version: " << GPIO::VERSION << endl;
-    cout << GPIO::JETSON_INFO() << endl;
+    cout << GPIO::JETSON_INFO << endl;
 
     // When CTRL+C pressed, signalHandler will be called
     signal(SIGINT, signalHandler);
