@@ -28,6 +28,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <algorithm>
 #include <cstdio>
+#include <fstream>
 #include <map>
 #include <set>
 #include <stdexcept>
@@ -95,6 +96,10 @@ namespace GPIO
         std::snprintf(&ret[0], size + 1, fmt.c_str(), args...);
         return ret;
     }
+
+    std::string read(const std::fstream& f);
+
+    std::string read(const std::ifstream& f);
 
 } // namespace GPIO
 

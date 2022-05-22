@@ -422,10 +422,8 @@ namespace GPIO
 
             { // scope for f:
                 ifstream f(compatible_path);
-                stringstream buffer{};
 
-                buffer << f.rdbuf();
-                string tmp_str = buffer.str();
+                string tmp_str = read(f);
                 vector<string> _vec_compatibles(split(tmp_str, '\x00'));
                 // convert to std::set
                 copy(_vec_compatibles.begin(), _vec_compatibles.end(), inserter(compatibles, compatibles.end()));
@@ -593,17 +591,13 @@ namespace GPIO
                     string base_fn = gpio_chip_gpio_dir + "/" + fn + "/base";
                     { // scope for f
                         ifstream f(base_fn);
-                        stringstream buffer;
-                        buffer << f.rdbuf();
-                        gpio_chip_base[gpio_chip_name] = stoi(strip(buffer.str()));
+                        gpio_chip_base[gpio_chip_name] = stoi(strip(read(f)));
                     } // scope ends
 
                     string ngpio_fn = gpio_chip_gpio_dir + "/" + fn + "/ngpio";
                     { // scope for f
                         ifstream f(ngpio_fn);
-                        stringstream buffer;
-                        buffer << f.rdbuf();
-                        gpio_chip_ngpio[gpio_chip_name] = strip(buffer.str());
+                        gpio_chip_ngpio[gpio_chip_name] = strip(read(f));
                     } // scope ends
 
                     break;

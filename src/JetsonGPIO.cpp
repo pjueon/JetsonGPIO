@@ -161,9 +161,8 @@ public:
         string gpio_direction{};
         { // scope for f
             ifstream f_direction(format("%s/direction", gpio_dir.c_str()));
-            stringstream buffer{};
-            buffer << f_direction.rdbuf();
-            gpio_direction = buffer.str();
+
+            gpio_direction = read(f_direction);
             gpio_direction = lower(strip(gpio_direction));
         } // scope ends
 
@@ -338,9 +337,8 @@ public:
         if (duty_cycle_ns == 0)
         {
             ch_info.f_duty_cycle->seekg(0, std::ios::beg);
-            stringstream buffer{};
-            buffer << ch_info.f_duty_cycle->rdbuf();
-            auto cur = buffer.str();
+
+            auto cur = read(*ch_info.f_duty_cycle);
             cur = strip(cur);
 
             if (cur == "0")
