@@ -432,8 +432,8 @@ MainModule& global() { return MainModule::get_instance(); }
 //==================================================================================
 // APIs
 
-string GPIO::model() { return global().model(); };
-string GPIO::JETSON_INFO() { return global().JETSON_INFO(); };
+LazyString GPIO::model{[]() { return global().model(); }};
+LazyString GPIO::JETSON_INFO{[]() { return global().JETSON_INFO(); }};
 
 void GPIO::setwarnings(bool state) { global()._gpio_warnings = state; }
 
@@ -997,4 +997,42 @@ bool GPIO::operator!=(const GPIO::Callback& A, const GPIO::Callback& B) { return
 // WaitResult
 GPIO::WaitResult::WaitResult(const std::string& channel) : _channel(channel) {}
 bool GPIO::WaitResult::is_event_detected() const { return !is_None(channel()); }
+//=======================================
+
+//=======================================
+// LazyString
+GPIO::LazyString::LazyString(const std::function<std::string(void)>& func) : buffer(), is_cached(false), func(func) {}
+
+GPIO::LazyString::LazyString(const std::string& str) : buffer(str), is_cached(true), func() {}
+
+GPIO::LazyString::LazyString(const char* str) : buffer(str), is_cached(true), func() {}
+
+GPIO::LazyString::operator const char*() const
+{
+    Evaluate();
+    return buffer.c_str();
+}
+
+GPIO::LazyString::operator std::string() const { return this->operator()(); }
+
+const std::string& GPIO::LazyString::operator()() const
+{
+    Evaluate();
+    return buffer;
+}
+
+void GPIO::LazyString::Evaluate() const
+{
+    if (is_cached)
+        return;
+
+    if (func != nullptr)
+        buffer = func();
+
+    is_cached = true;
+}
+
+bool GPIO::operator==(const GPIO::LazyString& a, const GPIO::LazyString& b) { return a() == b(); }
+
+bool GPIO::operator!=(const GPIO::LazyString& a, const GPIO::LazyString& b) { return !(a == b); }
 //=======================================
