@@ -1005,7 +1005,7 @@ GPIO::LazyString::LazyString(const std::function<std::string(void)>& func) : buf
 
 GPIO::LazyString::LazyString(const std::string& str) : buffer(str), is_cached(true), func() {}
 
-GPIO::LazyString::LazyString(const char* str) : buffer(str), is_cached(true), func() {}
+GPIO::LazyString::LazyString(const char* str) : buffer(str == nullptr ? "" : str), is_cached(true), func() {}
 
 GPIO::LazyString::operator const char*() const
 {
@@ -1031,8 +1031,4 @@ void GPIO::LazyString::Evaluate() const
 
     is_cached = true;
 }
-
-bool GPIO::operator==(const GPIO::LazyString& a, const GPIO::LazyString& b) { return a() == b(); }
-
-bool GPIO::operator!=(const GPIO::LazyString& a, const GPIO::LazyString& b) { return !(a == b); }
 //=======================================

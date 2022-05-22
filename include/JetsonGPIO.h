@@ -87,8 +87,32 @@ namespace GPIO
         void Evaluate() const;
     };
 
-    bool operator==(const LazyString& a, const LazyString& b);
-    bool operator!=(const LazyString& a, const LazyString& b);
+    namespace details
+    {
+        template <class T>
+        constexpr bool is_string =
+            std::is_constructible<LazyString, T>::value && !std::is_same<std::decay_t<T>, nullptr_t>::value;
+    }
+
+    template <class T1, class T2,
+              class = std::enable_if_t<details::is_string<T1> && details::is_string<T2> &&
+                                       (std::is_same<std::decay_t<T1>, LazyString>::value ||
+                                        std::is_same<std::decay_t<T2>, LazyString>::value)>>
+    bool operator==(T1&& a, const T2&& b)
+    {
+        LazyString _a(std::forward<T1>(a));
+        LazyString _b(std::forward<T2>(b));
+        return _a() == _b();
+    }
+
+    template <class T1, class T2,
+              class = std::enable_if_t<details::is_string<T1> && details::is_string<T2> &&
+                                       (std::is_same<std::decay_t<T1>, LazyString>::value ||
+                                        std::is_same<std::decay_t<T2>, LazyString>::value)>>
+    bool operator!=(T1&& a, const T2&& b)
+    {
+        return !(a == b);
+    }
 
     extern LazyString JETSON_INFO;
     extern LazyString model;
