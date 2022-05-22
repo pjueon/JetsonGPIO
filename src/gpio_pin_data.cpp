@@ -96,29 +96,29 @@ namespace GPIO
         : 
         JETSON_ORIN_PIN_DEFS
         {
-            { "{164: 106}"s, "{164:  PQ.06}"s, "2200000.gpio", "7",  "4",  "MCLK05",     "GP66",             "None",       -1 },
+            { "{164: 106}"s, "{164:  PQ.06}"s, "2200000.gpio", "7",  "4",  "MCLK05",     "GP66",             None,         None },
             // Output-only (due to base board)       
-            { "{164: 112}"s, "{164:  PR.04}"s, "2200000.gpio", "11", "17", "UART1_RTS",  "GP72_UART1_RTS_N", "None",       -1 },
-            { "{164:  50}"s, "{164:  PH.07}"s, "2200000.gpio", "12", "18", "I2S2_CLK",   "GP122",            "None",       -1 },
-            { "{164: 108}"s, "{164:  PR.00}"s, "2200000.gpio", "13", "27", "PWM01",      "GP68",             "None",       -1 },
-            { "{164:  85}"s, "{164:  PN.01}"s, "2200000.gpio", "15", "22", "GPIO27",     "GP88_PWM1",        "3280000.pwm", 0 },
-            { "{ 32:   9}"s, "{ 32: PBB.01}"s, "c2f0000.gpio", "16", "23", "GPIO08",     "GP26",             "None",       -1 },
-            { "{164:  43}"s, "{164:  PH.00}"s, "2200000.gpio", "18", "24", "GPIO35",     "GP115",            "32c0000.pwm", 0 },
-            { "{164: 135}"s, "{164:  PZ.05}"s, "2200000.gpio", "19", "10", "SPI1_MOSI",  "GP49_SPI1_MOSI",   "None",       -1 },
-            { "{164: 134}"s, "{164:  PZ.04}"s, "2200000.gpio", "21", "9",  "SPI1_MISO",  "GP48_SPI1_MISO",   "None",       -1 },
-            { "{164:  96}"s, "{164:  PP.04}"s, "2200000.gpio", "22", "25", "GPIO17",     "GP56",             "None",       -1 },
-            { "{164: 133}"s, "{164:  PZ.03}"s, "2200000.gpio", "23", "11", "SPI1_CLK",   "GP47_SPI1_CLK",    "None",       -1 },
-            { "{164: 136}"s, "{164:  PZ.06}"s, "2200000.gpio", "24", "8",  "SPI1_CS0_N", "GP50_SPI1_CS0_N",  "None",       -1 },
-            { "{164: 137}"s, "{164:  PZ.07}"s, "2200000.gpio", "26", "7",  "SPI1_CS1_N", "GP51_SPI1_CS1_N",  "None",       -1 },
-            { "{ 32:   1}"s, "{ 32: PAA.01}"s, "c2f0000.gpio", "29", "5",  "CAN0_DIN",   "GP18_CAN0_DIN",    "None",       -1 },
-            { "{ 32:   0}"s, "{ 32: PAA.00}"s, "c2f0000.gpio", "31", "6",  "CAN0_DOUT",  "GP17_CAN0_DOUT",   "None",       -1 },
-            { "{ 32:   8}"s, "{ 32: PBB.00}"s, "c2f0000.gpio", "32", "12", "GPIO09",     "GP25",             "None",       -1 },
-            { "{ 32:   2}"s, "{ 32: PAA.02}"s, "c2f0000.gpio", "33", "13", "CAN1_DOUT",  "GP19_CAN1_DOUT",   "None",       -1 },
-            { "{164:  53}"s, "{164:  PI.02}"s, "2200000.gpio", "35", "19", "I2S2_FS",    "GP125",            "None",       -1 },
-            { "{164: 113}"s, "{164:  PR.05}"s, "2200000.gpio", "36", "16", "UART1_CTS",  "GP73_UART1_CTS_N", "None",       -1 },
-            { "{ 32:   3}"s, "{ 32: PAA.03}"s, "c2f0000.gpio", "37", "26", "CAN1_DIN",   "GP20_CAN1_DIN",    "None",       -1 },
-            { "{164:  52}"s, "{164:  PI.01}"s, "2200000.gpio", "38", "20", "I2S2_DIN",   "GP124",            "None",       -1 },
-            { "{164:  51}"s, "{164:  PI.00}"s, "2200000.gpio", "40", "21", "I2S2_DOUT",  "GP123",            "None",       -1 }            
+            { "{164: 112}"s, "{164:  PR.04}"s, "2200000.gpio", "11", "17", "UART1_RTS",  "GP72_UART1_RTS_N", None,         None },
+            { "{164:  50}"s, "{164:  PH.07}"s, "2200000.gpio", "12", "18", "I2S2_CLK",   "GP122",            None,         None },
+            { "{164: 108}"s, "{164:  PR.00}"s, "2200000.gpio", "13", "27", "PWM01",      "GP68",             None,         None },
+            { "{164:  85}"s, "{164:  PN.01}"s, "2200000.gpio", "15", "22", "GPIO27",     "GP88_PWM1",        "3280000.pwm",   0 },
+            { "{ 32:   9}"s, "{ 32: PBB.01}"s, "c2f0000.gpio", "16", "23", "GPIO08",     "GP26",             None,         None },
+            { "{164:  43}"s, "{164:  PH.00}"s, "2200000.gpio", "18", "24", "GPIO35",     "GP115",            "32c0000.pwm",   0 },
+            { "{164: 135}"s, "{164:  PZ.05}"s, "2200000.gpio", "19", "10", "SPI1_MOSI",  "GP49_SPI1_MOSI",   None,         None },
+            { "{164: 134}"s, "{164:  PZ.04}"s, "2200000.gpio", "21", "9",  "SPI1_MISO",  "GP48_SPI1_MISO",   None,         None },
+            { "{164:  96}"s, "{164:  PP.04}"s, "2200000.gpio", "22", "25", "GPIO17",     "GP56",             None,         None },
+            { "{164: 133}"s, "{164:  PZ.03}"s, "2200000.gpio", "23", "11", "SPI1_CLK",   "GP47_SPI1_CLK",    None,         None },
+            { "{164: 136}"s, "{164:  PZ.06}"s, "2200000.gpio", "24", "8",  "SPI1_CS0_N", "GP50_SPI1_CS0_N",  None,         None },
+            { "{164: 137}"s, "{164:  PZ.07}"s, "2200000.gpio", "26", "7",  "SPI1_CS1_N", "GP51_SPI1_CS1_N",  None,         None },
+            { "{ 32:   1}"s, "{ 32: PAA.01}"s, "c2f0000.gpio", "29", "5",  "CAN0_DIN",   "GP18_CAN0_DIN",    None,         None },
+            { "{ 32:   0}"s, "{ 32: PAA.00}"s, "c2f0000.gpio", "31", "6",  "CAN0_DOUT",  "GP17_CAN0_DOUT",   None,         None },
+            { "{ 32:   8}"s, "{ 32: PBB.00}"s, "c2f0000.gpio", "32", "12", "GPIO09",     "GP25",             None,         None },
+            { "{ 32:   2}"s, "{ 32: PAA.02}"s, "c2f0000.gpio", "33", "13", "CAN1_DOUT",  "GP19_CAN1_DOUT",   None,         None },
+            { "{164:  53}"s, "{164:  PI.02}"s, "2200000.gpio", "35", "19", "I2S2_FS",    "GP125",            None,         None },
+            { "{164: 113}"s, "{164:  PR.05}"s, "2200000.gpio", "36", "16", "UART1_CTS",  "GP73_UART1_CTS_N", None,         None },
+            { "{ 32:   3}"s, "{ 32: PAA.03}"s, "c2f0000.gpio", "37", "26", "CAN1_DIN",   "GP20_CAN1_DIN",    None,         None },
+            { "{164:  52}"s, "{164:  PI.01}"s, "2200000.gpio", "38", "20", "I2S2_DIN",   "GP124",            None,         None },
+            { "{164:  51}"s, "{164:  PI.00}"s, "2200000.gpio", "40", "21", "I2S2_DOUT",  "GP123",            None,         None }            
         },
         compats_jetson_orins
         {
@@ -127,31 +127,31 @@ namespace GPIO
 
         CLARA_AGX_XAVIER_PIN_DEFS
         {
-            { "{224: 134, 169: 106}"s, "{169:  PQ.06}"s, "2200000.gpio", "7",  "4",   "MCLK05",     "SOC_GPIO42", "None",       -1 },
-            { "{224: 140, 169: 112}"s, "{169:  PR.04}"s, "2200000.gpio", "11", "17",  "UART1_RTS",  "UART1_RTS",  "None",       -1 },
-            { "{224:  63, 169:  51}"s, "{169:  PH.07}"s, "2200000.gpio", "12", "18",  "I2S2_CLK",   "DAP2_SCLK",  "None",       -1 },
-            { "{224: 124, 169:  96}"s, "{169:  PP.04}"s, "2200000.gpio", "13", "27",  "GPIO32",     "SOC_GPIO04", "None",       -1 },
+            { "{224: 134, 169: 106}"s, "{169:  PQ.06}"s, "2200000.gpio", "7",  "4",   "MCLK05",     "SOC_GPIO42", None,       None },
+            { "{224: 140, 169: 112}"s, "{169:  PR.04}"s, "2200000.gpio", "11", "17",  "UART1_RTS",  "UART1_RTS",  None,       None },
+            { "{224:  63, 169:  51}"s, "{169:  PH.07}"s, "2200000.gpio", "12", "18",  "I2S2_CLK",   "DAP2_SCLK",  None,       None },
+            { "{224: 124, 169:  96}"s, "{169:  PP.04}"s, "2200000.gpio", "13", "27",  "GPIO32",     "SOC_GPIO04", None,       None },
             // Older versions of L4T don"t enable this PWM controller in DT, so this PWM 
             // channel may not be available. 
             { "{224: 105, 169:  84}"s, "{169:  PN.01}"s, "2200000.gpio", "15", "22",  "GPIO27",     "SOC_GPIO54", "3280000.pwm", 0 },
-            { "{ 40:   8,  30:   8}"s, "{ 30: PBB.00}"s, "c2f0000.gpio", "16", "23",  "GPIO8",      "CAN1_STB",   "None",       -1 },
+            { "{ 40:   8,  30:   8}"s, "{ 30: PBB.00}"s, "c2f0000.gpio", "16", "23",  "GPIO8",      "CAN1_STB",   None,       None },
             { "{224:  56, 169:  44}"s, "{169:  PH.00}"s, "2200000.gpio", "18", "24",  "GPIO35",     "SOC_GPIO12", "32c0000.pwm", 0 },
-            { "{224: 205, 169: 162}"s, "{169:  PZ.05}"s, "2200000.gpio", "19", "10",  "SPI1_MOSI",  "SPI1_MOSI",  "None",       -1 },
-            { "{224: 204, 169: 161}"s, "{169:  PZ.04}"s, "2200000.gpio", "21", "9",   "SPI1_MISO",  "SPI1_MISO",  "None",       -1 },
-            { "{224: 129, 169: 101}"s, "{169:  PQ.01}"s, "2200000.gpio", "22", "25",  "GPIO17",     "SOC_GPIO21", "None",       -1 },
-            { "{224: 203, 169: 160}"s, "{169:  PZ.03}"s, "2200000.gpio", "23", "11",  "SPI1_CLK",   "SPI1_SCK",   "None",       -1 },
-            { "{224: 206, 169: 163}"s, "{169:  PZ.06}"s, "2200000.gpio", "24", "8",   "SPI1_CS0_N", "SPI1_CS0_N", "None",       -1 },
-            { "{224: 207, 169: 164}"s, "{169:  PZ.07}"s, "2200000.gpio", "26", "7",   "SPI1_CS1_N", "SPI1_CS1_N", "None",       -1 },
-            { "{ 40:   3,  30:   3}"s, "{ 30: PAA.03}"s, "c2f0000.gpio", "29", "5",   "CAN0_DIN",   "CAN0_DIN",   "None",       -1 },
-            { "{ 40:   2,  30:   2}"s, "{ 30: PAA.02}"s, "c2f0000.gpio", "31", "6",   "CAN0_DOUT",  "CAN0_DOUT",  "None",       -1 },
-            { "{ 40:   9,  30:   9}"s, "{ 30: PBB.01}"s, "c2f0000.gpio", "32", "12",  "GPIO9",      "CAN1_EN",    "None",       -1 },
-            { "{ 40:   0,  30:   0}"s, "{ 30: PAA.00}"s, "c2f0000.gpio", "33", "13",  "CAN1_DOUT",  "CAN1_DOUT",  "None",       -1 },
-            { "{224:  66, 169:  54}"s, "{169:  PI.02}"s, "2200000.gpio", "35", "19",  "I2S2_FS",    "DAP2_FS",    "None",       -1 },
+            { "{224: 205, 169: 162}"s, "{169:  PZ.05}"s, "2200000.gpio", "19", "10",  "SPI1_MOSI",  "SPI1_MOSI",  None,       None },
+            { "{224: 204, 169: 161}"s, "{169:  PZ.04}"s, "2200000.gpio", "21", "9",   "SPI1_MISO",  "SPI1_MISO",  None,       None },
+            { "{224: 129, 169: 101}"s, "{169:  PQ.01}"s, "2200000.gpio", "22", "25",  "GPIO17",     "SOC_GPIO21", None,       None },
+            { "{224: 203, 169: 160}"s, "{169:  PZ.03}"s, "2200000.gpio", "23", "11",  "SPI1_CLK",   "SPI1_SCK",   None,       None },
+            { "{224: 206, 169: 163}"s, "{169:  PZ.06}"s, "2200000.gpio", "24", "8",   "SPI1_CS0_N", "SPI1_CS0_N", None,       None },
+            { "{224: 207, 169: 164}"s, "{169:  PZ.07}"s, "2200000.gpio", "26", "7",   "SPI1_CS1_N", "SPI1_CS1_N", None,       None },
+            { "{ 40:   3,  30:   3}"s, "{ 30: PAA.03}"s, "c2f0000.gpio", "29", "5",   "CAN0_DIN",   "CAN0_DIN",   None,       None },
+            { "{ 40:   2,  30:   2}"s, "{ 30: PAA.02}"s, "c2f0000.gpio", "31", "6",   "CAN0_DOUT",  "CAN0_DOUT",  None,       None },
+            { "{ 40:   9,  30:   9}"s, "{ 30: PBB.01}"s, "c2f0000.gpio", "32", "12",  "GPIO9",      "CAN1_EN",    None,       None },
+            { "{ 40:   0,  30:   0}"s, "{ 30: PAA.00}"s, "c2f0000.gpio", "33", "13",  "CAN1_DOUT",  "CAN1_DOUT",  None,       None },
+            { "{224:  66, 169:  54}"s, "{169:  PI.02}"s, "2200000.gpio", "35", "19",  "I2S2_FS",    "DAP2_FS",    None,       None },
             // Input-only (due to base board)
-            { "{224: 141, 169: 113}"s, "{169:  PR.05}"s, "2200000.gpio", "36", "16",  "UART1_CTS", "UART1_CTS",   "None",       -1 },
-            { "{ 40:   1,  30:   1}"s, "{ 30: PAA.01}"s, "c2f0000.gpio",  "37", "26", "CAN1_DIN",  "CAN1_DIN",    "None",       -1 },
-            { "{224:  65, 169:  53}"s, "{169:  PI.01}"s, "2200000.gpio", "38", "20",  "I2S2_DIN",  "DAP2_DIN",    "None",       -1 },
-            { "{224:  64, 169:  52}"s, "{169:  PI.00}"s, "2200000.gpio", "40", "21",  "I2S2_DOUT", "DAP2_DOUT",   "None",       -1 }
+            { "{224: 141, 169: 113}"s, "{169:  PR.05}"s, "2200000.gpio", "36", "16",  "UART1_CTS", "UART1_CTS",   None,       None },
+            { "{ 40:   1,  30:   1}"s, "{ 30: PAA.01}"s, "c2f0000.gpio",  "37", "26", "CAN1_DIN",  "CAN1_DIN",    None,       None },
+            { "{224:  65, 169:  53}"s, "{169:  PI.01}"s, "2200000.gpio", "38", "20",  "I2S2_DIN",  "DAP2_DIN",    None,       None },
+            { "{224:  64, 169:  52}"s, "{169:  PI.00}"s, "2200000.gpio", "40", "21",  "I2S2_DOUT", "DAP2_DOUT",   None,       None }
         },
         compats_clara_agx_xavier
         {
@@ -160,28 +160,28 @@ namespace GPIO
 
         JETSON_NX_PIN_DEFS
         {
-            { "{224: 148, 169: 118}"s, "{169:  PS.04}"s, "2200000.gpio", "7", "4",   "GPIO09",    "AUD_MCLK",   "None",       -1 },
-            { "{224: 140, 169: 112}"s, "{169:  PR.04}"s, "2200000.gpio", "11", "17", "UART1_RTS", "UART1_RTS",  "None",       -1 },
-            { "{224: 157, 169: 127}"s, "{169:  PT.05}"s, "2200000.gpio", "12", "18", "I2S0_SCLK", "DAP5_SCLK",  "None",       -1 },
-            { "{224: 192, 169: 149}"s, "{169:  PY.00}"s, "2200000.gpio", "13", "27", "SPI1_SCK",  "SPI3_SCK",   "None",       -1 },
+            { "{224: 148, 169: 118}"s, "{169:  PS.04}"s, "2200000.gpio", "7", "4",   "GPIO09",    "AUD_MCLK",   None,       None },
+            { "{224: 140, 169: 112}"s, "{169:  PR.04}"s, "2200000.gpio", "11", "17", "UART1_RTS", "UART1_RTS",  None,       None },
+            { "{224: 157, 169: 127}"s, "{169:  PT.05}"s, "2200000.gpio", "12", "18", "I2S0_SCLK", "DAP5_SCLK",  None,       None },
+            { "{224: 192, 169: 149}"s, "{169:  PY.00}"s, "2200000.gpio", "13", "27", "SPI1_SCK",  "SPI3_SCK",   None,       None },
             { "{ 40:  20,  30:  16}"s, "{ 30: PCC.04}"s, "c2f0000.gpio", "15", "22", "GPIO12",    "TOUCH_CLK",  "c340000.pwm", 0 },
-            { "{224: 196, 169: 153}"s, "{169:  PY.04}"s, "2200000.gpio", "16", "23", "SPI1_CS1",  "SPI3_CS1_N", "None",       -1 },
-            { "{224: 195, 169: 152}"s, "{169:  PY.03}"s, "2200000.gpio", "18", "24", "SPI1_CS0",  "SPI3_CS0_N", "None",       -1 },
-            { "{224: 205, 169: 162}"s, "{169:  PZ.05}"s, "2200000.gpio", "19", "10", "SPI0_MOSI", "SPI1_MOSI",  "None",       -1 },
-            { "{224: 204, 169: 161}"s, "{169:  PZ.04}"s, "2200000.gpio", "21", "9",  "SPI0_MISO", "SPI1_MISO",  "None",       -1 },
-            { "{224: 193, 169: 150}"s, "{169:  PY.01}"s, "2200000.gpio", "22", "25", "SPI1_MISO", "SPI3_MISO",  "None",       -1 },
-            { "{224: 203, 169: 160}"s, "{169:  PZ.03}"s, "2200000.gpio", "23", "11", "SPI0_SCK",  "SPI1_SCK",   "None",       -1 },
-            { "{224: 206, 169: 163}"s, "{169:  PZ.06}"s, "2200000.gpio", "24", "8",  "SPI0_CS0",  "SPI1_CS0_N", "None",       -1 },
-            { "{224: 207, 169: 164}"s, "{169:  PZ.07}"s, "2200000.gpio", "26", "7",  "SPI0_CS1",  "SPI1_CS1_N", "None",       -1 },
-            { "{224: 133, 169: 105}"s, "{169:  PQ.05}"s, "2200000.gpio", "29", "5",  "GPIO01",    "SOC_GPIO41", "None",       -1 },
-            { "{224: 134, 169: 106}"s, "{169:  PQ.06}"s, "2200000.gpio", "31", "6",  "GPIO11",    "SOC_GPIO42", "None",       -1 },
+            { "{224: 196, 169: 153}"s, "{169:  PY.04}"s, "2200000.gpio", "16", "23", "SPI1_CS1",  "SPI3_CS1_N", None,       None },
+            { "{224: 195, 169: 152}"s, "{169:  PY.03}"s, "2200000.gpio", "18", "24", "SPI1_CS0",  "SPI3_CS0_N", None,       None },
+            { "{224: 205, 169: 162}"s, "{169:  PZ.05}"s, "2200000.gpio", "19", "10", "SPI0_MOSI", "SPI1_MOSI",  None,       None },
+            { "{224: 204, 169: 161}"s, "{169:  PZ.04}"s, "2200000.gpio", "21", "9",  "SPI0_MISO", "SPI1_MISO",  None,       None },
+            { "{224: 193, 169: 150}"s, "{169:  PY.01}"s, "2200000.gpio", "22", "25", "SPI1_MISO", "SPI3_MISO",  None,       None },
+            { "{224: 203, 169: 160}"s, "{169:  PZ.03}"s, "2200000.gpio", "23", "11", "SPI0_SCK",  "SPI1_SCK",   None,       None },
+            { "{224: 206, 169: 163}"s, "{169:  PZ.06}"s, "2200000.gpio", "24", "8",  "SPI0_CS0",  "SPI1_CS0_N", None,       None },
+            { "{224: 207, 169: 164}"s, "{169:  PZ.07}"s, "2200000.gpio", "26", "7",  "SPI0_CS1",  "SPI1_CS1_N", None,       None },
+            { "{224: 133, 169: 105}"s, "{169:  PQ.05}"s, "2200000.gpio", "29", "5",  "GPIO01",    "SOC_GPIO41", None,       None },
+            { "{224: 134, 169: 106}"s, "{169:  PQ.06}"s, "2200000.gpio", "31", "6",  "GPIO11",    "SOC_GPIO42", None,       None },
             { "{224: 136, 169: 108}"s, "{169:  PR.00}"s, "2200000.gpio", "32", "12", "GPIO07",    "SOC_GPIO44", "32f0000.pwm", 0 },
             { "{224: 105, 169:  84}"s, "{169:  PN.01}"s, "2200000.gpio", "33", "13", "GPIO13",    "SOC_GPIO54", "3280000.pwm", 0 },
-            { "{224: 160, 169: 130}"s, "{169:  PU.00}"s, "2200000.gpio", "35", "19", "I2S0_FS",   "DAP5_FS",    "None",       -1 },
-            { "{224: 141, 169: 113}"s, "{169:  PR.05}"s, "2200000.gpio", "36", "16", "UART1_CTS", "UART1_CTS",  "None",       -1 },
-            { "{224: 194, 169: 151}"s, "{169:  PY.02}"s, "2200000.gpio", "37", "26", "SPI1_MOSI", "SPI3_MOSI",  "None",       -1 },
-            { "{224: 159, 169: 129}"s, "{169:  PT.07}"s, "2200000.gpio", "38", "20", "I2S0_DIN",  "DAP5_DIN",   "None",       -1 },
-            { "{224: 158, 169: 128}"s, "{169:  PT.06}"s, "2200000.gpio", "40", "21", "I2S0_DOUT", "DAP5_DOUT",  "None",       -1 }
+            { "{224: 160, 169: 130}"s, "{169:  PU.00}"s, "2200000.gpio", "35", "19", "I2S0_FS",   "DAP5_FS",    None,       None },
+            { "{224: 141, 169: 113}"s, "{169:  PR.05}"s, "2200000.gpio", "36", "16", "UART1_CTS", "UART1_CTS",  None,       None },
+            { "{224: 194, 169: 151}"s, "{169:  PY.02}"s, "2200000.gpio", "37", "26", "SPI1_MOSI", "SPI3_MOSI",  None,       None },
+            { "{224: 159, 169: 129}"s, "{169:  PT.07}"s, "2200000.gpio", "38", "20", "I2S0_DIN",  "DAP5_DIN",   None,       None },
+            { "{224: 158, 169: 128}"s, "{169:  PT.06}"s, "2200000.gpio", "40", "21", "I2S0_DOUT", "DAP5_DOUT",  None,       None }
         },
         compats_nx
         {
@@ -194,31 +194,31 @@ namespace GPIO
 
         JETSON_XAVIER_PIN_DEFS
         {
-            { "{224: 134, 169: 106}"s, "{169:  PQ.06}"s, "2200000.gpio", "7", "4",   "MCLK05",     "SOC_GPIO42", "None",       -1 },
-            { "{224: 140, 169: 112}"s, "{169:  PR.04}"s, "2200000.gpio", "11", "17", "UART1_RTS",  "UART1_RTS",  "None",       -1 },
-            { "{224:  63, 169:  51}"s, "{169:  PH.07}"s, "2200000.gpio", "12", "18", "I2S2_CLK",   "DAP2_SCLK",  "None",       -1 },
+            { "{224: 134, 169: 106}"s, "{169:  PQ.06}"s, "2200000.gpio", "7", "4",   "MCLK05",     "SOC_GPIO42", None,       None },
+            { "{224: 140, 169: 112}"s, "{169:  PR.04}"s, "2200000.gpio", "11", "17", "UART1_RTS",  "UART1_RTS",  None,       None },
+            { "{224:  63, 169:  51}"s, "{169:  PH.07}"s, "2200000.gpio", "12", "18", "I2S2_CLK",   "DAP2_SCLK",  None,       None },
             { "{224: 136, 169: 108}"s, "{169:  PR.00}"s, "2200000.gpio", "13", "27", "PWM01",      "SOC_GPIO44", "32f0000.pwm", 0 },
             // Older versions of L4T don"t enable this PWM controller in DT, so this PWM 
             // channel may not be available. 
             { "{224: 105, 169:  84}"s, "{169:  PN.01}"s, "2200000.gpio", "15", "22", "GPIO27",     "SOC_GPIO54", "3280000.pwm", 0 },
-            { "{ 40:   8,  30:   8}"s, "{ 30: PBB.00}"s, "c2f0000.gpio", "16", "23", "GPIO8",      "CAN1_STB",   "None",       -1 },
+            { "{ 40:   8,  30:   8}"s, "{ 30: PBB.00}"s, "c2f0000.gpio", "16", "23", "GPIO8",      "CAN1_STB",   None,       None },
             { "{224:  56, 169:  44}"s, "{169:  PH.00}"s, "2200000.gpio", "18", "24", "GPIO35",     "SOC_GPIO12", "32c0000.pwm", 0 },
-            { "{224: 205, 169: 162}"s, "{169:  PZ.05}"s, "2200000.gpio", "19", "10", "SPI1_MOSI",  "SPI1_MOSI",  "None",       -1 },
-            { "{224: 204, 169: 161}"s, "{169:  PZ.04}"s, "2200000.gpio", "21", "9",  "SPI1_MISO",  "SPI1_MISO",  "None",       -1 },
-            { "{224: 129, 169: 101}"s, "{169:  PQ.01}"s, "2200000.gpio", "22", "25", "GPIO17",     "SOC_GPIO21", "None",       -1 },
-            { "{224: 203, 169: 160}"s, "{169:  PZ.03}"s, "2200000.gpio", "23", "11", "SPI1_CLK",   "SPI1_SCK",   "None",       -1 },
-            { "{224: 206, 169: 163}"s, "{169:  PZ.06}"s, "2200000.gpio", "24", "8",  "SPI1_CS0_N", "SPI1_CS0_N", "None",       -1 },
-            { "{224: 207, 169: 164}"s, "{169:  PZ.07}"s, "2200000.gpio", "26", "7",  "SPI1_CS1_N", "SPI1_CS1_N", "None",       -1 },
-            { "{ 40:   3,  30:   3}"s, "{ 30: PAA.03}"s, "c2f0000.gpio", "29", "5",  "CAN0_DIN",   "CAN0_DIN",   "None",       -1 },
-            { "{ 40:   2,  30:   2}"s, "{ 30: PAA.02}"s, "c2f0000.gpio", "31", "6",  "CAN0_DOUT",  "CAN0_DOUT",  "None",       -1 },
-            { "{ 40:   9,  30:   9}"s, "{ 30: PBB.01}"s, "c2f0000.gpio", "32", "12", "GPIO9",      "CAN1_EN",    "None",       -1 },
-            { "{ 40:   0,  30:   0}"s, "{ 30: PAA.00}"s, "c2f0000.gpio", "33", "13", "CAN1_DOUT",  "CAN1_DOUT",  "None",       -1 },
-            { "{224:  66, 169:  54}"s, "{169:  PI.02}"s, "2200000.gpio", "35", "19", "I2S2_FS",    "DAP2_FS",    "None",       -1 },
+            { "{224: 205, 169: 162}"s, "{169:  PZ.05}"s, "2200000.gpio", "19", "10", "SPI1_MOSI",  "SPI1_MOSI",  None,       None },
+            { "{224: 204, 169: 161}"s, "{169:  PZ.04}"s, "2200000.gpio", "21", "9",  "SPI1_MISO",  "SPI1_MISO",  None,       None },
+            { "{224: 129, 169: 101}"s, "{169:  PQ.01}"s, "2200000.gpio", "22", "25", "GPIO17",     "SOC_GPIO21", None,       None },
+            { "{224: 203, 169: 160}"s, "{169:  PZ.03}"s, "2200000.gpio", "23", "11", "SPI1_CLK",   "SPI1_SCK",   None,       None },
+            { "{224: 206, 169: 163}"s, "{169:  PZ.06}"s, "2200000.gpio", "24", "8",  "SPI1_CS0_N", "SPI1_CS0_N", None,       None },
+            { "{224: 207, 169: 164}"s, "{169:  PZ.07}"s, "2200000.gpio", "26", "7",  "SPI1_CS1_N", "SPI1_CS1_N", None,       None },
+            { "{ 40:   3,  30:   3}"s, "{ 30: PAA.03}"s, "c2f0000.gpio", "29", "5",  "CAN0_DIN",   "CAN0_DIN",   None,       None },
+            { "{ 40:   2,  30:   2}"s, "{ 30: PAA.02}"s, "c2f0000.gpio", "31", "6",  "CAN0_DOUT",  "CAN0_DOUT",  None,       None },
+            { "{ 40:   9,  30:   9}"s, "{ 30: PBB.01}"s, "c2f0000.gpio", "32", "12", "GPIO9",      "CAN1_EN",    None,       None },
+            { "{ 40:   0,  30:   0}"s, "{ 30: PAA.00}"s, "c2f0000.gpio", "33", "13", "CAN1_DOUT",  "CAN1_DOUT",  None,       None },
+            { "{224:  66, 169:  54}"s, "{169:  PI.02}"s, "2200000.gpio", "35", "19", "I2S2_FS",    "DAP2_FS",    None,       None },
             // Input-only (due to base board)
-            { "{224: 141, 169: 113}"s, "{169:  PR.05}"s, "2200000.gpio", "36", "16", "UART1_CTS",  "UART1_CTS",   "None",      -1 },
-            { "{ 40:   1,  30:   1}"s, "{ 30: PAA.01}"s, "c2f0000.gpio", "37", "26", "CAN1_DIN",   "CAN1_DIN",    "None",      -1 },
-            { "{224:  65, 169:  53}"s, "{169:  PI.01}"s, "2200000.gpio", "38", "20", "I2S2_DIN",   "DAP2_DIN",    "None",      -1 },
-            { "{224:  64, 169:  52}"s, "{169:  PI.00}"s, "2200000.gpio", "40", "21", "I2S2_DOUT",  "DAP2_DOUT",   "None",      -1 }
+            { "{224: 141, 169: 113}"s, "{169:  PR.05}"s, "2200000.gpio", "36", "16", "UART1_CTS",  "UART1_CTS",  None,       None },
+            { "{ 40:   1,  30:   1}"s, "{ 30: PAA.01}"s, "c2f0000.gpio", "37", "26", "CAN1_DIN",   "CAN1_DIN",   None,       None },
+            { "{224:  65, 169:  53}"s, "{169:  PI.01}"s, "2200000.gpio", "38", "20", "I2S2_DIN",   "DAP2_DIN",   None,       None },
+            { "{224:  64, 169:  52}"s, "{169:  PI.00}"s, "2200000.gpio", "40", "21", "I2S2_DOUT",  "DAP2_DOUT",  None,       None }
         },
         compats_xavier
         {
@@ -231,28 +231,28 @@ namespace GPIO
 
         JETSON_TX2_NX_PIN_DEFS
         {
-            { "{192: 76,  140:  66}"s, "{140:  PJ.04}"s, "2200000.gpio", "7",  "4",  "GPIO09",    "AUD_MCLK",  "None",       -1 },
-            { "{64:  28,  47:   23}"s, "{47:   PW.04}"s, "c2f0000.gpio", "11", "17", "UART1_RTS", "UART3_RTS", "None",       -1 },
-            { "{192: 72,  140:  62}"s, "{140:  PJ.00}"s, "2200000.gpio", "12", "18", "I2S0_SCLK", "DAP1_SCLK", "None",       -1 },
-            { "{64:  17,  47:   12}"s, "{47:   PV.01}"s, "c2f0000.gpio", "13", "27", "SPI1_SCK",  "GPIO_SEN1", "None",       -1 },
-            { "{192: 18,  140:  16}"s, "{140:  PC.02}"s, "2200000.gpio", "15", "22", "GPIO12",    "DAP2_DOUT", "None",       -1 },
-            { "{192: 19,  140:  17}"s, "{140:  PC.03}"s, "2200000.gpio", "16", "23", "SPI1_CS1",  "DAP2_DIN",  "None",       -1 },
-            { "{64:  20,  47:   15}"s, "{47:   PV.04}"s, "c2f0000.gpio", "18", "24", "SPI1_CS0",  "GPIO_SEN4", "None",       -1 },
-            { "{192: 58,  140:  49}"s, "{140:  PH.02}"s, "2200000.gpio", "19", "10", "SPI0_MOSI", "GPIO_WAN7", "None",       -1 },
-            { "{192: 57,  140:  48}"s, "{140:  PH.01}"s, "2200000.gpio", "21", "9",  "SPI0_MISO", "GPIO_WAN6", "None",       -1 },
-            { "{64:  18,  47:   13}"s, "{47:   PV.02}"s, "c2f0000.gpio", "22", "25", "SPI1_MISO", "GPIO_SEN2", "None",       -1 },
-            { "{192: 56,  140:  47}"s, "{140:  PH.00}"s, "2200000.gpio", "23", "11", "SPI1_CLK",  "GPIO_WAN5", "None",       -1 },
-            { "{192: 59,  140:  50}"s, "{140:  PH.03}"s, "2200000.gpio", "24", "8",  "SPI0_CS0",  "GPIO_WAN8", "None",       -1 },
-            { "{192: 163, 140: 130}"s, "{140:  PY.03}"s, "2200000.gpio", "26", "7",  "SPI0_CS1",  "GPIO_MDM4", "None",       -1 },
-            { "{192: 105, 140:  86}"s, "{140:  PN.01}"s, "2200000.gpio", "29", "5",  "GPIO01",    "GPIO_CAM2", "None",       -1 },
-            { "{64:  50,  47:   41}"s, "{47:  PEE.02}"s, "c2f0000.gpio", "31", "6",  "GPIO11",    "TOUCH_CLK", "None",       -1 },
+            { "{192: 76,  140:  66}"s, "{140:  PJ.04}"s, "2200000.gpio", "7",  "4",  "GPIO09",    "AUD_MCLK",  None,       None },
+            { "{64:  28,  47:   23}"s, "{47:   PW.04}"s, "c2f0000.gpio", "11", "17", "UART1_RTS", "UART3_RTS", None,       None },
+            { "{192: 72,  140:  62}"s, "{140:  PJ.00}"s, "2200000.gpio", "12", "18", "I2S0_SCLK", "DAP1_SCLK", None,       None },
+            { "{64:  17,  47:   12}"s, "{47:   PV.01}"s, "c2f0000.gpio", "13", "27", "SPI1_SCK",  "GPIO_SEN1", None,       None },
+            { "{192: 18,  140:  16}"s, "{140:  PC.02}"s, "2200000.gpio", "15", "22", "GPIO12",    "DAP2_DOUT", None,       None },
+            { "{192: 19,  140:  17}"s, "{140:  PC.03}"s, "2200000.gpio", "16", "23", "SPI1_CS1",  "DAP2_DIN",  None,       None },
+            { "{64:  20,  47:   15}"s, "{47:   PV.04}"s, "c2f0000.gpio", "18", "24", "SPI1_CS0",  "GPIO_SEN4", None,       None },
+            { "{192: 58,  140:  49}"s, "{140:  PH.02}"s, "2200000.gpio", "19", "10", "SPI0_MOSI", "GPIO_WAN7", None,       None },
+            { "{192: 57,  140:  48}"s, "{140:  PH.01}"s, "2200000.gpio", "21", "9",  "SPI0_MISO", "GPIO_WAN6", None,       None },
+            { "{64:  18,  47:   13}"s, "{47:   PV.02}"s, "c2f0000.gpio", "22", "25", "SPI1_MISO", "GPIO_SEN2", None,       None },
+            { "{192: 56,  140:  47}"s, "{140:  PH.00}"s, "2200000.gpio", "23", "11", "SPI1_CLK",  "GPIO_WAN5", None,       None },
+            { "{192: 59,  140:  50}"s, "{140:  PH.03}"s, "2200000.gpio", "24", "8",  "SPI0_CS0",  "GPIO_WAN8", None,       None },
+            { "{192: 163, 140: 130}"s, "{140:  PY.03}"s, "2200000.gpio", "26", "7",  "SPI0_CS1",  "GPIO_MDM4", None,       None },
+            { "{192: 105, 140:  86}"s, "{140:  PN.01}"s, "2200000.gpio", "29", "5",  "GPIO01",    "GPIO_CAM2", None,       None },
+            { "{64:  50,  47:   41}"s, "{47:  PEE.02}"s, "c2f0000.gpio", "31", "6",  "GPIO11",    "TOUCH_CLK", None,       None },
             { "{64:  8,   47:    5}"s, "{47:   PU.00}"s, "c2f0000.gpio", "32", "12", "GPIO07",    "GPIO_DIS0", "3280000.pwm", 0 },
             { "{64:  13,  47:   10}"s, "{47:   PU.05}"s, "c2f0000.gpio", "33", "13", "GPIO13",    "GPIO_DIS5", "32a0000.pwm", 0 },
-            { "{192: 75,  140:  65}"s, "{140:  PJ.03}"s, "2200000.gpio", "35", "19", "I2S0_FS",   "DAP1_FS",   "None",       -1 },
-            { "{64:  29,  47:   24}"s, "{47:   PW.05}"s, "c2f0000.gpio", "36", "16", "UART1_CTS", "UART3_CTS", "None",       -1 },
-            { "{64:  19,  47:   14}"s, "{47:   PV.03}"s, "c2f0000.gpio", "37", "26", "SPI1_MOSI", "GPIO_SEN3", "None",       -1 },
-            { "{192: 74,  140:  64}"s, "{140:  PJ.02}"s, "2200000.gpio", "38", "20", "I2S0_DIN",  "DAP1_DIN",  "None",       -1 },
-            { "{192: 73,  140:  63}"s, "{140:  PJ.01}"s, "2200000.gpio", "40", "21", "I2S0_DOUT", "DAP1_DOUT", "None",       -1 }       
+            { "{192: 75,  140:  65}"s, "{140:  PJ.03}"s, "2200000.gpio", "35", "19", "I2S0_FS",   "DAP1_FS",   None,       None },
+            { "{64:  29,  47:   24}"s, "{47:   PW.05}"s, "c2f0000.gpio", "36", "16", "UART1_CTS", "UART3_CTS", None,       None },
+            { "{64:  19,  47:   14}"s, "{47:   PV.03}"s, "c2f0000.gpio", "37", "26", "SPI1_MOSI", "GPIO_SEN3", None,       None },
+            { "{192: 74,  140:  64}"s, "{140:  PJ.02}"s, "2200000.gpio", "38", "20", "I2S0_DIN",  "DAP1_DIN",  None,       None },
+            { "{192: 73,  140:  63}"s, "{140:  PJ.01}"s, "2200000.gpio", "40", "21", "I2S0_DOUT", "DAP1_DOUT", None,       None }       
         },
         compats_tx2_nx
         {
@@ -261,33 +261,33 @@ namespace GPIO
 
         JETSON_TX2_PIN_DEFS
         {
-            { "{192:  76, 140:  66}"s, "{140:  PJ.04}"s, "2200000.gpio",             "7", "4",   "AUDIO_MCLK",         "AUD_MCLK",     "None", -1 },
+            { "{192:  76, 140:  66}"s, "{140:  PJ.04}"s, "2200000.gpio",             "7", "4",   "AUDIO_MCLK",         "AUD_MCLK",     None, None },
             // Output-only (due to base board)                   
-            { "{192: 146, 140: 117}"s, "{140:  PT.02}"s, "2200000.gpio",             "11", "17", "UART0_RTS",          "UART1_RTS",    "None", -1 },
-            { "{192:  72, 140:  62}"s, "{140:  PJ.00}"s, "2200000.gpio",             "12", "18", "I2S0_CLK",           "DAP1_SCLK",    "None", -1 },
-            { "{192:  77, 140:  67}"s, "{140:  PJ.05}"s, "2200000.gpio",             "13", "27", "GPIO20_AUD_INT",     "GPIO_AUD0",    "None", -1 },
-            { "                  15"s, "           {}"s, "3160000.i2c/i2c-0/0-0074", "15", "22", "GPIO_EXP_P17",       "GPIO_EXP_P17", "None", -1 },
+            { "{192: 146, 140: 117}"s, "{140:  PT.02}"s, "2200000.gpio",             "11", "17", "UART0_RTS",          "UART1_RTS",    None, None },
+            { "{192:  72, 140:  62}"s, "{140:  PJ.00}"s, "2200000.gpio",             "12", "18", "I2S0_CLK",           "DAP1_SCLK",    None, None },
+            { "{192:  77, 140:  67}"s, "{140:  PJ.05}"s, "2200000.gpio",             "13", "27", "GPIO20_AUD_INT",     "GPIO_AUD0",    None, None },
+            { "                  15"s, "           {}"s, "3160000.i2c/i2c-0/0-0074", "15", "22", "GPIO_EXP_P17",       "GPIO_EXP_P17", None, None },
             // Input-only (due to module):
-            { "{ 64:  40,  47:  31}"s, "{ 47: PAA.00}"s, "c2f0000.gpio",             "16", "23", "AO_DMIC_IN_DAT",     "CAN_GPIO0",    "None", -1 },
-            { "{192: 161, 140: 128}"s, "{140:  PY.01}"s, "2200000.gpio",             "18", "24", "GPIO16_MDM_WAKE_AP", "GPIO_MDM2",    "None", -1 },
-            { "{192: 109, 140:  90}"s, "{140:  PN.05}"s, "2200000.gpio",             "19", "10", "SPI1_MOSI",          "GPIO_CAM6",    "None", -1 },
-            { "{192: 108, 140:  89}"s, "{140:  PN.04}"s, "2200000.gpio",             "21", "9",  "SPI1_MISO",          "GPIO_CAM5",    "None", -1 },
-            { "                  14"s, "           {}"s, "3160000.i2c/i2c-0/0-0074", "22", "25", "GPIO_EXP_P16",       "GPIO_EXP_P16", "None", -1 },
-            { "{192: 107, 140:  88}"s, "{140:  PN.03}"s, "2200000.gpio",             "23", "11", "SPI1_CLK",           "GPIO_CAM4",    "None", -1 },
-            { "{192: 110, 140:  91}"s, "{140:  PN.06}"s, "2200000.gpio",             "24", "8",  "SPI1_CS0",           "GPIO_CAM7",    "None", -1 },
+            { "{ 64:  40,  47:  31}"s, "{ 47: PAA.00}"s, "c2f0000.gpio",             "16", "23", "AO_DMIC_IN_DAT",     "CAN_GPIO0",    None, None },
+            { "{192: 161, 140: 128}"s, "{140:  PY.01}"s, "2200000.gpio",             "18", "24", "GPIO16_MDM_WAKE_AP", "GPIO_MDM2",    None, None },
+            { "{192: 109, 140:  90}"s, "{140:  PN.05}"s, "2200000.gpio",             "19", "10", "SPI1_MOSI",          "GPIO_CAM6",    None, None },
+            { "{192: 108, 140:  89}"s, "{140:  PN.04}"s, "2200000.gpio",             "21", "9",  "SPI1_MISO",          "GPIO_CAM5",    None, None },
+            { "                  14"s, "           {}"s, "3160000.i2c/i2c-0/0-0074", "22", "25", "GPIO_EXP_P16",       "GPIO_EXP_P16", None, None },
+            { "{192: 107, 140:  88}"s, "{140:  PN.03}"s, "2200000.gpio",             "23", "11", "SPI1_CLK",           "GPIO_CAM4",    None, None },
+            { "{192: 110, 140:  91}"s, "{140:  PN.06}"s, "2200000.gpio",             "24", "8",  "SPI1_CS0",           "GPIO_CAM7",    None, None },
             // Board pin 26 is not available on this board   
-            { "{192:  78, 140:  68}"s, "{140:  PJ.06}"s, "2200000.gpio",             "29", "5",  "GPIO19_AUD_RST",     "GPIO_AUD1",    "None", -1 },
-            { "{ 64:  42,  47:  33}"s, "{ 47: PAA.02}"s, "c2f0000.gpio",             "31", "6",  "GPIO9_MOTION_INT",   "CAN_GPIO2",    "None", -1 },
+            { "{192:  78, 140:  68}"s, "{140:  PJ.06}"s, "2200000.gpio",             "29", "5",  "GPIO19_AUD_RST",     "GPIO_AUD1",    None, None },
+            { "{ 64:  42,  47:  33}"s, "{ 47: PAA.02}"s, "c2f0000.gpio",             "31", "6",  "GPIO9_MOTION_INT",   "CAN_GPIO2",    None, None },
             // Output-only (due to module):             
-            { "{ 64:  41,  47:  32}"s, "{ 47: PAA.01}"s, "c2f0000.gpio",             "32", "12", "AO_DMIC_IN_CLK",     "CAN_GPIO1",    "None", -1 },
-            { "{192:  69, 140:  59}"s, "{140:  PI.05}"s, "2200000.gpio",             "33", "13", "GPIO11_AP_WAKE_BT",  "GPIO_PQ5",     "None", -1 },
-            { "{192:  75, 140:  65}"s, "{140:  PJ.03}"s, "2200000.gpio",             "35", "19", "I2S0_LRCLK",         "DAP1_FS",      "None", -1 },
+            { "{ 64:  41,  47:  32}"s, "{ 47: PAA.01}"s, "c2f0000.gpio",             "32", "12", "AO_DMIC_IN_CLK",     "CAN_GPIO1",    None, None },
+            { "{192:  69, 140:  59}"s, "{140:  PI.05}"s, "2200000.gpio",             "33", "13", "GPIO11_AP_WAKE_BT",  "GPIO_PQ5",     None, None },
+            { "{192:  75, 140:  65}"s, "{140:  PJ.03}"s, "2200000.gpio",             "35", "19", "I2S0_LRCLK",         "DAP1_FS",      None, None },
             // Input-only (due to base board) IF NVIDIA debug card NOT plugged in   
             // Output-only (due to base board) IF NVIDIA debug card plugged in   
-            { "{192: 147, 140: 118}"s, "{140:  PT.03}"s, "2200000.gpio",             "36", "16", "UART0_CTS",          "UART1_CTS",    "None", -1 },
-            { "{192:  68, 140:  58}"s, "{140:  PI.04}"s, "2200000.gpio",             "37", "26", "GPIO8_ALS_PROX_INT", "GPIO_PQ4",     "None", -1 },
-            { "{192:  74, 140:  64}"s, "{140:  PJ.02}"s, "2200000.gpio",             "38", "20", "I2S0_SDIN",          "DAP1_DIN",     "None", -1 },
-            { "{192:  73, 140:  63}"s, "{140:  PJ.01}"s, "2200000.gpio",             "40", "21", "I2S0_SDOUT",         "DAP1_DOUT",    "None", -1 }
+            { "{192: 147, 140: 118}"s, "{140:  PT.03}"s, "2200000.gpio",             "36", "16", "UART0_CTS",          "UART1_CTS",    None, None },
+            { "{192:  68, 140:  58}"s, "{140:  PI.04}"s, "2200000.gpio",             "37", "26", "GPIO8_ALS_PROX_INT", "GPIO_PQ4",     None, None },
+            { "{192:  74, 140:  64}"s, "{140:  PJ.02}"s, "2200000.gpio",             "38", "20", "I2S0_SDIN",          "DAP1_DIN",     None, None },
+            { "{192:  73, 140:  63}"s, "{140:  PJ.01}"s, "2200000.gpio",             "40", "21", "I2S0_SDOUT",         "DAP1_DOUT",    None, None }
         },
         compats_tx2
         {
@@ -301,31 +301,31 @@ namespace GPIO
 
         JETSON_TX1_PIN_DEFS
         {
-            { "216"s, "{}"s, "6000d000.gpio",             "7", "4",   "AUDIO_MCLK",         "AUD_MCLK",      "None", -1 },
+            { "216"s, "{}"s, "6000d000.gpio",             "7", "4",   "AUDIO_MCLK",         "AUD_MCLK",      None, None },
             // Output-only (due to base board)                            
-            { "162"s, "{}"s, "6000d000.gpio",             "11", "17", "UART0_RTS",          "UART1_RTS",     "None", -1 },
-            { "11"s,  "{}"s, "6000d000.gpio",             "12", "18", "I2S0_CLK",           "DAP1_SCLK",     "None", -1 },
-            { "38"s,  "{}"s, "6000d000.gpio",             "13", "27", "GPIO20_AUD_INT",     "GPIO_PE6",      "None", -1 },
-            { "15"s,  "{}"s, "7000c400.i2c/i2c-1/1-0074", "15", "22", "GPIO_EXP_P17",       "GPIO_EXP_P17",  "None", -1 },
-            { "37"s,  "{}"s, "6000d000.gpio",             "16", "23", "AO_DMIC_IN_DAT",     "DMIC3_DAT",     "None", -1 },
-            { "184"s, "{}"s, "6000d000.gpio",             "18", "24", "GPIO16_MDM_WAKE_AP", "MODEM_WAKE_AP", "None", -1 },
-            { "16"s,  "{}"s, "6000d000.gpio",             "19", "10", "SPI1_MOSI",          "SPI1_MOSI",     "None", -1 },
-            { "17"s,  "{}"s, "6000d000.gpio",             "21", "9",  "SPI1_MISO",          "SPI1_MISO",     "None", -1 },
-            { "14"s,  "{}"s, "7000c400.i2c/i2c-1/1-0074", "22", "25", "GPIO_EXP_P16",       "GPIO_EXP_P16",  "None", -1 },
-            { "18"s,  "{}"s, "6000d000.gpio",             "23", "11", "SPI1_CLK",           "SPI1_SCK",      "None", -1 },
-            { "19"s,  "{}"s, "6000d000.gpio",             "24", "8",  "SPI1_CS0",           "SPI1_CS0",      "None", -1 },
-            { "20"s,  "{}"s, "6000d000.gpio",             "26", "7",  "SPI1_CS1",           "SPI1_CS1",      "None", -1 },
-            { "219"s, "{}"s, "6000d000.gpio",             "29", "5",  "GPIO19_AUD_RST",     "GPIO_X1_AUD",   "None", -1 },
-            { "186"s, "{}"s, "6000d000.gpio",             "31", "6",  "GPIO9_MOTION_INT",   "MOTION_INT",    "None", -1 },
-            { "36"s,  "{}"s, "6000d000.gpio",             "32", "12", "AO_DMIC_IN_CLK",     "DMIC3_CLK",     "None", -1 },
-            { "63"s,  "{}"s, "6000d000.gpio",             "33", "13", "GPIO11_AP_WAKE_BT",  "AP_WAKE_NFC",   "None", -1 },
-            { "8"s,   "{}"s, "6000d000.gpio",             "35", "19", "I2S0_LRCLK",         "DAP1_FS",       "None", -1 },
+            { "162"s, "{}"s, "6000d000.gpio",             "11", "17", "UART0_RTS",          "UART1_RTS",     None, None },
+            { "11"s,  "{}"s, "6000d000.gpio",             "12", "18", "I2S0_CLK",           "DAP1_SCLK",     None, None },
+            { "38"s,  "{}"s, "6000d000.gpio",             "13", "27", "GPIO20_AUD_INT",     "GPIO_PE6",      None, None },
+            { "15"s,  "{}"s, "7000c400.i2c/i2c-1/1-0074", "15", "22", "GPIO_EXP_P17",       "GPIO_EXP_P17",  None, None },
+            { "37"s,  "{}"s, "6000d000.gpio",             "16", "23", "AO_DMIC_IN_DAT",     "DMIC3_DAT",     None, None },
+            { "184"s, "{}"s, "6000d000.gpio",             "18", "24", "GPIO16_MDM_WAKE_AP", "MODEM_WAKE_AP", None, None },
+            { "16"s,  "{}"s, "6000d000.gpio",             "19", "10", "SPI1_MOSI",          "SPI1_MOSI",     None, None },
+            { "17"s,  "{}"s, "6000d000.gpio",             "21", "9",  "SPI1_MISO",          "SPI1_MISO",     None, None },
+            { "14"s,  "{}"s, "7000c400.i2c/i2c-1/1-0074", "22", "25", "GPIO_EXP_P16",       "GPIO_EXP_P16",  None, None },
+            { "18"s,  "{}"s, "6000d000.gpio",             "23", "11", "SPI1_CLK",           "SPI1_SCK",      None, None },
+            { "19"s,  "{}"s, "6000d000.gpio",             "24", "8",  "SPI1_CS0",           "SPI1_CS0",      None, None },
+            { "20"s,  "{}"s, "6000d000.gpio",             "26", "7",  "SPI1_CS1",           "SPI1_CS1",      None, None },
+            { "219"s, "{}"s, "6000d000.gpio",             "29", "5",  "GPIO19_AUD_RST",     "GPIO_X1_AUD",   None, None },
+            { "186"s, "{}"s, "6000d000.gpio",             "31", "6",  "GPIO9_MOTION_INT",   "MOTION_INT",    None, None },
+            { "36"s,  "{}"s, "6000d000.gpio",             "32", "12", "AO_DMIC_IN_CLK",     "DMIC3_CLK",     None, None },
+            { "63"s,  "{}"s, "6000d000.gpio",             "33", "13", "GPIO11_AP_WAKE_BT",  "AP_WAKE_NFC",   None, None },
+            { "8"s,   "{}"s, "6000d000.gpio",             "35", "19", "I2S0_LRCLK",         "DAP1_FS",       None, None },
             // Input-only (due to base board) IF NVIDIA debug card NOT plugged in
             // Input-only (due to base board) (always reads fixed value) IF NVIDIA debug card plugged in
-            { "163"s,  "{}"s, "6000d000.gpio",            "36", "16", "UART0_CTS",          "UART1_CTS",     "None", -1 },
-            { "187"s,  "{}"s, "6000d000.gpio",            "37", "26", "GPIO8_ALS_PROX_INT", "ALS_PROX_INT",  "None", -1 },
-            { "9"s,    "{}"s, "6000d000.gpio",            "38", "20", "I2S0_SDIN",          "DAP1_DIN",      "None", -1 },
-            { "10"s,   "{}"s, "6000d000.gpio",            "40", "21", "I2S0_SDOUT",         "DAP1_DOUT",     "None", -1 }
+            { "163"s,  "{}"s, "6000d000.gpio",            "36", "16", "UART0_CTS",          "UART1_CTS",     None, None },
+            { "187"s,  "{}"s, "6000d000.gpio",            "37", "26", "GPIO8_ALS_PROX_INT", "ALS_PROX_INT",  None, None },
+            { "9"s,    "{}"s, "6000d000.gpio",            "38", "20", "I2S0_SDIN",          "DAP1_DIN",      None, None },
+            { "10"s,   "{}"s, "6000d000.gpio",            "40", "21", "I2S0_SDOUT",         "DAP1_DOUT",     None, None }
         },
         compats_tx1
         {
@@ -335,30 +335,30 @@ namespace GPIO
 
         JETSON_NANO_PIN_DEFS
         {
-            { "216"s, "{}"s, "6000d000.gpio", "7", "4",   "GPIO9",     "AUD_MCLK",  "None",        -1 },
-            { "50"s,  "{}"s, "6000d000.gpio", "11", "17", "UART1_RTS", "UART2_RTS", "None",        -1 },
-            { "79"s,  "{}"s, "6000d000.gpio", "12", "18", "I2S0_SCLK", "DAP4_SCLK", "None",        -1 },
-            { "14"s,  "{}"s, "6000d000.gpio", "13", "27", "SPI1_SCK",  "SPI2_SCK",  "None",        -1 },
-            { "194"s, "{}"s, "6000d000.gpio", "15", "22", "GPIO12",    "LCD_TE",    "None",        -1 },
-            { "232"s, "{}"s, "6000d000.gpio", "16", "23", "SPI1_CS1",  "SPI2_CS1",  "None",        -1 },
-            { "15"s,  "{}"s, "6000d000.gpio", "18", "24", "SPI1_CS0",  "SPI2_CS0",  "None",        -1 },
-            { "16"s,  "{}"s, "6000d000.gpio", "19", "10", "SPI0_MOSI", "SPI1_MOSI", "None",        -1 },
-            { "17"s,  "{}"s, "6000d000.gpio", "21", "9",  "SPI0_MISO", "SPI1_MISO", "None",        -1 },
-            { "13"s,  "{}"s, "6000d000.gpio", "22", "25", "SPI1_MISO", "SPI2_MISO", "None",        -1 },
-            { "18"s,  "{}"s, "6000d000.gpio", "23", "11", "SPI0_SCK",  "SPI1_SCK",  "None",        -1 },
-            { "19"s,  "{}"s, "6000d000.gpio", "24", "8",  "SPI0_CS0",  "SPI1_CS0",  "None",        -1 },
-            { "20"s,  "{}"s, "6000d000.gpio", "26", "7",  "SPI0_CS1",  "SPI1_CS1",  "None",        -1 },
-            { "149"s, "{}"s, "6000d000.gpio", "29", "5",  "GPIO01",    "CAM_AF_EN", "None",        -1 },
-            { "200"s, "{}"s, "6000d000.gpio", "31", "6",  "GPIO11",    "GPIO_PZ0",  "None",        -1 },
+            { "216"s, "{}"s, "6000d000.gpio", "7", "4",   "GPIO9",     "AUD_MCLK",  None,        None },
+            { "50"s,  "{}"s, "6000d000.gpio", "11", "17", "UART1_RTS", "UART2_RTS", None,        None },
+            { "79"s,  "{}"s, "6000d000.gpio", "12", "18", "I2S0_SCLK", "DAP4_SCLK", None,        None },
+            { "14"s,  "{}"s, "6000d000.gpio", "13", "27", "SPI1_SCK",  "SPI2_SCK",  None,        None },
+            { "194"s, "{}"s, "6000d000.gpio", "15", "22", "GPIO12",    "LCD_TE",    None,        None },
+            { "232"s, "{}"s, "6000d000.gpio", "16", "23", "SPI1_CS1",  "SPI2_CS1",  None,        None },
+            { "15"s,  "{}"s, "6000d000.gpio", "18", "24", "SPI1_CS0",  "SPI2_CS0",  None,        None },
+            { "16"s,  "{}"s, "6000d000.gpio", "19", "10", "SPI0_MOSI", "SPI1_MOSI", None,        None },
+            { "17"s,  "{}"s, "6000d000.gpio", "21", "9",  "SPI0_MISO", "SPI1_MISO", None,        None },
+            { "13"s,  "{}"s, "6000d000.gpio", "22", "25", "SPI1_MISO", "SPI2_MISO", None,        None },
+            { "18"s,  "{}"s, "6000d000.gpio", "23", "11", "SPI0_SCK",  "SPI1_SCK",  None,        None },
+            { "19"s,  "{}"s, "6000d000.gpio", "24", "8",  "SPI0_CS0",  "SPI1_CS0",  None,        None },
+            { "20"s,  "{}"s, "6000d000.gpio", "26", "7",  "SPI0_CS1",  "SPI1_CS1",  None,        None },
+            { "149"s, "{}"s, "6000d000.gpio", "29", "5",  "GPIO01",    "CAM_AF_EN", None,        None },
+            { "200"s, "{}"s, "6000d000.gpio", "31", "6",  "GPIO11",    "GPIO_PZ0",  None,        None },
             // Older versions of L4T have a DT bug which instantiates a bogus device
             // which prevents this library from using this PWM channel.
             { "168"s, "{}"s, "6000d000.gpio", "32", "12", "GPIO07",    "LCD_BL_PW", "7000a000.pwm", 0 },
             { "38"s,  "{}"s, "6000d000.gpio", "33", "13", "GPIO13",    "GPIO_PE6",  "7000a000.pwm", 2 },
-            { "76"s,  "{}"s, "6000d000.gpio", "35", "19", "I2S0_FS",   "DAP4_FS",   "None",        -1 },
-            { "51"s,  "{}"s, "6000d000.gpio", "36", "16", "UART1_CTS", "UART2_CTS", "None",        -1 },
-            { "12"s,  "{}"s, "6000d000.gpio", "37", "26", "SPI1_MOSI", "SPI2_MOSI", "None",        -1 },
-            { "77"s,  "{}"s, "6000d000.gpio", "38", "20", "I2S0_DIN",  "DAP4_DIN",  "None",        -1 },
-            { "78"s,  "{}"s, "6000d000.gpio", "40", "21", "I2S0_DOUT", "DAP4_DOUT", "None",        -1 }
+            { "76"s,  "{}"s, "6000d000.gpio", "35", "19", "I2S0_FS",   "DAP4_FS",   None,        None },
+            { "51"s,  "{}"s, "6000d000.gpio", "36", "16", "UART1_CTS", "UART2_CTS", None,        None },
+            { "12"s,  "{}"s, "6000d000.gpio", "37", "26", "SPI1_MOSI", "SPI2_MOSI", None,        None },
+            { "77"s,  "{}"s, "6000d000.gpio", "38", "20", "I2S0_DIN",  "DAP4_DIN",  None,        None },
+            { "78"s,  "{}"s, "6000d000.gpio", "40", "21", "I2S0_DOUT", "DAP4_DOUT", None,        None }
         },
         compats_nano
         {
@@ -406,30 +406,24 @@ namespace GPIO
         return ss.str();
     }
 
+    set<string> get_compatibles()
+    {
+        constexpr auto compatible_path = "/proc/device-tree/compatible";
+        ifstream f(compatible_path);
+        vector<string> v(split(read(f), '\x00'));
+
+        // convert to std::set
+        set<string> compatibles{v.begin(), v.end()};
+        return compatibles;
+    }
+
     static bool ids_warned = false;
 
     PinData get_data()
     {
         try
         {
-            EntirePinData& _DATA = EntirePinData::get_instance();
-
-            const string compatible_path = "/proc/device-tree/compatible";
-            const string ids_path = "/proc/device-tree/chosen/plugin-manager/ids";
-            const string ids_path_k510 = "/proc/device-tree/chosen/ids";
-
-            set<string> compatibles{};
-
-            { // scope for f:
-                ifstream f(compatible_path);
-                stringstream buffer{};
-
-                buffer << f.rdbuf();
-                string tmp_str = buffer.str();
-                vector<string> _vec_compatibles(split(tmp_str, '\x00'));
-                // convert to std::set
-                copy(_vec_compatibles.begin(), _vec_compatibles.end(), inserter(compatibles, compatibles.end()));
-            } // scope ends
+            set<string> compatibles = get_compatibles();
 
             auto matches = [&compatibles](const vector<string>& vals)
             {
@@ -441,8 +435,11 @@ namespace GPIO
                 return false;
             };
 
-            auto find_pmgr_board = [&](const string& prefix) -> string
+            auto find_pmgr_board = [](const string& prefix) -> string
             {
+                constexpr auto ids_path = "/proc/device-tree/chosen/plugin-manager/ids";
+                constexpr auto ids_path_k510 = "/proc/device-tree/chosen/ids";
+
                 if (os_path_exists(ids_path))
                 {
                     for (const auto& file : os_listdir(ids_path))
@@ -461,20 +458,15 @@ namespace GPIO
                             return s;
                     }
                 }
-                else
+                else if (ids_warned == false)
                 {
-                    if (ids_warned == false)
-                    {
-                        ids_warned = true;
-                        string msg = "WARNING: Plugin manager information missing from device tree.\n"
-                                     "WARNING: Cannot determine whether the expected Jetson board is present.";
-                        cerr << msg;
-                    }
-
-                    return "None";
+                    ids_warned = true;
+                    string msg = "WARNING: Plugin manager information missing from device tree.\n"
+                                 "WARNING: Cannot determine whether the expected Jetson board is present.";
+                    cerr << msg;
                 }
 
-                return "None";
+                return None;
             };
 
             auto warn_if_not_carrier_board = [&find_pmgr_board](const vector<string>& carrier_boards)
@@ -497,6 +489,7 @@ namespace GPIO
                 }
             };
 
+            EntirePinData& _DATA = EntirePinData::get_instance();
             Model model{};
 
             if (matches(_DATA.compats_tx1))
@@ -573,7 +566,7 @@ namespace GPIO
 
             for (const auto& gpio_chip_name : gpio_chip_names)
             {
-                string gpio_chip_dir = "None";
+                string gpio_chip_dir = None;
                 for (const auto& prefix : sysfs_prefixes)
                 {
                     auto d = prefix + gpio_chip_name;
@@ -598,17 +591,13 @@ namespace GPIO
                     string base_fn = gpio_chip_gpio_dir + "/" + fn + "/base";
                     { // scope for f
                         ifstream f(base_fn);
-                        stringstream buffer;
-                        buffer << f.rdbuf();
-                        gpio_chip_base[gpio_chip_name] = stoi(strip(buffer.str()));
+                        gpio_chip_base[gpio_chip_name] = stoi(strip(read(f)));
                     } // scope ends
 
                     string ngpio_fn = gpio_chip_gpio_dir + "/" + fn + "/ngpio";
                     { // scope for f
                         ifstream f(ngpio_fn);
-                        stringstream buffer;
-                        buffer << f.rdbuf();
-                        gpio_chip_ngpio[gpio_chip_name] = strip(buffer.str());
+                        gpio_chip_ngpio[gpio_chip_name] = strip(read(f));
                     } // scope ends
 
                     break;
@@ -620,7 +609,7 @@ namespace GPIO
                                                                            string gpio_chip_name) -> tuple<int, string>
             {
                 if (!is_in(gpio_chip_name, gpio_chip_ngpio))
-                    return {-1, "None"};
+                    return {None, None};
 
                 auto chip_gpio_ngpio = gpio_chip_ngpio[gpio_chip_name];
 
@@ -645,7 +634,7 @@ namespace GPIO
 
             for (const auto& pwm_chip_name : pwm_chip_names)
             {
-                string pwm_chip_dir = "None";
+                string pwm_chip_dir = None;
                 for (const auto& prefix : sysfs_prefixes)
                 {
                     auto d = prefix + pwm_chip_name;
@@ -696,7 +685,7 @@ namespace GPIO
                     auto gpio_name = get<1>(tmp);
 
                     ret.insert({pinName, ChannelInfo{pinName, gpio_chip_dirs.at(x.SysfsDir), gpio, gpio_name,
-                                                     get_or(pwm_dirs, x.PWMSysfsDir, "None"), x.PWMID}});
+                                                     get_or(pwm_dirs, x.PWMSysfsDir, None), x.PWMID}});
                 }
                 return ret;
             };

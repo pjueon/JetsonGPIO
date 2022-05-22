@@ -28,6 +28,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <algorithm>
 #include <cstdio>
+#include <fstream>
 #include <map>
 #include <set>
 #include <stdexcept>
@@ -53,6 +54,8 @@ namespace GPIO
     std::string strip(const std::string& s);
 
     bool is_None(const std::string& s);
+
+    bool is_None(int i);
 
     template <class key_t, class element_t> bool is_in(const key_t& key, const std::map<key_t, element_t>& dictionary)
     {
@@ -95,6 +98,19 @@ namespace GPIO
         std::snprintf(&ret[0], size + 1, fmt.c_str(), args...);
         return ret;
     }
+
+    std::string read(const std::fstream& f);
+
+    std::string read(const std::ifstream& f);
+
+    class NoneType
+    {
+    public:
+        operator std::string() const { return "None"; }
+        constexpr operator int() const { return -1; };
+    };
+
+    constexpr NoneType None{};
 
 } // namespace GPIO
 
