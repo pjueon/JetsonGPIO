@@ -98,7 +98,7 @@ namespace GPIO
               class = std::enable_if_t<details::is_string<T1> && details::is_string<T2> &&
                                        (std::is_same<std::decay_t<T1>, LazyString>::value ||
                                         std::is_same<std::decay_t<T2>, LazyString>::value)>>
-    bool operator==(T1&& a, const T2&& b)
+    bool operator==(T1&& a, T2&& b)
     {
         LazyString _a(std::forward<T1>(a));
         LazyString _b(std::forward<T2>(b));
@@ -109,7 +109,7 @@ namespace GPIO
               class = std::enable_if_t<details::is_string<T1> && details::is_string<T2> &&
                                        (std::is_same<std::decay_t<T1>, LazyString>::value ||
                                         std::is_same<std::decay_t<T2>, LazyString>::value)>>
-    bool operator!=(T1&& a, const T2&& b)
+    bool operator!=(T1&& a, T2&& b)
     {
         return !(a == b);
     }
