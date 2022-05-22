@@ -55,6 +55,8 @@ namespace GPIO
 
     bool is_None(const std::string& s);
 
+    bool is_None(int i);
+
     template <class key_t, class element_t> bool is_in(const key_t& key, const std::map<key_t, element_t>& dictionary)
     {
         return dictionary.find(key) != dictionary.end();
@@ -100,6 +102,15 @@ namespace GPIO
     std::string read(const std::fstream& f);
 
     std::string read(const std::ifstream& f);
+
+    class NoneType
+    {
+    public:
+        operator std::string() const { return "None"; }
+        constexpr operator int() const { return -1; };
+    };
+
+    constexpr NoneType None{};
 
 } // namespace GPIO
 

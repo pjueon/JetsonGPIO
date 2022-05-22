@@ -228,7 +228,7 @@ public:
         ch_info.f_value->flush();
     }
 
-    void _setup_single_out(const ChannelInfo& ch_info, int initial = -1)
+    void _setup_single_out(const ChannelInfo& ch_info, int initial = None)
     {
         _export_gpio(ch_info);
 
@@ -236,7 +236,7 @@ public:
         *ch_info.f_direction << "out";
         ch_info.f_direction->flush();
 
-        if (initial != -1)
+        if (!is_None(initial))
             _output_one(ch_info, initial);
 
         _channel_configuration[ch_info.channel] = OUT;
@@ -487,7 +487,7 @@ void GPIO::setup(const string& channel, Directions direction, int initial)
         }
         else if (direction == IN)
         {
-            if (initial != -1)
+            if (!is_None(initial))
                 throw runtime_error("initial parameter is not valid for inputs");
             global()._setup_single_in(ch_info);
         }
@@ -762,7 +762,7 @@ WaitResult GPIO::wait_for_edge(const std::string& channel, Edge edge, uint64_t b
         {
         case EventResultCode::None:
             // Timeout
-            return "None"s;
+            return (std::string)None;
         case EventResultCode::EdgeDetected:
             // Event Detected
             return channel;
