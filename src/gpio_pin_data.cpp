@@ -406,28 +406,24 @@ namespace GPIO
         return ss.str();
     }
 
+    set<string> get_compatibles()
+    {
+        constexpr auto compatible_path = "/proc/device-tree/compatible";
+        ifstream f(compatible_path);
+        vector<string> v(split(read(f), '\x00'));
+
+        // convert to std::set
+        set<string> compatibles{v.begin(), v.end()};
+        return compatibles;
+    }
+
     static bool ids_warned = false;
 
     PinData get_data()
     {
         try
         {
-            EntirePinData& _DATA = EntirePinData::get_instance();
-
-            const string compatible_path = "/proc/device-tree/compatible";
-            const string ids_path = "/proc/device-tree/chosen/plugin-manager/ids";
-            const string ids_path_k510 = "/proc/device-tree/chosen/ids";
-
-            set<string> compatibles{};
-
-            { // scope for f:
-                ifstream f(compatible_path);
-
-                string tmp_str = read(f);
-                vector<string> _vec_compatibles(split(tmp_str, '\x00'));
-                // convert to std::set
-                copy(_vec_compatibles.begin(), _vec_compatibles.end(), inserter(compatibles, compatibles.end()));
-            } // scope ends
+            set<string> compatibles = get_compatibles();
 
             auto matches = [&compatibles](const vector<string>& vals)
             {
@@ -439,8 +435,11 @@ namespace GPIO
                 return false;
             };
 
-            auto find_pmgr_board = [&](const string& prefix) -> string
+            auto find_pmgr_board = [](const string& prefix) -> string
             {
+                constexpr auto ids_path = "/proc/device-tree/chosen/plugin-manager/ids";
+                constexpr auto ids_path_k510 = "/proc/device-tree/chosen/ids";
+
                 if (os_path_exists(ids_path))
                 {
                     for (const auto& file : os_listdir(ids_path))
@@ -490,6 +489,7 @@ namespace GPIO
                 }
             };
 
+            EntirePinData& _DATA = EntirePinData::get_instance();
             Model model{};
 
             if (matches(_DATA.compats_tx1))
