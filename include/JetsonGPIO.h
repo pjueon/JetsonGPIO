@@ -59,6 +59,11 @@ namespace std
 }
 #endif
 
+#define _ARG_COUNT(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, N, ...) N
+#define _EXPAND(x) x
+#define ARG_COUNT(...)                                                                                                 \
+    _EXPAND(_ARG_COUNT(__VA_ARGS__, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1))
+
 namespace GPIO
 {
     constexpr auto VERSION = JETSONGPIO_VERSION;
@@ -117,15 +122,26 @@ namespace GPIO
     extern LazyString JETSON_INFO;
     extern LazyString model;
 
-    // Pin Numbering Modes
-    enum class NumberingModes
+    namespace details
     {
-        BOARD,
-        BCM,
-        TEGRA_SOC,
-        CVM,
-        None
-    };
+        template <class E> struct enum_size
+        {
+        };
+    } // namespace details
+
+#define PUBLIC_ENUM_CLASS(NAME, ...)                                                                                   \
+    enum class NAME                                                                                                    \
+    {                                                                                                                  \
+        __VA_ARGS__                                                                                                    \
+    };                                                                                                                 \
+                                                                                                                       \
+    template <> struct details::enum_size<NAME>                                                                        \
+    {                                                                                                                  \
+        static constexpr size_t value = ARG_COUNT(__VA_ARGS__);                                                        \
+    }
+
+    // Pin Numbering Modes
+    PUBLIC_ENUM_CLASS(NumberingModes, BOARD, BCM, TEGRA_SOC, CVM, None);
 
     // alias for GPIO::NumberingModes
     constexpr NumberingModes BOARD = NumberingModes::BOARD;
@@ -143,27 +159,14 @@ namespace GPIO
     // UNKNOWN constant is for gpios that are not yet setup
     // If the user uses UNKNOWN or HARD_PWM as a parameter to GPIO::setmode function,
     // An exception will occur
-    enum class Directions
-    {
-        UNKNOWN,
-        OUT,
-        IN,
-        HARD_PWM
-    };
+    PUBLIC_ENUM_CLASS(Directions, UNKNOWN, OUT, IN, HARD_PWM);
 
     // alias for GPIO::Directions
     constexpr Directions IN = Directions::IN;
     constexpr Directions OUT = Directions::OUT;
 
     // GPIO Event Types
-    enum class Edge
-    {
-        UNKNOWN,
-        NONE,
-        RISING,
-        FALLING,
-        BOTH
-    };
+    PUBLIC_ENUM_CLASS(Edge, UNKNOWN, NONE, RISING, FALLING, BOTH);
 
     // alias for GPIO::Edge
     constexpr Edge NO_EDGE = Edge::NONE;
@@ -434,4 +437,5 @@ namespace GPIO
     };
 } // namespace GPIO
 
+#undef PUBLIC_ENUM_CLASS
 #endif // JETSON_GPIO_H
