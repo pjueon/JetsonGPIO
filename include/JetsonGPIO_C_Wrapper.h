@@ -76,41 +76,41 @@ extern "C"
        HIGH or LOW and is only valid when direction is OUT
        @returns 0 on success -1 on failure
        */
-    int gpio_setup(int channel, enum GPIODirections direction, int initial);
+    int gpio_setup(const char* channel, enum GPIODirections direction, int initial);
 
     /* Function used to cleanup channels at the end of the program.
        If no channel is provided, all channels are cleaned
        returns 0 on success -1 on failure*/
-    int gpio_cleanup(int channel);
+    int gpio_cleanup(const char* channel);
 
     /* Function used to return the current value of the specified channel.
        Function returns either HIGH or LOW or -1 on failure*/
-    int gpio_input(int channel);
+    int gpio_input(const char* channel);
 
     /* Function used to set a value to a channel.
        Values must be either HIGH or LOW
        returns 0 on success -1 on failure*/
-    int gpio_output(int channel, int value);
+    int gpio_output(const char* channel, int value);
 
     /* Function used to check the currently set function of the channel specified.
        returns the function of the channel according to Directions
        returns -1 on failure*/
-    int gpio_gpio_function(int channel);
+    int gpio_gpio_function(const char* channel);
 
     /* Function used to check if an event occurred on the specified channel.
        Param channel must be an integer.
        This function return True or False
        returns -1 on failure*/
-    int gpio_event_detected(int channel);
+    int gpio_event_detected(const char* channel);
 
     /* Function used to add a callback function to channel, after it has been
        registered for events using add_event_detect()
        returns 0 on success -1 on failure*/
-    int gpio_add_event_callback(int channel, void (*callback)());
+    int gpio_add_event_callback(const char* channel, void (*callback)());
 
     /* Function used to remove a callback function previously added to detect a channel event
      * returns 0 on success -1 on failure*/
-    int gpio_remove_event_callback(int channel, void (*callback)());
+    int gpio_remove_event_callback(const char* channel, void (*callback)());
 
     /* Function used to add threaded event detection for a specified gpio channel.
        @gpio must be an integer specifying the channel
@@ -118,10 +118,10 @@ extern "C"
        @callback (optional) may be a callback function to be called when the event is detected (or nullptr)
        @bouncetime (optional) a button-bounce signal ignore time (in milliseconds, default=none)
        @return 0 on success -1 on failure*/
-    int gpio_add_event_detect(int channel, enum GPIOEdge edge, void (*callback)(), unsigned long bounce_time);
+    int gpio_add_event_detect(const char* channel, enum GPIOEdge edge, void (*callback)(), unsigned long bounce_time);
 
     /* Function used to remove event detection for channel */
-    void gpio_remove_event_detect(int channel);
+    void gpio_remove_event_detect(const char* channel);
 
     /* Function used to perform a blocking wait until the specified edge event is detected within the specified
        timeout period. Returns the channel if an event is detected or 0 if a timeout has occurred.
@@ -130,7 +130,7 @@ extern "C"
        @bouncetime in milliseconds (optional)
        @timeout in milliseconds (optional)
        @returns channel number if detected, 0 on timeout, -1 on failure*/
-    int gpio_wait_for_edge(int channel, enum GPIOEdge edge, unsigned long bounce_time, unsigned long timeout);
+    int gpio_wait_for_edge(const char* channel, enum GPIOEdge edge, unsigned long bounce_time, unsigned long timeout);
 
 #ifdef __cplusplus
 }
