@@ -43,7 +43,7 @@ namespace GPIO
         {
             auto itr = dictionary.find(key);
             if (itr == dictionary.end())
-                return "None";
+                return None;
 
             return itr->second;
         }

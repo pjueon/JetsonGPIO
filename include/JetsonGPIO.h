@@ -59,25 +59,91 @@ namespace std
 }
 #endif
 
+#define _ARG_COUNT(_1, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _16, _17, _18, _19, _20, N, ...) N
+#define _EXPAND(x) x
+#define ARG_COUNT(...)                                                                                                 \
+    _EXPAND(_ARG_COUNT(__VA_ARGS__, 20, 19, 18, 17, 16, 15, 14, 13, 12, 11, 10, 9, 8, 7, 6, 5, 4, 3, 2, 1))
+
 namespace GPIO
 {
     constexpr auto VERSION = JETSONGPIO_VERSION;
 
-    extern const std::string JETSON_INFO;
-    extern const std::string model;
-
-    // Pin Numbering Modes
-    enum class NumberingModes
+    class LazyString // lazily evaluated string object
     {
-        BOARD,
-        BCM,
-        TEGRA_SOC,
-        CVM,
-        None,
-        SIZE // has to be in here for checking if enum is changed in c header, needs to be last element
+    public:
+        LazyString(const std::function<std::string(void)>& func);
+        LazyString(const std::string& str);
+        LazyString(const char* str);
+
+        LazyString(const LazyString&) = default;
+        LazyString(LazyString&&) = default;
+
+        LazyString& operator=(const LazyString&) = default;
+        LazyString& operator=(LazyString&&) = default;
+
+        operator const char*() const;
+        operator std::string() const;
+        const std::string& operator()() const;
+
+    private:
+        mutable std::string buffer;
+        mutable bool is_cached;
+        std::function<std::string(void)> func;
+        void Evaluate() const;
     };
 
-    // GPIO::BOARD, GPIO::BCM, GPIO::TEGRA_SOC, GPIO::CVM
+    namespace details
+    {
+        template <class T>
+        constexpr bool is_string =
+            std::is_constructible<LazyString, T>::value && !std::is_same<std::decay_t<T>, nullptr_t>::value;
+    }
+
+    template <class T1, class T2,
+              class = std::enable_if_t<details::is_string<T1> && details::is_string<T2> &&
+                                       (std::is_same<std::decay_t<T1>, LazyString>::value ||
+                                        std::is_same<std::decay_t<T2>, LazyString>::value)>>
+    bool operator==(T1&& a, T2&& b)
+    {
+        LazyString _a(std::forward<T1>(a));
+        LazyString _b(std::forward<T2>(b));
+        return _a() == _b();
+    }
+
+    template <class T1, class T2,
+              class = std::enable_if_t<details::is_string<T1> && details::is_string<T2> &&
+                                       (std::is_same<std::decay_t<T1>, LazyString>::value ||
+                                        std::is_same<std::decay_t<T2>, LazyString>::value)>>
+    bool operator!=(T1&& a, T2&& b)
+    {
+        return !(a == b);
+    }
+
+    extern LazyString JETSON_INFO;
+    extern LazyString model;
+
+    namespace details
+    {
+        template <class E> struct enum_size
+        {
+        };
+    } // namespace details
+
+#define PUBLIC_ENUM_CLASS(NAME, ...)                                                                                   \
+    enum class NAME                                                                                                    \
+    {                                                                                                                  \
+        __VA_ARGS__                                                                                                    \
+    };                                                                                                                 \
+                                                                                                                       \
+    template <> struct details::enum_size<NAME>                                                                        \
+    {                                                                                                                  \
+        static constexpr size_t value = ARG_COUNT(__VA_ARGS__);                                                        \
+    }
+
+    // Pin Numbering Modes
+    PUBLIC_ENUM_CLASS(NumberingModes, BOARD, BCM, TEGRA_SOC, CVM, None);
+
+    // alias for GPIO::NumberingModes
     constexpr NumberingModes BOARD = NumberingModes::BOARD;
     constexpr NumberingModes BCM = NumberingModes::BCM;
     constexpr NumberingModes TEGRA_SOC = NumberingModes::TEGRA_SOC;
@@ -93,30 +159,16 @@ namespace GPIO
     // UNKNOWN constant is for gpios that are not yet setup
     // If the user uses UNKNOWN or HARD_PWM as a parameter to GPIO::setmode function,
     // An exception will occur
-    enum class Directions
-    {
-        UNKNOWN,
-        OUT,
-        IN,
-        HARD_PWM,
-        SIZE // has to be in here for checking if enum is changed in c header, needs to be last element
-    };
+    PUBLIC_ENUM_CLASS(Directions, UNKNOWN, OUT, IN, HARD_PWM);
 
-    // GPIO::IN, GPIO::OUT
+    // alias for GPIO::Directions
     constexpr Directions IN = Directions::IN;
     constexpr Directions OUT = Directions::OUT;
 
     // GPIO Event Types
-    enum class Edge
-    {
-        UNKNOWN,
-        NONE,
-        RISING,
-        FALLING,
-        BOTH,
-        SIZE // has to be in here for checking if enum is changed in c header, needs to be last element
-    };
+    PUBLIC_ENUM_CLASS(Edge, UNKNOWN, NONE, RISING, FALLING, BOTH);
 
+    // alias for GPIO::Edge
     constexpr Edge NO_EDGE = Edge::NONE;
     constexpr Edge RISING = Edge::RISING;
     constexpr Edge FALLING = Edge::FALLING;
@@ -125,16 +177,16 @@ namespace GPIO
     // Function used to enable/disable warnings during setup and cleanup.
     void setwarnings(bool state);
 
-    // Function used to set the pin mumbering mode.
-    // Possible mode values are BOARD, BCM, TEGRA_SOC and CVM
+    /* Function used to set the pin mumbering mode.
+       @mode must be one of BOARD, BCM, TEGRA_SOC or CV */
     void setmode(NumberingModes mode);
 
     // Function used to get the currently set pin numbering mode
     NumberingModes getmode();
 
     /* Function used to setup individual pins as Input or Output.
-       direction must be IN or OUT, initial must be
-       HIGH or LOW and is only valid when direction is OUT  */
+       @direction must be IN or OUT
+       @initial must be HIGH, LOW or -1 and is only valid when direction is OUT  */
     void setup(const std::string& channel, Directions direction, int initial = -1);
     void setup(int channel, Directions direction, int initial = -1);
 
@@ -144,12 +196,12 @@ namespace GPIO
     void cleanup(int channel);
 
     /* Function used to return the current value of the specified channel.
-       Function returns either HIGH or LOW */
+       @returns either HIGH or LOW */
     int input(const std::string& channel);
     int input(int channel);
 
     /* Function used to set a value to a channel.
-       Values must be either HIGH or LOW */
+       @value must be either HIGH or LOW */
     void output(const std::string& channel, int value);
     void output(int channel, int value);
 
@@ -324,7 +376,7 @@ namespace GPIO
     //----------------------------------
 
     /* Function used to check if an event occurred on the specified channel.
-       Param channel must be an integer.
+       Param channel must be an integer or a string.
        This function return True or False */
     bool event_detected(const std::string& channel);
     bool event_detected(int channel);
@@ -339,7 +391,7 @@ namespace GPIO
     void remove_event_callback(int channel, const Callback& callback);
 
     /* Function used to add threaded event detection for a specified gpio channel.
-       @gpio must be an integer specifying the channel
+       @channel is an integer or a string specifying the channel
        @edge must be a member of GPIO::Edge
        @callback (optional) may be a callback function to be called when the event is detected (or nullptr)
        @bouncetime (optional) a button-bounce signal ignore time (in milliseconds, default=none) */
@@ -353,11 +405,11 @@ namespace GPIO
 
     /* Function used to perform a blocking wait until the specified edge event is detected within the specified
        timeout period. Returns the channel if an event is detected or 0 if a timeout has occurred.
-       @channel is an integer specifying the channel
+       @channel is an integer or a string specifying the channel
        @edge must be a member of GPIO::Edge
        @bouncetime in milliseconds (optional)
        @timeout in milliseconds (optional)
-       @returns WaitResult object*/
+       @returns WaitResult object */
     WaitResult wait_for_edge(const std::string& channel, Edge edge, unsigned long bounce_time = 0,
                              unsigned long timeout = 0);
     WaitResult wait_for_edge(int channel, Edge edge, unsigned long bounce_time = 0, unsigned long timeout = 0);
@@ -367,6 +419,7 @@ namespace GPIO
     class PWM
     {
     public:
+        PWM(const std::string& channel, int frequency_hz);
         PWM(int channel, int frequency_hz);
         PWM(PWM&& other);
         PWM& operator=(PWM&& other);
@@ -384,4 +437,5 @@ namespace GPIO
     };
 } // namespace GPIO
 
+#undef PUBLIC_ENUM_CLASS
 #endif // JETSON_GPIO_H

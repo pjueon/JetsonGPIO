@@ -128,5 +128,19 @@ namespace GPIO
         return s.substr(start_idx, end_idx - start_idx + 1);
     }
 
-    bool is_None(const std::string& s) { return s == "None"; }
+    bool is_None(const std::string& s) { return s == (std::string)None; }
+
+    bool is_None(int i) { return i == None; }
+
+    template <class T> std::string read_impl(const T& f)
+    {
+        stringstream buffer{};
+        buffer << f.rdbuf();
+        return buffer.str();
+    }
+
+    std::string read(const std::ifstream& f) { return read_impl(f); }
+
+    std::string read(const std::fstream& f) { return read_impl(f); }
+
 } // namespace GPIO

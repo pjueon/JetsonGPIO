@@ -678,7 +678,7 @@ namespace GPIO
         std::lock_guard<std::recursive_mutex> mutex_lock(_epmutex);
 
         auto find_result = _gpio_events.find(gpio);
-        if (find_result == _gpio_events.end())
+        if (find_result != _gpio_events.end())
         {
             return find_result->second->_epoll_change_flag != _gpioEventObject::ModifyEvent::REMOVE;
         }
@@ -790,7 +790,7 @@ namespace GPIO
         return 0;
     }
 
-    void _remove_edge_detect(int gpio) 
+    void _remove_edge_detect(int gpio)
     {
         // Enter Mutex
         std::unique_lock<std::recursive_mutex> mutex_lock(_epmutex);
