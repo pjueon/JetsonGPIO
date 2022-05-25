@@ -45,6 +45,8 @@ namespace GPIO
         const std::string TYPE;
         const std::string MANUFACTURER;
         const std::string PROCESSOR;
+
+        std::string JETSON_INFO() const;
     };
 
     struct ChannelInfo
