@@ -1007,11 +1007,7 @@ GPIO::LazyString::LazyString(const std::string& str) : buffer(str), is_cached(tr
 
 GPIO::LazyString::LazyString(const char* str) : buffer(str == nullptr ? "" : str), is_cached(true), func() {}
 
-GPIO::LazyString::operator const char*() const
-{
-    Evaluate();
-    return buffer.c_str();
-}
+GPIO::LazyString::operator const char*() const { return this->operator()().c_str(); }
 
 GPIO::LazyString::operator std::string() const { return this->operator()(); }
 
