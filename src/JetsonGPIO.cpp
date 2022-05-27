@@ -23,9 +23,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#include <dirent.h>
-#include <unistd.h>
-
 #include <algorithm>
 #include <cctype>
 #include <chrono>
@@ -37,11 +34,11 @@ DEALINGS IN THE SOFTWARE.
 #include <stdexcept>
 #include <string>
 #include <thread>
+#include <unistd.h>
 #include <utility>
 #include <vector>
 
 #include "JetsonGPIO.h"
-
 #include "private/ExceptionHandling.h"
 #include "private/Model.h"
 #include "private/PythonFunctions.h"
