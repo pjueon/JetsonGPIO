@@ -475,68 +475,73 @@ namespace GPIO
     Model get_model()
     {
         constexpr auto compatible_path = "/proc/device-tree/compatible";
-        set<string> compatibles = get_compatibles(compatible_path);
 
-        auto matches = [&compatibles](const vector<string>& vals)
+        // get model info from compatible_path
+        if (os_path_exists(compatible_path))
         {
-            for (const auto& v : vals)
+            set<string> compatibles = get_compatibles(compatible_path);
+
+            auto matches = [&compatibles](const vector<string>& vals)
             {
-                if (is_in(v, compatibles))
-                    return true;
+                for (const auto& v : vals)
+                {
+                    if (is_in(v, compatibles))
+                        return true;
+                }
+                return false;
+            };
+
+            auto& _DATA = EntirePinData::get_instance();
+
+            if (matches(_DATA.compats_tx1))
+            {
+                warn_if_not_carrier_board({"2597"s});
+                return JETSON_TX1;
             }
-            return false;
-        };
+            else if (matches(_DATA.compats_tx2))
+            {
+                warn_if_not_carrier_board({"2597"s});
+                return JETSON_TX2;
+            }
+            else if (matches(_DATA.compats_clara_agx_xavier))
+            {
+                warn_if_not_carrier_board({"3900"s});
+                return CLARA_AGX_XAVIER;
+            }
+            else if (matches(_DATA.compats_tx2_nx))
+            {
+                warn_if_not_carrier_board({"3509"s});
+                return JETSON_TX2_NX;
+            }
+            else if (matches(_DATA.compats_xavier))
+            {
+                warn_if_not_carrier_board({"2822"s});
+                return JETSON_XAVIER;
+            }
+            else if (matches(_DATA.compats_nano))
+            {
+                string module_id = find_pmgr_board("3448");
 
-        auto& _DATA = EntirePinData::get_instance();
+                if (is_None(module_id))
+                    throw runtime_error("Could not determine Jetson Nano module revision");
+                string revision = split(module_id, '-').back();
+                // Revision is an ordered string, not a decimal integer
+                if (revision < "200")
+                    throw runtime_error("Jetson Nano module revision must be A02 or later");
 
-        if (matches(_DATA.compats_tx1))
-        {
-            warn_if_not_carrier_board({"2597"s});
-            return JETSON_TX1;
-        }
-        else if (matches(_DATA.compats_tx2))
-        {
-            warn_if_not_carrier_board({"2597"s});
-            return JETSON_TX2;
-        }
-        else if (matches(_DATA.compats_clara_agx_xavier))
-        {
-            warn_if_not_carrier_board({"3900"s});
-            return CLARA_AGX_XAVIER;
-        }
-        else if (matches(_DATA.compats_tx2_nx))
-        {
-            warn_if_not_carrier_board({"3509"s});
-            return JETSON_TX2_NX;
-        }
-        else if (matches(_DATA.compats_xavier))
-        {
-            warn_if_not_carrier_board({"2822"s});
-            return JETSON_XAVIER;
-        }
-        else if (matches(_DATA.compats_nano))
-        {
-            string module_id = find_pmgr_board("3448");
-
-            if (is_None(module_id))
-                throw runtime_error("Could not determine Jetson Nano module revision");
-            string revision = split(module_id, '-').back();
-            // Revision is an ordered string, not a decimal integer
-            if (revision < "200")
-                throw runtime_error("Jetson Nano module revision must be A02 or later");
-
-            warn_if_not_carrier_board({"3449"s, "3542"s});
-            return JETSON_NANO;
-        }
-        else if (matches(_DATA.compats_nx))
-        {
-            warn_if_not_carrier_board({"3509"s, "3449"s});
-            return JETSON_NX;
-        }
-        else if (matches(_DATA.compats_jetson_orins))
-        {
-            warn_if_not_carrier_board({"3737"s, "0000"s});
-            return JETSON_ORIN;
+                warn_if_not_carrier_board({"3449"s, "3542"s});
+                return JETSON_NANO;
+            }
+            else if (matches(_DATA.compats_nx))
+            {
+                warn_if_not_carrier_board({"3509"s, "3449"s});
+                return JETSON_NX;
+            }
+            else if (matches(_DATA.compats_jetson_orins))
+            {
+                warn_if_not_carrier_board({"3737"s, "0000"s});
+                return JETSON_ORIN;
+            }
         }
 
         throw runtime_error("Could not determine Jetson model");
