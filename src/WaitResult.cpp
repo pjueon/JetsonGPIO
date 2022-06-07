@@ -23,33 +23,11 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#include "private/Model.h"
-#include <stdexcept>
+#include "JetsonGPIO.h"
+#include "private/PythonFunctions.h"
 
 namespace GPIO
 {
-    std::string model_name(Model model)
-    {
-        switch (model)
-        {
-        case CLARA_AGX_XAVIER:
-            return "CLARA_AGX_XAVIER";
-        case JETSON_NX:
-            return "JETSON_NX";
-        case JETSON_XAVIER:
-            return "JETSON_XAVIER";
-        case JETSON_TX1:
-            return "JETSON_TX1";
-        case JETSON_TX2:
-            return "JETSON_TX2";
-        case JETSON_NANO:
-            return "JETSON_NANO";
-        case JETSON_TX2_NX:
-            return "JETSON_TX2_NX";
-        case JETSON_ORIN:
-            return "JETSON_ORIN";
-        default:
-            throw std::runtime_error("model_name error");
-        }
-    }
+    WaitResult::WaitResult(const std::string& channel) : _channel(channel) {}
+    bool WaitResult::is_event_detected() const { return !is_None(channel()); }
 } // namespace GPIO

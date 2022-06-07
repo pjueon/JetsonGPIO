@@ -23,33 +23,17 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#include "private/Model.h"
-#include <stdexcept>
+#include "JetsonGPIO.h"
 
 namespace GPIO
 {
-    std::string model_name(Model model)
+    void Callback::operator()(const std::string& input) const
     {
-        switch (model)
-        {
-        case CLARA_AGX_XAVIER:
-            return "CLARA_AGX_XAVIER";
-        case JETSON_NX:
-            return "JETSON_NX";
-        case JETSON_XAVIER:
-            return "JETSON_XAVIER";
-        case JETSON_TX1:
-            return "JETSON_TX1";
-        case JETSON_TX2:
-            return "JETSON_TX2";
-        case JETSON_NANO:
-            return "JETSON_NANO";
-        case JETSON_TX2_NX:
-            return "JETSON_TX2_NX";
-        case JETSON_ORIN:
-            return "JETSON_ORIN";
-        default:
-            throw std::runtime_error("model_name error");
-        }
+        if (function != nullptr)
+            function(input);
     }
+
+    bool operator==(const Callback& A, const Callback& B) { return A.comparer(A.function, B.function); }
+
+    bool operator!=(const Callback& A, const Callback& B) { return !(A == B); }
 } // namespace GPIO

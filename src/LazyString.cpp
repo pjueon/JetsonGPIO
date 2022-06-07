@@ -23,33 +23,34 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#include "private/Model.h"
-#include <stdexcept>
+#include "JetsonGPIO.h"
 
 namespace GPIO
 {
-    std::string model_name(Model model)
+    LazyString::LazyString(const std::function<std::string(void)>& func) : buffer(), is_cached(false), func(func) {}
+
+    LazyString::LazyString(const std::string& str) : buffer(str), is_cached(true), func() {}
+
+    LazyString::LazyString(const char* str) : buffer(str == nullptr ? "" : str), is_cached(true), func() {}
+
+    LazyString::operator const char*() const { return this->operator()().c_str(); }
+
+    LazyString::operator std::string() const { return this->operator()(); }
+
+    const std::string& LazyString::operator()() const
     {
-        switch (model)
-        {
-        case CLARA_AGX_XAVIER:
-            return "CLARA_AGX_XAVIER";
-        case JETSON_NX:
-            return "JETSON_NX";
-        case JETSON_XAVIER:
-            return "JETSON_XAVIER";
-        case JETSON_TX1:
-            return "JETSON_TX1";
-        case JETSON_TX2:
-            return "JETSON_TX2";
-        case JETSON_NANO:
-            return "JETSON_NANO";
-        case JETSON_TX2_NX:
-            return "JETSON_TX2_NX";
-        case JETSON_ORIN:
-            return "JETSON_ORIN";
-        default:
-            throw std::runtime_error("model_name error");
-        }
+        Evaluate();
+        return buffer;
+    }
+
+    void LazyString::Evaluate() const
+    {
+        if (is_cached)
+            return;
+
+        if (func != nullptr)
+            buffer = func();
+
+        is_cached = true;
     }
 } // namespace GPIO

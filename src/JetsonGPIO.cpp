@@ -23,9 +23,6 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#include <dirent.h>
-#include <unistd.h>
-
 #include <algorithm>
 #include <cctype>
 #include <chrono>
@@ -37,11 +34,11 @@ DEALINGS IN THE SOFTWARE.
 #include <stdexcept>
 #include <string>
 #include <thread>
+#include <unistd.h>
 #include <utility>
 #include <vector>
 
 #include "JetsonGPIO.h"
-
 #include "private/ExceptionHandling.h"
 #include "private/Model.h"
 #include "private/PythonFunctions.h"
@@ -978,57 +975,4 @@ void GPIO::PWM::ChangeDutyCycle(double duty_cycle_percent) { pImpl->ChangeDutyCy
 
 void GPIO::PWM::stop() { pImpl->stop(); }
 
-//=======================================
-
-//=======================================
-// Callback
-void GPIO::Callback::operator()(const std::string& input) const
-{
-    if (function != nullptr)
-        function(input);
-}
-
-bool GPIO::operator==(const GPIO::Callback& A, const GPIO::Callback& B) { return A.comparer(A.function, B.function); }
-
-bool GPIO::operator!=(const GPIO::Callback& A, const GPIO::Callback& B) { return !(A == B); }
-//=======================================
-
-//=======================================
-// WaitResult
-GPIO::WaitResult::WaitResult(const std::string& channel) : _channel(channel) {}
-bool GPIO::WaitResult::is_event_detected() const { return !is_None(channel()); }
-//=======================================
-
-//=======================================
-// LazyString
-GPIO::LazyString::LazyString(const std::function<std::string(void)>& func) : buffer(), is_cached(false), func(func) {}
-
-GPIO::LazyString::LazyString(const std::string& str) : buffer(str), is_cached(true), func() {}
-
-GPIO::LazyString::LazyString(const char* str) : buffer(str == nullptr ? "" : str), is_cached(true), func() {}
-
-GPIO::LazyString::operator const char*() const
-{
-    Evaluate();
-    return buffer.c_str();
-}
-
-GPIO::LazyString::operator std::string() const { return this->operator()(); }
-
-const std::string& GPIO::LazyString::operator()() const
-{
-    Evaluate();
-    return buffer;
-}
-
-void GPIO::LazyString::Evaluate() const
-{
-    if (is_cached)
-        return;
-
-    if (func != nullptr)
-        buffer = func();
-
-    is_cached = true;
-}
 //=======================================
