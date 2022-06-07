@@ -406,9 +406,64 @@ namespace GPIO
         return ss.str();
     }
 
-    set<string> get_compatibles()
+    static bool ids_warned = false;
+
+    string find_pmgr_board(const string& prefix)
     {
-        constexpr auto compatible_path = "/proc/device-tree/compatible";
+        constexpr auto ids_path = "/proc/device-tree/chosen/plugin-manager/ids";
+        constexpr auto ids_path_k510 = "/proc/device-tree/chosen/ids";
+
+        if (os_path_exists(ids_path))
+        {
+            for (const auto& file : os_listdir(ids_path))
+            {
+                if (startswith(file, prefix))
+                    return file;
+            }
+        }
+        else if (os_path_exists(ids_path_k510))
+        {
+            std::ifstream f(ids_path_k510);
+            std::string s{};
+            while (f >> s)
+            {
+                if (startswith(s, prefix))
+                    return s;
+            }
+        }
+        else if (ids_warned == false)
+        {
+            ids_warned = true;
+            string msg = "WARNING: Plugin manager information missing from device tree.\n"
+                         "WARNING: Cannot determine whether the expected Jetson board is present.";
+            cerr << msg;
+        }
+
+        return None;
+    }
+
+    void warn_if_not_carrier_board(const vector<string>& carrier_boards)
+    {
+        auto found = false;
+
+        for (auto&& b : carrier_boards)
+        {
+            found = !is_None(find_pmgr_board(b + "-"s));
+            if (found)
+                break;
+        }
+
+        if (found == false)
+        {
+            string msg = "WARNING: Carrier board is not from a Jetson Developer Kit.\n"
+                         "WARNNIG: Jetson.GPIO library has not been verified with this carrier board,\n"
+                         "WARNING: and in fact is unlikely to work correctly.";
+            cerr << msg << endl;
+        }
+    }
+
+    set<string> get_compatibles(const string& compatible_path)
+    {
         ifstream f(compatible_path);
         vector<string> v(split(read(f), '\x00'));
 
@@ -417,134 +472,82 @@ namespace GPIO
         return compatibles;
     }
 
-    static bool ids_warned = false;
+    Model get_model()
+    {
+        constexpr auto compatible_path = "/proc/device-tree/compatible";
+        set<string> compatibles = get_compatibles(compatible_path);
+
+        auto matches = [&compatibles](const vector<string>& vals)
+        {
+            for (const auto& v : vals)
+            {
+                if (is_in(v, compatibles))
+                    return true;
+            }
+            return false;
+        };
+
+        auto& _DATA = EntirePinData::get_instance();
+
+        if (matches(_DATA.compats_tx1))
+        {
+            warn_if_not_carrier_board({"2597"s});
+            return JETSON_TX1;
+        }
+        else if (matches(_DATA.compats_tx2))
+        {
+            warn_if_not_carrier_board({"2597"s});
+            return JETSON_TX2;
+        }
+        else if (matches(_DATA.compats_clara_agx_xavier))
+        {
+            warn_if_not_carrier_board({"3900"s});
+            return CLARA_AGX_XAVIER;
+        }
+        else if (matches(_DATA.compats_tx2_nx))
+        {
+            warn_if_not_carrier_board({"3509"s});
+            return JETSON_TX2_NX;
+        }
+        else if (matches(_DATA.compats_xavier))
+        {
+            warn_if_not_carrier_board({"2822"s});
+            return JETSON_XAVIER;
+        }
+        else if (matches(_DATA.compats_nano))
+        {
+            string module_id = find_pmgr_board("3448");
+
+            if (is_None(module_id))
+                throw runtime_error("Could not determine Jetson Nano module revision");
+            string revision = split(module_id, '-').back();
+            // Revision is an ordered string, not a decimal integer
+            if (revision < "200")
+                throw runtime_error("Jetson Nano module revision must be A02 or later");
+
+            warn_if_not_carrier_board({"3449"s, "3542"s});
+            return JETSON_NANO;
+        }
+        else if (matches(_DATA.compats_nx))
+        {
+            warn_if_not_carrier_board({"3509"s, "3449"s});
+            return JETSON_NX;
+        }
+        else if (matches(_DATA.compats_jetson_orins))
+        {
+            warn_if_not_carrier_board({"3737"s, "0000"s});
+            return JETSON_ORIN;
+        }
+
+        throw runtime_error("Could not determine Jetson model");
+    }
 
     PinData get_data()
     {
         try
         {
-            set<string> compatibles = get_compatibles();
-
-            auto matches = [&compatibles](const vector<string>& vals)
-            {
-                for (const auto& v : vals)
-                {
-                    if (is_in(v, compatibles))
-                        return true;
-                }
-                return false;
-            };
-
-            auto find_pmgr_board = [](const string& prefix) -> string
-            {
-                constexpr auto ids_path = "/proc/device-tree/chosen/plugin-manager/ids";
-                constexpr auto ids_path_k510 = "/proc/device-tree/chosen/ids";
-
-                if (os_path_exists(ids_path))
-                {
-                    for (const auto& file : os_listdir(ids_path))
-                    {
-                        if (startswith(file, prefix))
-                            return file;
-                    }
-                }
-                else if (os_path_exists(ids_path_k510))
-                {
-                    std::ifstream f(ids_path_k510);
-                    std::string s{};
-                    while (f >> s)
-                    {
-                        if (startswith(s, prefix))
-                            return s;
-                    }
-                }
-                else if (ids_warned == false)
-                {
-                    ids_warned = true;
-                    string msg = "WARNING: Plugin manager information missing from device tree.\n"
-                                 "WARNING: Cannot determine whether the expected Jetson board is present.";
-                    cerr << msg;
-                }
-
-                return None;
-            };
-
-            auto warn_if_not_carrier_board = [&find_pmgr_board](const vector<string>& carrier_boards)
-            {
-                auto found = false;
-
-                for (auto&& b : carrier_boards)
-                {
-                    found = !is_None(find_pmgr_board(b + "-"s));
-                    if (found)
-                        break;
-                }
-
-                if (found == false)
-                {
-                    string msg = "WARNING: Carrier board is not from a Jetson Developer Kit.\n"
-                                 "WARNNIG: Jetson.GPIO library has not been verified with this carrier board,\n"
-                                 "WARNING: and in fact is unlikely to work correctly.";
-                    cerr << msg << endl;
-                }
-            };
-
-            EntirePinData& _DATA = EntirePinData::get_instance();
-            Model model{};
-
-            if (matches(_DATA.compats_tx1))
-            {
-                model = JETSON_TX1;
-                warn_if_not_carrier_board({"2597"s});
-            }
-            else if (matches(_DATA.compats_tx2))
-            {
-                model = JETSON_TX2;
-                warn_if_not_carrier_board({"2597"s});
-            }
-            else if (matches(_DATA.compats_clara_agx_xavier))
-            {
-                model = CLARA_AGX_XAVIER;
-                warn_if_not_carrier_board({"3900"s});
-            }
-            else if (matches(_DATA.compats_tx2_nx))
-            {
-                model = JETSON_TX2_NX;
-                warn_if_not_carrier_board({"3509"s});
-            }
-            else if (matches(_DATA.compats_xavier))
-            {
-                model = JETSON_XAVIER;
-                warn_if_not_carrier_board({"2822"s});
-            }
-            else if (matches(_DATA.compats_nano))
-            {
-                model = JETSON_NANO;
-                string module_id = find_pmgr_board("3448");
-
-                if (is_None(module_id))
-                    throw runtime_error("Could not determine Jetson Nano module revision");
-                string revision = split(module_id, '-').back();
-                // Revision is an ordered string, not a decimal integer
-                if (revision < "200")
-                    throw runtime_error("Jetson Nano module revision must be A02 or later");
-
-                warn_if_not_carrier_board({"3449"s, "3542"s});
-            }
-            else if (matches(_DATA.compats_nx))
-            {
-                model = JETSON_NX;
-                warn_if_not_carrier_board({"3509"s, "3449"s});
-            }
-            else if (matches(_DATA.compats_jetson_orins))
-            {
-                model = JETSON_ORIN;
-                warn_if_not_carrier_board({"3737"s, "0000"s});
-            }
-            else
-            {
-                throw runtime_error("Could not determine Jetson model");
-            }
+            auto& _DATA = EntirePinData::get_instance();
+            auto model = get_model();
 
             vector<PinDefinition> pin_defs = _DATA.PIN_DEFS_MAP.at(model);
             PinInfo jetson_info = _DATA.JETSON_INFO_MAP.at(model);
