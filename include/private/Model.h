@@ -58,7 +58,9 @@ namespace GPIO
     constexpr Model JETSON_ORIN = Model::JETSON_ORIN;
 
     std::string model_name(Model model);
-    Model to_model(const std::string& name);
+    int model_name_index(const std::string& name);
+    Model index_to_model(int idx);
+    Model name_to_model(const std::string& name);
 
 } // namespace GPIO
 

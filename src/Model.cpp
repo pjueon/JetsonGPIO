@@ -40,14 +40,27 @@ namespace GPIO
         return MODEL_NAMES[idx];
     }
 
-    Model to_model(const std::string& name)
+    int model_name_index(const std::string& name)
     {
+        auto _name = strip(name);
+
         for (int idx = 0; idx < number_of_models; idx++)
         {
-            if (name == MODEL_NAMES[idx])
-                return static_cast<Model>(idx);
+            if (_name == MODEL_NAMES[idx])
+                return idx;
         }
 
-        throw std::runtime_error(format("%s is an invalid model name.", name.c_str()));
+        return None;
     }
+
+    Model index_to_model(int idx)
+    {
+        if (idx < 0 || idx >= number_of_models)
+            throw std::runtime_error("index_to_model error");
+
+        return static_cast<Model>(idx);
+    }
+
+    Model name_to_model(const std::string& name) { return index_to_model(model_name_index(name)); }
+
 } // namespace GPIO
