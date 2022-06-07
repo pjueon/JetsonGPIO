@@ -30,7 +30,7 @@ DEALINGS IN THE SOFTWARE.
 
 namespace GPIO
 {
-    // Jetson Models
+    // enum
     enum class Model
     {
         CLARA_AGX_XAVIER,
@@ -43,6 +43,10 @@ namespace GPIO
         JETSON_ORIN
     };
 
+    // names
+    constexpr const char* MODEL_NAMES[] = {"CLARA_AGX_XAVIER", "JETSON_NX",   "JETSON_XAVIER", "JETSON_TX2",
+                                           "JETSON_TX1",       "JETSON_NANO", "JETSON_TX2_NX", "JETSON_ORIN"};
+
     // alias
     constexpr Model CLARA_AGX_XAVIER = Model::CLARA_AGX_XAVIER;
     constexpr Model JETSON_NX = Model::JETSON_NX;
@@ -54,6 +58,7 @@ namespace GPIO
     constexpr Model JETSON_ORIN = Model::JETSON_ORIN;
 
     std::string model_name(Model model);
+    Model to_model(const std::string& name);
 
 } // namespace GPIO
 

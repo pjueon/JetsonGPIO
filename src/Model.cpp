@@ -24,32 +24,30 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include "private/Model.h"
+#include "private/PythonFunctions.h"
 #include <stdexcept>
 
 namespace GPIO
 {
+    constexpr auto number_of_models = static_cast<int>(sizeof(MODEL_NAMES) / sizeof(Model));
+
     std::string model_name(Model model)
     {
-        switch (model)
-        {
-        case CLARA_AGX_XAVIER:
-            return "CLARA_AGX_XAVIER";
-        case JETSON_NX:
-            return "JETSON_NX";
-        case JETSON_XAVIER:
-            return "JETSON_XAVIER";
-        case JETSON_TX1:
-            return "JETSON_TX1";
-        case JETSON_TX2:
-            return "JETSON_TX2";
-        case JETSON_NANO:
-            return "JETSON_NANO";
-        case JETSON_TX2_NX:
-            return "JETSON_TX2_NX";
-        case JETSON_ORIN:
-            return "JETSON_ORIN";
-        default:
+        int idx = static_cast<int>(model);
+        if (idx < 0 || idx >= number_of_models)
             throw std::runtime_error("model_name error");
+
+        return MODEL_NAMES[idx];
+    }
+
+    Model to_model(const std::string& name)
+    {
+        for (int idx = 0; idx < number_of_models; idx++)
+        {
+            if (name == MODEL_NAMES[idx])
+                return static_cast<Model>(idx);
         }
+
+        throw std::runtime_error(format("%s is an invalid model name.", name.c_str()));
     }
 } // namespace GPIO
