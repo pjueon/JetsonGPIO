@@ -29,9 +29,11 @@ mkdir build && cd build
 ```
 cmake .. [OPTIONS]
 ```
-options: 
-- `-DCMAKE_INSTALL_PREFIX=/usr`: option to install it to `/usr` according to your preference. (The default installation directory is `/usr/local`)
-- `-DBUILD_EXAMPLES=OFF`: option not to build example codes in `samples`.
+
+|Option|Default value|Description|
+|------|-------------|-----------|
+|`-DCMAKE_INSTALL_PREFIX=`|`/usr/local`|installation path|
+|`-DBUILD_EXAMPLES=`|ON|build example codes in `samples`|
 
 ### 4. Build and Install the library
 ```
