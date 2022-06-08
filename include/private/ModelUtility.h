@@ -23,39 +23,21 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #pragma once
-#ifndef MODEL_H
-#define MODEL_H
+#ifndef MODEL_UTILITY_H
+#define MODEL_UTILITY_H
 
 #include <string>
 
 namespace GPIO
 {
     // enum
-    enum class Model
-    {
-        CLARA_AGX_XAVIER,
-        JETSON_NX,
-        JETSON_XAVIER,
-        JETSON_TX2,
-        JETSON_TX1,
-        JETSON_NANO,
-        JETSON_TX2_NX,
-        JETSON_ORIN
-    };
+    enum class Model;
 
-    // names
-    constexpr const char* MODEL_NAMES[] = {"CLARA_AGX_XAVIER", "JETSON_NX",   "JETSON_XAVIER", "JETSON_TX2",
-                                           "JETSON_TX1",       "JETSON_NANO", "JETSON_TX2_NX", "JETSON_ORIN"};
+    std::string model_name(Model model);
+    int model_name_index(const std::string& name);
+    Model index_to_model(int idx);
+    Model name_to_model(const std::string& name);
 
-    // alias
-    constexpr Model CLARA_AGX_XAVIER = Model::CLARA_AGX_XAVIER;
-    constexpr Model JETSON_NX = Model::JETSON_NX;
-    constexpr Model JETSON_XAVIER = Model::JETSON_XAVIER;
-    constexpr Model JETSON_TX2 = Model::JETSON_TX2;
-    constexpr Model JETSON_TX1 = Model::JETSON_TX1;
-    constexpr Model JETSON_NANO = Model::JETSON_NANO;
-    constexpr Model JETSON_TX2_NX = Model::JETSON_TX2_NX;
-    constexpr Model JETSON_ORIN = Model::JETSON_ORIN;
 } // namespace GPIO
 
 #endif

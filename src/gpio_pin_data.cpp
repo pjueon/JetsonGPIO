@@ -22,9 +22,12 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
+#include <algorithm>
 #include <cctype>
+#include <cstdlib>
 #include <fstream>
 #include <iostream>
+#include <iterator>
 #include <map>
 #include <set>
 #include <sstream>
@@ -33,11 +36,9 @@ DEALINGS IN THE SOFTWARE.
 #include <tuple>
 #include <vector>
 
-#include <algorithm>
-#include <iterator>
-
 #include "JetsonGPIO.h"
 #include "private/ExceptionHandling.h"
+#include "private/ModelUtility.h"
 #include "private/PinDefinition.h"
 #include "private/PythonFunctions.h"
 #include "private/gpio_pin_data.h"
@@ -542,6 +543,19 @@ namespace GPIO
                 warn_if_not_carrier_board({"3737"s, "0000"s});
                 return JETSON_ORIN;
             }
+        }
+
+        // get model info from the environment variables for docker containers
+        const char* _model_name = std::getenv("JETSON_MODEL_NAME");
+
+        if (_model_name != nullptr)
+        {
+            auto idx = model_name_index(_model_name);
+
+            if (!is_None(idx))
+                return index_to_model(idx);
+
+            std::cerr << format("%s is an invalid model name.", _model_name);
         }
 
         throw runtime_error("Could not determine Jetson model");

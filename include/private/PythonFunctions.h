@@ -77,6 +77,12 @@ namespace GPIO
         return std::find(vector.begin(), vector.end(), element) != vector.end();
     }
 
+    template <class element_t, size_t N> bool is_in(const element_t& element, const element_t (&arr)[N])
+    {
+        auto end = arr + N;
+        return std::find(arr, end, element) != end;
+    }
+
     // modified from https://stackoverflow.com/questions/2342162/stdstring-formatting-like-sprintf
     template <typename... Args> std::string format(const std::string& fmt, Args... args)
     {

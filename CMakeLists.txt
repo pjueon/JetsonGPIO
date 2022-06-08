@@ -6,7 +6,7 @@ PROJECT(JetsonGPIO
 include(GNUInstallDirs)
 SET(CMAKE_CXX_STANDARD 14)
 
-option(BUILD_EXAMPLES "Build examples" OFF)
+option(BUILD_EXAMPLES "Build examples" ON)
 option(JETSON_GPIO_POST_INSTALL "Create gpio group and reload udev rules" ON)
 
 SET (UDEVRULES_INSTALL_DIR "/lib/udev/rules.d" CACHE STRING "Base directory for udev rules")
@@ -24,7 +24,7 @@ set(JetsonGPIO_LIB_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gpio_event.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Callback.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/DictionaryLike.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/Model.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ModelUtility.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/WaitResult.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/LazyString.cpp
     )
@@ -96,7 +96,7 @@ install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/99-gpio.rules DESTINATION ${UDEVRULES
 
 # Run post installation script
 if (JETSON_GPIO_POST_INSTALL)
-install (CODE "execute_process(COMMAND bash ./post_install.sh WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})")
+install (CODE "execute_process(COMMAND bash ./scripts/post_install.sh WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})")
 endif()
 
 # Build test codes 
