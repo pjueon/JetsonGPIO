@@ -24,6 +24,8 @@ FROM nvcr.io/nvidia/l4t-base:r32.4.3 AS base
 
 RUN apt-get update 
 RUN apt-get install git build-essential cmake -y
+RUN apt-get install -y python3-pip
+RUN pip3 install Jetson.GPIO
 
 # build 
 FROM base AS builder
@@ -44,12 +46,11 @@ RUN python3 ./copy_built_results.py
 
 # app
 FROM base AS app 
-WORKDIR /app
 
 # install built results
 COPY --from=builder /source/JetsonGPIO/build/install/ /usr/local/
+# COPY --from=builder /lib/udev/rules.d/99-gpio.rules /lib/udev/rules.d/99-gpio.rules
 
-# for debug
-COPY --from=builder /source/JetsonGPIO/build/samples/ /samples
-COPY --from=builder /source/JetsonGPIO/build/tests/ /tests
-
+# copy sample codes
+COPY --from=builder /source/JetsonGPIO/build/samples/ /gpio-cpp/samples
+COPY --from=builder /source/JetsonGPIO/build/tests/ /gpio-cpp/tests
