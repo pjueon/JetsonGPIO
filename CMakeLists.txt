@@ -24,7 +24,7 @@ set(JetsonGPIO_LIB_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/gpio_event.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Callback.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/DictionaryLike.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/Model.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ModelUtility.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/WaitResult.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/LazyString.cpp
     )

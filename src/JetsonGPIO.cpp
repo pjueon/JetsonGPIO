@@ -41,6 +41,7 @@ DEALINGS IN THE SOFTWARE.
 #include "JetsonGPIO.h"
 #include "private/ExceptionHandling.h"
 #include "private/Model.h"
+#include "private/ModelUtility.h"
 #include "private/PythonFunctions.h"
 #include "private/gpio_event.h"
 #include "private/gpio_pin_data.h"
