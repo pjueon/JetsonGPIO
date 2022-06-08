@@ -3,6 +3,7 @@ set(_example_targets
     "button_interrupt"
     "simple_out"
     "simple_pwm"
+    "jetson_model"
     )
 
 foreach (example ${_example_targets})
