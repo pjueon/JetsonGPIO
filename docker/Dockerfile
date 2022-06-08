@@ -46,8 +46,10 @@ RUN python3 ./copy_built_results.py
 FROM base AS app 
 WORKDIR /app
 
+# install built results
 COPY --from=builder /source/JetsonGPIO/build/install/ /usr/local/
 
-# # for debug
-# COPY --from=builder /source/JetsonGPIO/build/samples/ ./
+# for debug
+COPY --from=builder /source/JetsonGPIO/build/samples/ /samples
+COPY --from=builder /source/JetsonGPIO/build/tests/ /tests
 
