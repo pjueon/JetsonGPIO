@@ -24,17 +24,19 @@
 import os
 import shutil
 
-prefix = "/usr/local/"
 with open("./install_manifest.txt", "r") as f:
-    paths = [l.strip() for l in f.readlines() if l.startswith(prefix)]
+    paths = [l.strip() for l in f.readlines() if not l.startswith("/lib/udev")]
 
+installation_path = os.path.commonprefix(paths)
 destination = "./install"
+print(f"installation_path: {installation_path}")
+
 if not os.path.exists(destination):
     os.makedirs(destination)
 
 for input_path in paths:
     filename = os.path.basename(input_path)
-    directory = input_path[len(prefix):-len(filename)]
+    directory = input_path[len(installation_path):-len(filename)]
 
     directory = os.path.join(destination, directory)
     if not os.path.exists(directory):
