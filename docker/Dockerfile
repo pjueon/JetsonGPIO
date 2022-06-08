@@ -39,7 +39,7 @@ RUN cmake ../ -DBUILD_EXAMPLES=ON -DJETSON_GPIO_POST_INSTALL=OFF
 RUN make install
 
 # copy built results to ./install
-COPY docker/copy_built_results.py .
+COPY scripts/copy_built_results.py .
 RUN python3 ./copy_built_results.py
 
 # app
