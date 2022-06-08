@@ -25,6 +25,7 @@ FROM nvcr.io/nvidia/l4t-base:r32.4.3 AS base
 RUN apt-get update 
 RUN apt-get install git build-essential cmake -y
 
+# build 
 FROM base AS builder
 
 WORKDIR /source
@@ -36,3 +37,17 @@ RUN mkdir build
 WORKDIR /source/JetsonGPIO/build
 RUN cmake ../ -DBUILD_EXAMPLES=ON -DJETSON_GPIO_POST_INSTALL=OFF
 RUN make install
+
+# copy built results to ./install
+COPY docker/copy_built_results.py .
+RUN python3 ./copy_built_results.py
+
+# app
+FROM base AS app 
+WORKDIR /app
+
+COPY --from=builder /source/JetsonGPIO/build/install/ /usr/local/
+
+# # for debug
+# COPY --from=builder /source/JetsonGPIO/build/samples/ ./
+
