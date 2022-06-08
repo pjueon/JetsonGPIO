@@ -6,7 +6,7 @@ PROJECT(JetsonGPIO
 include(GNUInstallDirs)
 SET(CMAKE_CXX_STANDARD 14)
 
-option(BUILD_EXAMPLES "Build examples" OFF)
+option(BUILD_EXAMPLES "Build examples" ON)
 option(JETSON_GPIO_POST_INSTALL "Create gpio group and reload udev rules" ON)
 
 SET (UDEVRULES_INSTALL_DIR "/lib/udev/rules.d" CACHE STRING "Base directory for udev rules")
