@@ -141,10 +141,20 @@ bool cache()
     return count == 1;
 }
 
-#define TEST(F) std::cout << "test: " << #F << ", result: " << (F() ? "PASSED" : "FAILED") << std::endl;
+#define TEST(F)                                                                                                        \
+    std::cout << "case name: " << #F << ", result: ";                                                                  \
+    {                                                                                                                  \
+        bool passed = F();                                                                                             \
+        std::cout << (passed ? "PASSED" : "FAILED") << std::endl;                                                      \
+        all_passed = all_passed && passed;                                                                             \
+    }
 
 int main()
 {
+    bool all_passed = true;
+
+    // TEST([]() { return false; });
+
     TEST(compare_to_const_char0);
     TEST(compare_to_const_char1);
     TEST(compare_to_const_char2);
@@ -159,5 +169,6 @@ int main()
     TEST(lazy_evaluation1);
     TEST(cache);
 
-    return 0;
+    std::cout << "total: " << (all_passed ? "PASSED" : "FAILED") << std::endl;  
+    return all_passed ? 0 : -1;
 }
