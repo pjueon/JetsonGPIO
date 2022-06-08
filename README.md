@@ -78,10 +78,10 @@ The code will be automatically fetched at configure time and built alongside you
 
 Note that with this method will *not* set user permissions, so you will need to set user permissions manually or run your code with root permissions.
 
-To set user permissions, run `post_install.sh` script. 
+To set user permissions, run `scripts/post_install.sh` script. 
 Assuming you are in `build` directory:
 ```
-sudo bash ../post_install.sh
+sudo bash ../scripts/post_install.sh
 ```
 
 
