@@ -23,22 +23,22 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#include "test_utility.h"
+#include "private/test_utility.h"
+#include <iostream>
 #include <stdexcept>
 
 namespace assert
 {
     void is_true(bool b, std::string msg)
     {
-        if(b)
+        if (b)
             return;
-        
-        if(msg != "")
+
+        if (msg != "")
             msg = " message: " + msg;
-        
+
         throw std::runtime_error("assert failed." + msg);
     }
-
 
     void expect_exception(const std::function<void(void)>& func, std::string msg)
     {
@@ -48,11 +48,45 @@ namespace assert
         {
             func();
         }
-        catch(...)
+        catch (...)
         {
             exception_occured = true;
         }
 
         is_true(exception_occured, msg);
     }
+} // namespace assert
+
+void TestFunction::execute() const
+{
+    if (func != nullptr)
+        func();
 }
+
+void TestSuit::run()
+{
+    setup();
+    std::cout << "Number of test cases: " << tests.size() << std::endl;
+
+    for (auto& test : tests)
+    {
+        std::cout << "Testing " << test.name << std::endl;
+
+        try
+        {
+            test.func();
+        }
+        catch (...)
+        {
+            on_failed();
+            std::cout << "test failed." << std::endl;
+            throw;
+        }
+    }
+
+    std::cout << "All tests passed." << std::endl;
+}
+
+void TestSuit::reserve(size_t n) { tests.reserve(n); }
+
+void TestSuit::add(const TestFunction& test) { tests.emplace_back(test); }

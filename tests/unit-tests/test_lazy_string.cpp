@@ -24,6 +24,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include "JetsonGPIO.h"
+#include "private/test_utility.h"
 #include <iostream>
 #include <map>
 #include <string>
@@ -141,32 +142,36 @@ bool cache()
     return count == 1;
 }
 
-#define TEST(F)                                                                                                        \
-    std::cout << "case name: " << #F << ", result: ";                                                                  \
-    {                                                                                                                  \
-        bool passed = F();                                                                                             \
-        std::cout << (passed ? "PASSED" : "FAILED") << std::endl;                                                      \
-        all_passed = all_passed && passed;                                                                             \
-    }
-
 int main()
 {
-    bool all_passed = true;
+    TestSuit suit{};
+    suit.reserve(20);
 
-    TEST(compare_to_const_char0);
-    TEST(compare_to_const_char1);
-    TEST(compare_to_const_char2);
-    TEST(compare_to_const_char3);
-    TEST(compare_to_lazy_string0);
-    TEST(compare_to_lazy_string1);
-    TEST(compare_to_string0);
-    TEST(compare_to_string1);
-    TEST(compare_to_string2);
-    TEST(compare_to_string3);
-    TEST(lazy_evaluation0);
-    TEST(lazy_evaluation1);
-    TEST(cache);
+#define TEST(NAME) {#NAME, NAME}
+    suit.add(TEST(compare_to_const_char0));
+    suit.add(TEST(compare_to_const_char1));
+    suit.add(TEST(compare_to_const_char2));
+    suit.add(TEST(compare_to_const_char3));
+    suit.add(TEST(compare_to_lazy_string0));
+    suit.add(TEST(compare_to_lazy_string1));
+    suit.add(TEST(compare_to_string0));
+    suit.add(TEST(compare_to_string1));
+    suit.add(TEST(compare_to_string2));
+    suit.add(TEST(compare_to_string3));
+    suit.add(TEST(lazy_evaluation0));
+    suit.add(TEST(lazy_evaluation1));
+    suit.add(TEST(cache));
+#undef TEST
 
-    std::cout << "total: " << (all_passed ? "PASSED" : "FAILED") << std::endl;  
-    return all_passed ? 0 : -1;
+    try
+    {
+        suit.run();
+    }
+    catch (std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+        return -1;
+    }
+
+    return 0;
 }

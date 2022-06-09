@@ -23,6 +23,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
+#include "private/test_utility.h"
 #include <JetsonGPIO.h>
 #include <algorithm>
 #include <chrono>
@@ -35,7 +36,6 @@ DEALINGS IN THE SOFTWARE.
 #include <tuple>
 #include <utility>
 #include <vector>
-#include "test_utility.h"
 
 using namespace std::string_literals;
 
@@ -73,12 +73,6 @@ std::future<void> DelayedSetChannel(int channel, int value, double delay)
 
     return std::async(std::launch::async, run);
 }
-
-struct TestFunc
-{
-    std::function<void(void)> func;
-    std::string name;
-};
 
 class TestCallback
 {
@@ -119,7 +113,7 @@ struct TestPinData
     std::vector<int> all_pwms;
 };
 
-class APITests
+class APITests : public TestSuit
 {
 private:
     static TestPinData get_test_pin_data(const std::string& model)
@@ -183,32 +177,15 @@ private:
     std::vector<int> all_board_pins = {7,  11, 12, 13, 15, 16, 18, 19, 21, 22, 23,
                                        24, 26, 29, 31, 32, 33, 35, 36, 37, 38, 40};
     int bcm_pin = 4;
-    std::vector<TestFunc> tests = {};
 
-public:
-    void run()
+protected:
+    void setup() override
     {
-        print_info();
         add_tests();
-
-        for (auto& test : tests)
-        {
-            std::cout << "Testing " << test.name << std::endl;
-
-            try
-            {
-                test.func();
-            }
-            catch (...)
-            {
-                std::cout << "test failed." << std::endl;
-                GPIO::cleanup();
-                throw;
-            }
-        }
-
-        std::cout << "All tests passed." << std::endl;
+        print_info();
     }
+
+    void on_failed() override { GPIO::cleanup(); }
 
 private:
     // test cases
@@ -680,8 +657,8 @@ private:
 
     void add_tests()
     {
-        tests.reserve(100);
-#define ADD_TEST(NAME) tests.push_back({[this]() { NAME(); }, #NAME})
+        reserve(100);
+#define ADD_TEST(NAME) add({#NAME, [this]() { NAME(); }})
 
         ADD_TEST(test_warnings_off);
         ADD_TEST(test_warnings_on);
@@ -727,7 +704,6 @@ private:
 
 #undef ADD_TEST
     }
-
 
     void _test_events(int init, GPIO::Edge edge, const std::vector<std::pair<int, bool>>& tests, bool specify_callback,
                       bool use_add_callback)
@@ -782,6 +758,15 @@ private:
 int main()
 {
     APITests t{};
-    t.run();
+    try
+    {
+        t.run();
+    }
+    catch (std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+        return -1;
+    }
+
     return 0;
 }
