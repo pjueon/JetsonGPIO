@@ -23,9 +23,9 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#include "private/gpio_event.h"
+#include "private/GPIOEvent.h"
 #include "private/PythonFunctions.h"
-#include "private/sysfs_root.h"
+#include "private/SysfsRoot.h"
 
 #include <fcntl.h>
 #include <sys/epoll.h>

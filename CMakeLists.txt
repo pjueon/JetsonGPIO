@@ -22,8 +22,8 @@ ADD_DEFINITIONS(-Wall -O2 -fPIC -g)
 set(JetsonGPIO_LIB_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/JetsonGPIO.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/PythonFunctions.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/gpio_pin_data.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/gpio_event.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/GPIOPinData.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/GPIOEvent.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/Callback.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/DictionaryLike.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/ModelUtility.cpp

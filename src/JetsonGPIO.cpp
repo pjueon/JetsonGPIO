@@ -43,9 +43,9 @@ DEALINGS IN THE SOFTWARE.
 #include "private/Model.h"
 #include "private/ModelUtility.h"
 #include "private/PythonFunctions.h"
-#include "private/gpio_event.h"
-#include "private/gpio_pin_data.h"
-#include "private/sysfs_root.h"
+#include "private/GPIOEvent.h"
+#include "private/GPIOPinData.h"
+#include "private/SysfsRoot.h"
 
 using namespace GPIO;
 using namespace std;

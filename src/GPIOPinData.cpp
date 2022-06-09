@@ -41,7 +41,7 @@ DEALINGS IN THE SOFTWARE.
 #include "private/ModelUtility.h"
 #include "private/PinDefinition.h"
 #include "private/PythonFunctions.h"
-#include "private/gpio_pin_data.h"
+#include "private/GPIOPinData.h"
 
 using namespace std;
 using namespace std::string_literals; // enables s-suffix for std::string literals
