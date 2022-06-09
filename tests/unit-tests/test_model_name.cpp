@@ -34,7 +34,21 @@ int main()
 
 #define TEST(NAME)                                                                                                     \
     {                                                                                                                  \
-        "case " #NAME, []() { assert::are_equal(#NAME, GPIO::model_name(GPIO::NAME)); }                                \
+        "model to name " #NAME, []() { assert::are_equal(#NAME, GPIO::model_name(GPIO::NAME)); }                       \
+    }
+    suit.add(TEST(CLARA_AGX_XAVIER));
+    suit.add(TEST(JETSON_NX));
+    suit.add(TEST(JETSON_XAVIER));
+    suit.add(TEST(JETSON_TX2));
+    suit.add(TEST(JETSON_TX1));
+    suit.add(TEST(JETSON_NANO));
+    suit.add(TEST(JETSON_TX2_NX));
+    suit.add(TEST(JETSON_ORIN));
+#undef TEST
+
+#define TEST(NAME)                                                                                                     \
+    {                                                                                                                  \
+        "name to model " #NAME, []() { assert::is_true(GPIO::NAME == GPIO::name_to_model(#NAME)); }                    \
     }
     suit.add(TEST(CLARA_AGX_XAVIER));
     suit.add(TEST(JETSON_NX));
