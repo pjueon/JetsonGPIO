@@ -23,26 +23,36 @@
 
 import os
 import shutil
+import sys
 
-with open("./install_manifest.txt", "r") as f:
-    paths = [l.strip() for l in f.readlines() if not l.startswith("/lib/udev")]
+try:
+    print("Collecting the installed files...")
+    
+    with open("./install_manifest.txt", "r") as f:
+        paths = [l.strip() for l in f.readlines() if not l.startswith("/lib/udev")]
 
-installation_path = os.path.commonprefix(paths)
-destination = "./install"
-print(f"installation_path: {installation_path}")
+    installation_path = os.path.commonprefix(paths)
+    destination_path = "./install"
+    print(f"Installation path: {installation_path}")
 
-if not os.path.exists(destination):
-    os.makedirs(destination)
+    if not os.path.exists(destination_path):
+        os.makedirs(destination_path)
 
-for input_path in paths:
-    filename = os.path.basename(input_path)
-    directory = input_path[len(installation_path):-len(filename)]
+    for input_path in paths:
+        filename = os.path.basename(input_path)
+        directory = input_path[len(installation_path):-len(filename)]
 
-    directory = os.path.join(destination, directory)
-    if not os.path.exists(directory):
-        os.makedirs(directory)
+        directory = os.path.join(destination_path, directory)
+        if not os.path.exists(directory):
+            os.makedirs(directory)
 
-    output_path = os.path.join(directory, filename)
-    shutil.copy(input_path, output_path)
+        output_path = os.path.join(directory, filename)
+        shutil.copy(input_path, output_path)
 
-    print(f"copy '{input_path}' to '{output_path}'")
+        print(f"Copy '{input_path}' to '{output_path}'")
+    
+    print("Done.")
+
+except Exception as e:
+    print(e)
+    sys.exit(1)

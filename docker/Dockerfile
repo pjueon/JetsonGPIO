@@ -40,17 +40,17 @@ WORKDIR /source/JetsonGPIO/build
 RUN cmake ../ -DBUILD_EXAMPLES=ON -DJETSON_GPIO_POST_INSTALL=OFF
 RUN make install
 
-# copy built results to ./install
-COPY scripts/copy_built_results.py .
-RUN python3 ./copy_built_results.py
+# collect install files to ./install
+COPY scripts/collect_install_files.py .
+RUN python3 ./collect_install_files.py
 
 # app
 FROM base AS app 
 
-# install built results
+# install JetsonGPIO
 COPY --from=builder /source/JetsonGPIO/build/install/ /usr/local/
 # COPY --from=builder /lib/udev/rules.d/99-gpio.rules /lib/udev/rules.d/99-gpio.rules
 
-# copy sample codes
+# copy samples and tests
 COPY --from=builder /source/JetsonGPIO/build/samples/ /gpio-cpp/samples
 COPY --from=builder /source/JetsonGPIO/build/tests/ /gpio-cpp/tests
