@@ -34,7 +34,7 @@ cmake .. [OPTIONS]
 |------|-------------|-----------|
 |`-DCMAKE_INSTALL_PREFIX=`|`/usr/local`|installation path|
 |`-DBUILD_EXAMPLES=`|ON|build example codes in `samples`|
-|`-DJETSON_GPIO_POST_INSTALL`|ON|run the post install script after installation to set user permissions.|
+|`-DJETSON_GPIO_POST_INSTALL=`|ON|run the post install script after installation to set user permissions.|
 
 ### 4. Build and Install the library
 ```
