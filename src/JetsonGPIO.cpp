@@ -47,7 +47,6 @@ DEALINGS IN THE SOFTWARE.
 #include "private/SysfsRoot.h"
 
 using namespace GPIO;
-using namespace std;
 
 // APIs
 
@@ -62,15 +61,15 @@ void GPIO::setmode(NumberingModes mode)
     {
         // check if mode is valid
         if (mode == NumberingModes::None)
-            throw runtime_error("Pin numbering mode must be GPIO::BOARD, GPIO::BCM, GPIO::TEGRA_SOC or GPIO::CVM");
+            throw std::runtime_error("Pin numbering mode must be GPIO::BOARD, GPIO::BCM, GPIO::TEGRA_SOC or GPIO::CVM");
         // check if a different mode has been set
         if (global()._gpio_mode != NumberingModes::None && mode != global()._gpio_mode)
-            throw runtime_error("A different mode has already been set!");
+            throw std::runtime_error("A different mode has already been set!");
 
         global()._channel_data = global()._channel_data_by_mode.at(mode);
         global()._gpio_mode = mode;
     }
-    catch (exception& e)
+    catch (std::exception& e)
     {
         throw _error(e, "GPIO::setmode()");
     }
@@ -78,7 +77,7 @@ void GPIO::setmode(NumberingModes mode)
 
 NumberingModes GPIO::getmode() { return global()._gpio_mode; }
 
-void GPIO::setup(const string& channel, Directions direction, int initial)
+void GPIO::setup(const std::string& channel, Directions direction, int initial)
 {
     try
     {
@@ -91,9 +90,10 @@ void GPIO::setup(const string& channel, Directions direction, int initial)
 
             if (app_cfg == UNKNOWN && sysfs_cfg != UNKNOWN)
             {
-                cerr << "[WARNING] This channel is already in use, continuing anyway. Use GPIO::setwarnings(false) to "
-                        "disable warnings. channel: "
-                     << channel << endl;
+                std::cerr
+                    << "[WARNING] This channel is already in use, continuing anyway. Use GPIO::setwarnings(false) to "
+                       "disable warnings. channel: "
+                    << channel << std::endl;
             }
         }
 
@@ -107,30 +107,30 @@ void GPIO::setup(const string& channel, Directions direction, int initial)
         else if (direction == IN)
         {
             if (!is_None(initial))
-                throw runtime_error("initial parameter is not valid for inputs");
+                throw std::runtime_error("initial parameter is not valid for inputs");
             global()._setup_single_in(ch_info);
         }
         else
-            throw runtime_error("GPIO direction must be GPIO::IN or GPIO::OUT");
+            throw std::runtime_error("GPIO direction must be GPIO::IN or GPIO::OUT");
     }
-    catch (exception& e)
+    catch (std::exception& e)
     {
         throw _error(e, "GPIO::setup()");
     }
 }
 
-void GPIO::setup(int channel, Directions direction, int initial) { setup(to_string(channel), direction, initial); }
+void GPIO::setup(int channel, Directions direction, int initial) { setup(std::to_string(channel), direction, initial); }
 
-void GPIO::cleanup(const string& channel)
+void GPIO::cleanup(const std::string& channel)
 {
     try
     {
         // warn if no channel is setup
         if (global()._gpio_mode == NumberingModes::None && global()._gpio_warnings)
         {
-            cerr << "[WARNING] No channels have been set up yet - nothing to clean up! "
-                    "Try cleaning up at the end of your program instead!"
-                 << endl;
+            std::cerr << "[WARNING] No channels have been set up yet - nothing to clean up! "
+                         "Try cleaning up at the end of your program instead!"
+                      << std::endl;
             return;
         }
 
@@ -147,7 +147,7 @@ void GPIO::cleanup(const string& channel)
             global()._cleanup_one(ch_info);
         }
     }
-    catch (exception& e)
+    catch (std::exception& e)
     {
         throw _error(e, "GPIO::cleanup()");
     }
@@ -155,11 +155,11 @@ void GPIO::cleanup(const string& channel)
 
 void GPIO::cleanup(int channel)
 {
-    string str_channel = to_string(channel);
+    std::string str_channel = std::to_string(channel);
     cleanup(str_channel);
 }
 
-int GPIO::input(const string& channel)
+int GPIO::input(const std::string& channel)
 {
     try
     {
@@ -168,55 +168,55 @@ int GPIO::input(const string& channel)
         Directions app_cfg = global()._app_channel_configuration(ch_info);
 
         if (app_cfg != IN && app_cfg != OUT)
-            throw runtime_error("You must setup() the GPIO channel first");
+            throw std::runtime_error("You must setup() the GPIO channel first");
 
         ch_info.f_value->seekg(0, std::ios::beg);
         int value_read{};
         *ch_info.f_value >> value_read;
         return value_read;
     }
-    catch (exception& e)
+    catch (std::exception& e)
     {
         throw _error(e, "GPIO::input()");
     }
 }
 
-int GPIO::input(int channel) { return input(to_string(channel)); }
+int GPIO::input(int channel) { return input(std::to_string(channel)); }
 
 /* Function used to set a value to a channel.
    Values must be either HIGH or LOW */
-void GPIO::output(const string& channel, int value)
+void GPIO::output(const std::string& channel, int value)
 {
     try
     {
         ChannelInfo ch_info = global()._channel_to_info(channel, true);
         // check that the channel has been set as output
         if (global()._app_channel_configuration(ch_info) != OUT)
-            throw runtime_error("The GPIO channel has not been set up as an OUTPUT");
+            throw std::runtime_error("The GPIO channel has not been set up as an OUTPUT");
         global()._output_one(ch_info, value);
     }
-    catch (exception& e)
+    catch (std::exception& e)
     {
         throw _error(e, "GPIO::output()");
     }
 }
 
-void GPIO::output(int channel, int value) { output(to_string(channel), value); }
+void GPIO::output(int channel, int value) { output(std::to_string(channel), value); }
 
-Directions GPIO::gpio_function(const string& channel)
+Directions GPIO::gpio_function(const std::string& channel)
 {
     try
     {
         ChannelInfo ch_info = global()._channel_to_info(channel);
         return global()._sysfs_channel_configuration(ch_info);
     }
-    catch (exception& e)
+    catch (std::exception& e)
     {
         throw _error(e, "GPIO::gpio_function()");
     }
 }
 
-Directions GPIO::gpio_function(int channel) { return gpio_function(to_string(channel)); }
+Directions GPIO::gpio_function(int channel) { return gpio_function(std::to_string(channel)); }
 
 //=============================== Events =================================
 
@@ -228,11 +228,11 @@ bool GPIO::event_detected(const std::string& channel)
         // channel must be setup as input
         Directions app_cfg = global()._app_channel_configuration(ch_info);
         if (app_cfg != Directions::IN)
-            throw runtime_error("You must setup() the GPIO channel as an input first");
+            throw std::runtime_error("You must setup() the GPIO channel as an input first");
 
         return _edge_event_detected(ch_info.gpio);
     }
-    catch (exception& e)
+    catch (std::exception& e)
     {
         throw _error(e, "GPIO::event_detected()");
     }
@@ -247,7 +247,7 @@ void GPIO::add_event_callback(const std::string& channel, const Callback& callba
         // Argument Check
         if (callback == nullptr)
         {
-            throw invalid_argument("callback cannot be null");
+            throw std::invalid_argument("callback cannot be null");
         }
 
         ChannelInfo ch_info = global()._channel_to_info(channel, true);
@@ -256,12 +256,12 @@ void GPIO::add_event_callback(const std::string& channel, const Callback& callba
         Directions app_cfg = global()._app_channel_configuration(ch_info);
         if (app_cfg != Directions::IN)
         {
-            throw runtime_error("You must setup() the GPIO channel as an input first");
+            throw std::runtime_error("You must setup() the GPIO channel as an input first");
         }
 
         // edge event must already exist
         if (!_edge_event_exists(ch_info.gpio))
-            throw runtime_error("The edge event must have been set via add_event_detect()");
+            throw std::runtime_error("The edge event must have been set via add_event_detect()");
 
         // Execute
         EventResultCode result = (EventResultCode)_add_edge_callback(ch_info.gpio, callback);
@@ -272,11 +272,11 @@ void GPIO::add_event_callback(const std::string& channel, const Callback& callba
         default:
         {
             const char* error_msg = event_error_code_to_message[result];
-            throw runtime_error(error_msg ? error_msg : "Unknown Error");
+            throw std::runtime_error(error_msg ? error_msg : "Unknown Error");
         }
         }
     }
-    catch (exception& e)
+    catch (std::exception& e)
     {
         throw _error(e, "GPIO::add_event_callback()");
     }
@@ -309,12 +309,12 @@ void GPIO::add_event_detect(const std::string& channel, Edge edge, const Callbac
         Directions app_cfg = global()._app_channel_configuration(ch_info);
         if (app_cfg != Directions::IN)
         {
-            throw runtime_error("You must setup() the GPIO channel as an input first");
+            throw std::runtime_error("You must setup() the GPIO channel as an input first");
         }
 
         // edge provided must be rising, falling or both
         if (edge != Edge::RISING && edge != Edge::FALLING && edge != Edge::BOTH)
-            throw invalid_argument("argument 'edge' must be set to RISING, FALLING or BOTH");
+            throw std::invalid_argument("argument 'edge' must be set to RISING, FALLING or BOTH");
 
         // Execute
         EventResultCode result =
@@ -326,7 +326,7 @@ void GPIO::add_event_detect(const std::string& channel, Edge edge, const Callbac
         default:
         {
             const char* error_msg = event_error_code_to_message[result];
-            throw runtime_error(error_msg ? error_msg : "Unknown Error");
+            throw std::runtime_error(error_msg ? error_msg : "Unknown Error");
         }
         }
 
@@ -334,10 +334,10 @@ void GPIO::add_event_detect(const std::string& channel, Edge edge, const Callbac
         {
             if (_add_edge_callback(ch_info.gpio, callback))
                 // Shouldn't happen (--it was just added successfully)
-                throw runtime_error("Couldn't add callback due to unknown error with just added event");
+                throw std::runtime_error("Couldn't add callback due to unknown error with just added event");
         }
     }
-    catch (exception& e)
+    catch (std::exception& e)
     {
         throw _error(e, "GPIO::add_event_detect()");
     }
@@ -367,12 +367,12 @@ WaitResult GPIO::wait_for_edge(const std::string& channel, Edge edge, uint64_t b
         Directions app_cfg = global()._app_channel_configuration(ch_info);
         if (app_cfg != Directions::IN)
         {
-            throw runtime_error("You must setup() the GPIO channel as an input first");
+            throw std::runtime_error("You must setup() the GPIO channel as an input first");
         }
 
         // edge provided must be rising, falling or both
         if (edge != Edge::RISING && edge != Edge::FALLING && edge != Edge::BOTH)
-            throw invalid_argument("argument 'edge' must be set to RISING, FALLING or BOTH");
+            throw std::invalid_argument("argument 'edge' must be set to RISING, FALLING or BOTH");
 
         // Execute
         EventResultCode result = (EventResultCode)_blocking_wait_for_edge(ch_info.gpio, ch_info.gpio_name, channel,
@@ -388,11 +388,11 @@ WaitResult GPIO::wait_for_edge(const std::string& channel, Edge edge, uint64_t b
         default:
         {
             const char* error_msg = event_error_code_to_message[result];
-            throw runtime_error(error_msg ? error_msg : "Unknown Error");
+            throw std::runtime_error(error_msg ? error_msg : "Unknown Error");
         }
         }
     }
-    catch (exception& e)
+    catch (std::exception& e)
     {
         throw _error(e, "GPIO::wait_for_edge()");
     }
