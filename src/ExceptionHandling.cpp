@@ -22,17 +22,21 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#pragma once
-#ifndef EXCEPTION_HANDLING_H
-#define EXCEPTION_HANDLING_H
-
+#include "private/ExceptionHandling.h"
+#include "private/PythonFunctions.h"
 #include <stdexcept>
 #include <string>
 
 namespace GPIO
 {
-    std::string _error_message(const std::exception& e, const std::string& from);
-    std::runtime_error _error(const std::exception& e, const std::string& from);
-} // namespace GPIO
+    // for exception handling
+    std::string _error_message(const std::exception& e, const std::string& from)
+    {
+        return format("[Exception] %s (catched from: %s)\n", e.what(), from.c_str());
+    }
 
-#endif
+    std::runtime_error _error(const std::exception& e, const std::string& from)
+    {
+        return std::runtime_error(_error_message(e, from));
+    }
+} // namespace GPIO
