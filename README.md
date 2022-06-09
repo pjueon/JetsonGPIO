@@ -413,8 +413,12 @@ configure the pinmux.
 # Using the library from a docker container
 The following describes how to use the JetsonGPIO library from a docker container. 
 
-## Building a docker image
-`docker/Dockerfile` is a sample Dockerfile for the library. The following command will build a docker image named `testimg` from it. 
+## Get the docker image
+You can get the pre-built docker image from [pjueon/jetson-gpio](https://hub.docker.com/repository/docker/pjueon/jetson-gpio/).
+
+## Building docker image (optional)
+You can also build the docker image from the source. `docker/Dockerfile` is the Dockerfile for the library. 
+The following command will build a docker image named `testimg` from it. 
 
 ```shell
 sudo docker image build -f docker/Dockerfile -t testimg .
@@ -445,7 +449,7 @@ sudo docker container run -it --rm \
 -v /proc/device-tree/chosen:/proc/device-tree/chosen \
 -v /sys/devices/:/sys/devices/ \
 -v /sys/class/gpio:/sys/class/gpio \
-testimg /bin/bash
+pjueon/jetson-gpio /bin/bash
 ```
 
 ### Running the container in non-privilleged mode
@@ -463,7 +467,7 @@ sudo docker container run --rm \
 -v /proc/device-tree/chosen:/proc/device-tree/chosen \
 -v /sys/devices/:/sys/devices/ \
 -v /sys/class/gpio:/sys/class/gpio \
-testimg /gpio-cpp/samples/jetson_model
+pjueon/jetson-gpio /gpio-cpp/samples/jetson_model
 ```
 
 The following example will run `/bin/bash` from the container in non-privilleged mode. 
@@ -474,5 +478,5 @@ sudo docker container run -it --rm \
 -v /sys/devices/:/sys/devices/ \
 -v /sys/class/gpio:/sys/class/gpio \
 -e JETSON_MODEL_NAME=[PUT_YOUR_JETSON_MODEL_NAME_HERE] \
-testimg /bin/bash
+pjueon/jetson-gpio /bin/bash
 ```
