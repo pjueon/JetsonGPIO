@@ -23,7 +23,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#include "private/test_utility.h"
+#include "private/TestUtility.h"
 #include <JetsonGPIO.h>
 #include <algorithm>
 #include <chrono>

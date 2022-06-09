@@ -25,7 +25,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include "private/Model.h"
 #include "private/ModelUtility.h"
-#include "private/test_utility.h"
+#include "private/TestUtility.h"
 #include <iostream>
 
 int main()

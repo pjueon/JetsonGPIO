@@ -24,7 +24,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include "JetsonGPIO.h"
-#include "private/test_utility.h"
+#include "private/TestUtility.h"
 #include <iostream>
 #include <map>
 #include <string>

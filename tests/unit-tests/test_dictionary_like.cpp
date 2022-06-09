@@ -24,7 +24,7 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include "private/DictionaryLike.h"
-#include "private/test_utility.h"
+#include "private/TestUtility.h"
 #include <iostream>
 #include <map>
 #include <sstream>
