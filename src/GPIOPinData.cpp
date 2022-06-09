@@ -38,10 +38,10 @@ DEALINGS IN THE SOFTWARE.
 
 #include "JetsonGPIO.h"
 #include "private/ExceptionHandling.h"
+#include "private/GPIOPinData.h"
 #include "private/ModelUtility.h"
 #include "private/PinDefinition.h"
 #include "private/PythonFunctions.h"
-#include "private/gpio_pin_data.h"
 
 using namespace std;
 using namespace std::string_literals; // enables s-suffix for std::string literals

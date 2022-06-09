@@ -28,17 +28,16 @@ DEALINGS IN THE SOFTWARE.
 #define SIMPLE_UNIT_TEST_H
 
 #include <functional>
+#include <sstream>
 #include <string>
 #include <vector>
-#include <sstream>
 
 namespace assert
 {
     void is_true(bool b, std::string msg = "");
     void expect_exception(const std::function<void(void)>& func, std::string msg = "");
 
-    template<class T1, class T2>
-    void are_equal(const T1& expected, const T2& actual, std::string msg = "")
+    template <class T1, class T2> void are_equal(const T1& expected, const T2& actual, std::string msg = "")
     {
         std::ostringstream s{};
         s << msg << "(expected: " << expected << ", actual: " << actual << ")";
