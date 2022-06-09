@@ -16,5 +16,6 @@ set(_unit_test_targets
 
 foreach (test ${_unit_test_targets})
   add_executable(${test} unit-tests/${test}.cpp test_utility.cpp)
+  add_test(NAME ${test} COMMAND $<TARGET_FILE:${test}>)
   target_link_libraries(${test} PRIVATE JetsonGPIO)
 endforeach ()
