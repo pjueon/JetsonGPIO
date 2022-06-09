@@ -413,11 +413,15 @@ configure the pinmux.
 # Using the library from a docker container
 The following describes how to use the JetsonGPIO library from a docker container. 
 
-## Get the docker image
-You can get the pre-built docker image from [pjueon/jetson-gpio](https://hub.docker.com/repository/docker/pjueon/jetson-gpio/).
+## Preparing the docker image
+### From Docker hub
+You can get the pre-built image that has JetsonGPIO from [pjueon/jetson-gpio](https://hub.docker.com/r/pjueon/jetson-gpio/).
+```shell
+docker pull pjueon/jetson-gpio
+```
 
-## Building docker image (optional)
-You can also build the docker image from the source. `docker/Dockerfile` is the Dockerfile for the library. 
+### From the source
+You can also build the image from the source. `docker/Dockerfile` is the Dockerfile for the library. 
 The following command will build a docker image named `testimg` from it. 
 
 ```shell
