@@ -23,6 +23,7 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
+#include "private/TestUtility.h"
 #include <JetsonGPIO.h>
 #include <algorithm>
 #include <chrono>
@@ -73,12 +74,6 @@ std::future<void> DelayedSetChannel(int channel, int value, double delay)
     return std::async(std::launch::async, run);
 }
 
-struct TestFunc
-{
-    std::function<void(void)> func;
-    std::string name;
-};
-
 class TestCallback
 {
 public:
@@ -118,7 +113,7 @@ struct TestPinData
     std::vector<int> all_pwms;
 };
 
-class APITests
+class APITests : public TestSuit
 {
 private:
     static TestPinData get_test_pin_data(const std::string& model)
@@ -182,32 +177,15 @@ private:
     std::vector<int> all_board_pins = {7,  11, 12, 13, 15, 16, 18, 19, 21, 22, 23,
                                        24, 26, 29, 31, 32, 33, 35, 36, 37, 38, 40};
     int bcm_pin = 4;
-    std::vector<TestFunc> tests = {};
 
-public:
-    void run()
+protected:
+    void setup() override
     {
-        print_info();
         add_tests();
-
-        for (auto& test : tests)
-        {
-            std::cout << "Testing " << test.name << std::endl;
-
-            try
-            {
-                test.func();
-            }
-            catch (...)
-            {
-                std::cout << "test failed." << std::endl;
-                GPIO::cleanup();
-                throw;
-            }
-        }
-
-        std::cout << "All tests passed." << std::endl;
+        print_info();
     }
+
+    void on_failed() override { GPIO::cleanup(); }
 
 private:
     // test cases
@@ -238,37 +216,37 @@ private:
     void test_setup_one_board()
     {
         GPIO::setmode(GPIO::BOARD);
-        assert(GPIO::getmode() == GPIO::BOARD);
+        assert::is_true(GPIO::getmode() == GPIO::BOARD);
         GPIO::setup(pin_data.in_a, GPIO::IN);
         GPIO::cleanup();
-        assert(GPIO::getmode() == GPIO::NumberingModes::None);
+        assert::is_true(GPIO::getmode() == GPIO::NumberingModes::None);
     }
 
     void test_setup_one_bcm()
     {
         GPIO::setmode(GPIO::BCM);
-        assert(GPIO::getmode() == GPIO::BCM);
+        assert::is_true(GPIO::getmode() == GPIO::BCM);
         GPIO::setup(bcm_pin, GPIO::IN);
         GPIO::cleanup();
-        assert(GPIO::getmode() == GPIO::NumberingModes::None);
+        assert::is_true(GPIO::getmode() == GPIO::NumberingModes::None);
     }
 
     void test_setup_one_cvm()
     {
         GPIO::setmode(GPIO::CVM);
-        assert(GPIO::getmode() == GPIO::CVM);
+        assert::is_true(GPIO::getmode() == GPIO::CVM);
         GPIO::setup(pin_data.cvm_pin, GPIO::IN);
         GPIO::cleanup();
-        assert(GPIO::getmode() == GPIO::NumberingModes::None);
+        assert::is_true(GPIO::getmode() == GPIO::NumberingModes::None);
     }
 
     void test_setup_one_tegra_soc()
     {
         GPIO::setmode(GPIO::TEGRA_SOC);
-        assert(GPIO::getmode() == GPIO::TEGRA_SOC);
+        assert::is_true(GPIO::getmode() == GPIO::TEGRA_SOC);
         GPIO::setup(pin_data.tegra_soc_pin, GPIO::IN);
         GPIO::cleanup();
-        assert(GPIO::getmode() == GPIO::NumberingModes::None);
+        assert::is_true(GPIO::getmode() == GPIO::NumberingModes::None);
     }
 
     void test_setup_twice()
@@ -281,7 +259,7 @@ private:
         GPIO::setup(pin_data.in_a, GPIO::IN);
 
         auto val = GPIO::input(pin_data.in_a);
-        assert(val == GPIO::HIGH);
+        assert::is_true(val == GPIO::HIGH);
 
         GPIO::cleanup();
     }
@@ -331,9 +309,9 @@ private:
         GPIO::setmode(GPIO::BOARD);
         GPIO::setup(pin_data.in_a, GPIO::IN);
         GPIO::cleanup(pin_data.in_a);
-        assert(GPIO::getmode() == GPIO::BOARD);
+        assert::is_true(GPIO::getmode() == GPIO::BOARD);
         GPIO::cleanup();
-        assert(GPIO::getmode() == GPIO::NumberingModes::None);
+        assert::is_true(GPIO::getmode() == GPIO::NumberingModes::None);
     }
 
     void test_cleanup_all()
@@ -342,7 +320,7 @@ private:
         GPIO::setup(pin_data.in_a, GPIO::IN);
         GPIO::setup(pin_data.in_b, GPIO::IN);
         GPIO::cleanup();
-        assert(GPIO::getmode() == GPIO::NumberingModes::None);
+        assert::is_true(GPIO::getmode() == GPIO::NumberingModes::None);
     }
 
     void test_input()
@@ -369,15 +347,15 @@ private:
         GPIO::setup(pin_data.in_a, GPIO::IN);
 
         auto val = GPIO::input(pin_data.in_a);
-        assert(val == GPIO::HIGH);
+        assert::is_true(val == GPIO::HIGH);
 
         GPIO::output(pin_data.out_a, GPIO::LOW);
         val = GPIO::input(pin_data.in_a);
-        assert(val == GPIO::LOW);
+        assert::is_true(val == GPIO::LOW);
 
         GPIO::output(pin_data.out_a, GPIO::HIGH);
         val = GPIO::input(pin_data.in_a);
-        assert(val == GPIO::HIGH);
+        assert::is_true(val == GPIO::HIGH);
 
         GPIO::cleanup();
     }
@@ -389,15 +367,15 @@ private:
         GPIO::setup(pin_data.in_a, GPIO::IN);
 
         auto val = GPIO::input(pin_data.in_a);
-        assert(val == GPIO::LOW);
+        assert::is_true(val == GPIO::LOW);
 
         GPIO::output(pin_data.out_a, GPIO::HIGH);
         val = GPIO::input(pin_data.in_a);
-        assert(val == GPIO::HIGH);
+        assert::is_true(val == GPIO::HIGH);
 
         GPIO::output(pin_data.out_a, GPIO::LOW);
         val = GPIO::input(pin_data.in_a);
-        assert(val == GPIO::LOW);
+        assert::is_true(val == GPIO::LOW);
 
         GPIO::cleanup();
     }
@@ -406,7 +384,7 @@ private:
     {
         GPIO::setmode(GPIO::BOARD);
         auto val = GPIO::gpio_function(pin_data.in_a);
-        assert(val == GPIO::Directions::UNKNOWN);
+        assert::is_true(val == GPIO::Directions::UNKNOWN);
         GPIO::cleanup();
     }
 
@@ -415,7 +393,7 @@ private:
         GPIO::setmode(GPIO::BOARD);
         GPIO::setup(pin_data.in_a, GPIO::IN);
         auto val = GPIO::gpio_function(pin_data.in_a);
-        assert(val == GPIO::Directions::IN);
+        assert::is_true(val == GPIO::Directions::IN);
         GPIO::cleanup();
     }
 
@@ -424,7 +402,7 @@ private:
         GPIO::setmode(GPIO::BOARD);
         GPIO::setup(pin_data.out_a, GPIO::OUT);
         auto val = GPIO::gpio_function(pin_data.out_a);
-        assert(val == GPIO::Directions::OUT);
+        assert::is_true(val == GPIO::Directions::OUT);
         GPIO::cleanup();
     }
 
@@ -436,8 +414,8 @@ private:
         auto dsc = DelayedSetChannel(pin_data.out_a, GPIO::HIGH, 0.5);
         auto result = GPIO::wait_for_edge(pin_data.in_a, GPIO::RISING, 10, 1000);
         dsc.wait();
-        assert(std::stoi(result.channel()) == pin_data.in_a);
-        assert(result.is_event_detected());
+        assert::is_true(std::stoi(result.channel()) == pin_data.in_a);
+        assert::is_true(result.is_event_detected());
         GPIO::cleanup();
     }
 
@@ -449,8 +427,8 @@ private:
         auto dsc = DelayedSetChannel(pin_data.out_a, GPIO::LOW, 0.5);
         auto result = GPIO::wait_for_edge(pin_data.in_a, GPIO::FALLING, 10, 1000);
         dsc.wait();
-        assert(std::stoi(result.channel()) == pin_data.in_a);
-        assert(result.is_event_detected());
+        assert::is_true(std::stoi(result.channel()) == pin_data.in_a);
+        assert::is_true(result.is_event_detected());
         GPIO::cleanup();
     }
 
@@ -568,7 +546,7 @@ private:
             const auto min_ct = N * (pct - delta) / 100.0;
             const auto max_ct = N * (pct + delta) / 100.0;
 
-            assert(min_ct <= count && count <= max_ct);
+            assert::is_true(min_ct <= count && count <= max_ct);
             GPIO::cleanup();
         }
     }
@@ -652,7 +630,7 @@ private:
             GPIO::add_event_callback(pin_data.in_a, callback);
         };
 
-        expect_exception(invalid_operation);
+        assert::expect_exception(invalid_operation);
         GPIO::cleanup();
     }
 
@@ -679,8 +657,8 @@ private:
 
     void add_tests()
     {
-        tests.reserve(100);
-#define ADD_TEST(NAME) tests.push_back({[this]() { NAME(); }, #NAME})
+        reserve(100);
+#define ADD_TEST(NAME) add({#NAME, [this]() { NAME(); }})
 
         ADD_TEST(test_warnings_off);
         ADD_TEST(test_warnings_on);
@@ -727,28 +705,6 @@ private:
 #undef ADD_TEST
     }
 
-    void assert(bool b) const
-    {
-        if (b == false)
-            throw std::runtime_error("assert fail");
-    }
-
-    void expect_exception(std::function<void(void)> work) const
-    {
-        bool exception_occured = false;
-
-        try
-        {
-            work();
-        }
-        catch(...)
-        {
-            exception_occured = true;
-        }
-
-        assert(exception_occured);
-    }
-
     void _test_events(int init, GPIO::Edge edge, const std::vector<std::pair<int, bool>>& tests, bool specify_callback,
                       bool use_add_callback)
     {
@@ -781,7 +737,7 @@ private:
             GPIO::add_event_callback(pin_data.in_a, callback);
 
         sleep(0.1);
-        assert(!get_saw_event());
+        assert::is_true(!get_saw_event());
 
         for (auto& pair : tests)
         {
@@ -790,8 +746,8 @@ private:
 
             GPIO::output(pin_data.out_a, output);
             sleep(0.1);
-            assert(get_saw_event() == event_expected);
-            assert(!get_saw_event());
+            assert::is_true(get_saw_event() == event_expected);
+            assert::is_true(!get_saw_event());
         }
 
         GPIO::remove_event_detect(pin_data.in_a);
@@ -802,6 +758,15 @@ private:
 int main()
 {
     APITests t{};
-    t.run();
+    try
+    {
+        t.run();
+    }
+    catch (std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+        return -1;
+    }
+
     return 0;
 }

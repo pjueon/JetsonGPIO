@@ -24,8 +24,10 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #include "private/DictionaryLike.h"
+#include "private/TestUtility.h"
 #include <iostream>
 #include <map>
+#include <sstream>
 #include <vector>
 
 using namespace std::string_literals;
@@ -61,24 +63,33 @@ int main()
     expectedResults[3]["169"] = "None";
     expectedResults[3]["no_such_key"] = "None";
 
+    TestSuit suit{};
+
     for (size_t i = 0; i < testCases.size(); i++)
     {
-        size_t sub_index = 0;
-        for (const auto& key : keys)
+        for (size_t sub_index = 0; sub_index < keys.size(); sub_index++)
         {
+            const auto& key = keys[sub_index];
             auto value = testCases[i].get(key);
             auto expected = expectedResults[i][key];
 
-            std::cout << "case " << i << " - " << sub_index << ": ";
-            if (value == expected)
-                std::cout << "PASSED";
-            else
-                std::cout << "FAILED (expected: " << expected << ", actual: " << value << ")";
+            std::ostringstream ss{};
+            ss << "case " << i << " - " << sub_index;
 
-            std::cout << std::endl;
-
-            sub_index++;
+            auto case_name = ss.str();
+            auto func = [expected, value]() { assert::are_equal(expected, value); };
+            suit.add({case_name, func});
         }
+    }
+
+    try
+    {
+        suit.run();
+    }
+    catch (std::exception& e)
+    {
+        std::cerr << e.what() << std::endl;
+        return -1;
     }
 
     return 0;
