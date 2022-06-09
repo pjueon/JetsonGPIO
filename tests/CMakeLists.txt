@@ -4,7 +4,7 @@ set(_test_targets
     )
 
 foreach (test ${_test_targets})
-  add_executable(${test} ${test}.cpp)
+  add_executable(${test} ${test}.cpp test_utility.cpp)
   target_link_libraries(${test} PRIVATE JetsonGPIO)
 endforeach ()
 
@@ -15,6 +15,6 @@ set(_unit_test_targets
     )
 
 foreach (test ${_unit_test_targets})
-  add_executable(${test} unit-tests/${test}.cpp)
+  add_executable(${test} unit-tests/${test}.cpp test_utility.cpp)
   target_link_libraries(${test} PRIVATE JetsonGPIO)
 endforeach ()

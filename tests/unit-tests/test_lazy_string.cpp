@@ -153,8 +153,6 @@ int main()
 {
     bool all_passed = true;
 
-    // TEST([]() { return false; });
-
     TEST(compare_to_const_char0);
     TEST(compare_to_const_char1);
     TEST(compare_to_const_char2);
