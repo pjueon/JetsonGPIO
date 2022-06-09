@@ -15,6 +15,7 @@ set(_unit_test_targets
     "test_model_name"
     )
 
+
 foreach (test ${_unit_test_targets})
   add_executable(${test} unit-tests/${test}.cpp TestUtility.cpp)
   add_test(NAME ${test} COMMAND $<TARGET_FILE:${test}>)

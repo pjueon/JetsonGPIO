@@ -23,8 +23,8 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#include "private/Model.h"
 #include "private/ModelUtility.h"
+#include "private/Model.h"
 #include "private/PythonFunctions.h"
 #include <stdexcept>
 

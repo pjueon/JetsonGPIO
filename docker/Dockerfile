@@ -52,4 +52,3 @@ COPY --from=builder /source/JetsonGPIO/build/install/ /usr/local/
 # for debug
 COPY --from=builder /source/JetsonGPIO/build/samples/ /samples
 COPY --from=builder /source/JetsonGPIO/build/tests/ /tests
-

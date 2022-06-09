@@ -49,7 +49,6 @@ constexpr size_t MAX_EPOLL_EVENTS = 20;
 
 namespace GPIO
 {
-
     // Error messages for all errors produced by this module
     std::map<EventResultCode, const char*> event_error_code_to_message = {
         {EventResultCode::SysFD_EdgeOpen, "Failure to open the /sys/class/gpio/gpio{$ch}/edge file"},
