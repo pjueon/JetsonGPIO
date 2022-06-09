@@ -1,12 +1,14 @@
 cmake_minimum_required(VERSION 3.2)
+enable_testing()
+
 PROJECT(JetsonGPIO
-        VERSION 1.2.2
+        VERSION 1.2.3
         LANGUAGES C CXX)
 
 include(GNUInstallDirs)
 SET(CMAKE_CXX_STANDARD 14)
 
-option(BUILD_EXAMPLES "Build examples" OFF)
+option(BUILD_EXAMPLES "Build examples" ON)
 option(JETSON_GPIO_POST_INSTALL "Create gpio group and reload udev rules" ON)
 
 SET (UDEVRULES_INSTALL_DIR "/lib/udev/rules.d" CACHE STRING "Base directory for udev rules")
@@ -20,11 +22,18 @@ ADD_DEFINITIONS(-Wall -O2 -fPIC -g)
 set(JetsonGPIO_LIB_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/JetsonGPIO.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/JetsonGPIO_C_Wrapper.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/MainModule.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/PWM.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/PythonFunctions.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/gpio_pin_data.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/gpio_event.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ExceptionHandling.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/GPIOPinData.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/GPIOEvent.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Callback.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/DictionaryLike.cpp
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/Model.cpp)
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/ModelUtility.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/WaitResult.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/LazyString.cpp
+    )
 
 # Generate a *Config.h header in the build directory
 configure_file(cmake/JetsonGPIOConfig.h.in JetsonGPIOConfig.h)
@@ -93,7 +102,7 @@ install (FILES ${CMAKE_CURRENT_SOURCE_DIR}/99-gpio.rules DESTINATION ${UDEVRULES
 
 # Run post installation script
 if (JETSON_GPIO_POST_INSTALL)
-install (CODE "execute_process(COMMAND bash ./post_install.sh WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})")
+install (CODE "execute_process(COMMAND bash ./scripts/post_install.sh WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR})")
 endif()
 
 # Build test codes 

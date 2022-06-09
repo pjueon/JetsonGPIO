@@ -97,12 +97,14 @@ namespace GPIO
         template <class T>
         constexpr bool is_string =
             std::is_constructible<LazyString, T>::value && !std::is_same<std::decay_t<T>, nullptr_t>::value;
-    }
 
-    template <class T1, class T2,
-              class = std::enable_if_t<details::is_string<T1> && details::is_string<T2> &&
-                                       (std::is_same<std::decay_t<T1>, LazyString>::value ||
-                                        std::is_same<std::decay_t<T2>, LazyString>::value)>>
+        template <class T1, class T2>
+        constexpr bool is_lazy_string_comparision = is_string<T1>&& is_string<T2> &&
+                                                    (std::is_same<std::decay_t<T1>, LazyString>::value ||
+                                                     std::is_same<std::decay_t<T2>, LazyString>::value);
+    } // namespace details
+
+    template <class T1, class T2, class = std::enable_if_t<details::is_lazy_string_comparision<T1, T2>>>
     bool operator==(T1&& a, T2&& b)
     {
         LazyString _a(std::forward<T1>(a));
@@ -110,10 +112,7 @@ namespace GPIO
         return _a() == _b();
     }
 
-    template <class T1, class T2,
-              class = std::enable_if_t<details::is_string<T1> && details::is_string<T2> &&
-                                       (std::is_same<std::decay_t<T1>, LazyString>::value ||
-                                        std::is_same<std::decay_t<T2>, LazyString>::value)>>
+    template <class T1, class T2, class = std::enable_if_t<details::is_lazy_string_comparision<T1, T2>>>
     bool operator!=(T1&& a, T2&& b)
     {
         return !(a == b);

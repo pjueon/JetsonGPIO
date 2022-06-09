@@ -2,6 +2,7 @@
 Copyright (c) 2012-2017 Ben Croston ben@croston.org.
 Copyright (c) 2019, NVIDIA CORPORATION.
 Copyright (c) 2019 Jueon Park(pjueon) bluegbg@gmail.com.
+Copyright (c) 2021 Adam Rasburn blackforestcheesecake@protonmail.ch
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -22,17 +23,45 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#pragma once
-#ifndef EXCEPTION_HANDLING_H
-#define EXCEPTION_HANDLING_H
-
+#include "private/ModelUtility.h"
+#include "private/Model.h"
+#include "private/PythonFunctions.h"
 #include <stdexcept>
-#include <string>
 
 namespace GPIO
 {
-    std::string _error_message(const std::exception& e, const std::string& from);
-    std::runtime_error _error(const std::exception& e, const std::string& from);
-} // namespace GPIO
+    constexpr auto number_of_models = static_cast<int>(sizeof(MODEL_NAMES) / sizeof(Model));
 
-#endif
+    std::string model_name(Model model)
+    {
+        int idx = static_cast<int>(model);
+        if (idx < 0 || idx >= number_of_models)
+            throw std::runtime_error("model_name error");
+
+        return MODEL_NAMES[idx];
+    }
+
+    int model_name_index(const std::string& name)
+    {
+        auto _name = strip(name);
+
+        for (int idx = 0; idx < number_of_models; idx++)
+        {
+            if (_name == MODEL_NAMES[idx])
+                return idx;
+        }
+
+        return None;
+    }
+
+    Model index_to_model(int idx)
+    {
+        if (idx < 0 || idx >= number_of_models)
+            throw std::runtime_error("index_to_model error");
+
+        return static_cast<Model>(idx);
+    }
+
+    Model name_to_model(const std::string& name) { return index_to_model(model_name_index(name)); }
+
+} // namespace GPIO

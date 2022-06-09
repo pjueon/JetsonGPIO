@@ -67,5 +67,8 @@
         "stack": "cpp",
         "random": "cpp"
     },
-    "C_Cpp.clang_format_style": "file"
+    "C_Cpp.clang_format_style": "file",
+
+    "files.insertFinalNewline": true,
+    "files.trimFinalNewlines": true
 }

@@ -2,6 +2,7 @@
 Copyright (c) 2012-2017 Ben Croston ben@croston.org.
 Copyright (c) 2019, NVIDIA CORPORATION.
 Copyright (c) 2019 Jueon Park(pjueon) bluegbg@gmail.com.
+Copyright (c) 2021 Adam Rasburn blackforestcheesecake@protonmail.ch
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -22,17 +23,34 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#pragma once
-#ifndef EXCEPTION_HANDLING_H
-#define EXCEPTION_HANDLING_H
-
-#include <stdexcept>
-#include <string>
+#include "JetsonGPIO.h"
 
 namespace GPIO
 {
-    std::string _error_message(const std::exception& e, const std::string& from);
-    std::runtime_error _error(const std::exception& e, const std::string& from);
-} // namespace GPIO
+    LazyString::LazyString(const std::function<std::string(void)>& func) : buffer(), is_cached(false), func(func) {}
 
-#endif
+    LazyString::LazyString(const std::string& str) : buffer(str), is_cached(true), func() {}
+
+    LazyString::LazyString(const char* str) : buffer(str == nullptr ? "" : str), is_cached(true), func() {}
+
+    LazyString::operator const char*() const { return this->operator()().c_str(); }
+
+    LazyString::operator std::string() const { return this->operator()(); }
+
+    const std::string& LazyString::operator()() const
+    {
+        Evaluate();
+        return buffer;
+    }
+
+    void LazyString::Evaluate() const
+    {
+        if (is_cached)
+            return;
+
+        if (func != nullptr)
+            buffer = func();
+
+        is_cached = true;
+    }
+} // namespace GPIO

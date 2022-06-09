@@ -23,9 +23,9 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#include "private/gpio_event.h"
+#include "private/GPIOEvent.h"
 #include "private/PythonFunctions.h"
-#include "private/sysfs_root.h"
+#include "private/SysfsRoot.h"
 
 #include <fcntl.h>
 #include <sys/epoll.h>
@@ -49,7 +49,6 @@ constexpr size_t MAX_EPOLL_EVENTS = 20;
 
 namespace GPIO
 {
-
     // Error messages for all errors produced by this module
     std::map<EventResultCode, const char*> event_error_code_to_message = {
         {EventResultCode::SysFD_EdgeOpen, "Failure to open the /sys/class/gpio/gpio{$ch}/edge file"},

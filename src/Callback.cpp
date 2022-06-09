@@ -2,6 +2,7 @@
 Copyright (c) 2012-2017 Ben Croston ben@croston.org.
 Copyright (c) 2019, NVIDIA CORPORATION.
 Copyright (c) 2019 Jueon Park(pjueon) bluegbg@gmail.com.
+Copyright (c) 2021 Adam Rasburn blackforestcheesecake@protonmail.ch
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -22,17 +23,17 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#pragma once
-#ifndef EXCEPTION_HANDLING_H
-#define EXCEPTION_HANDLING_H
-
-#include <stdexcept>
-#include <string>
+#include "JetsonGPIO.h"
 
 namespace GPIO
 {
-    std::string _error_message(const std::exception& e, const std::string& from);
-    std::runtime_error _error(const std::exception& e, const std::string& from);
-} // namespace GPIO
+    void Callback::operator()(const std::string& input) const
+    {
+        if (function != nullptr)
+            function(input);
+    }
 
-#endif
+    bool operator==(const Callback& A, const Callback& B) { return A.comparer(A.function, B.function); }
+
+    bool operator!=(const Callback& A, const Callback& B) { return !(A == B); }
+} // namespace GPIO

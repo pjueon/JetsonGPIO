@@ -27,11 +27,14 @@ mkdir build && cd build
 
 ### 3. Configure the cmake
 ```
-cmake ..
+cmake .. [OPTIONS]
 ```
-You can add
-- `-DCMAKE_INSTALL_PREFIX=/usr` option to install it to `/usr` according to your preference. (The default installation directory is `/usr/local`)
-- `-DBUILD_EXAMPLES=ON` option to build example codes in `samples`.
+
+|Option|Default value|Description|
+|------|-------------|-----------|
+|`-DCMAKE_INSTALL_PREFIX=`|`/usr/local`|installation path|
+|`-DBUILD_EXAMPLES=`|ON|build example codes in `samples`|
+|`-DJETSON_GPIO_POST_INSTALL=`|ON|run the post install script after installation to set user permissions.|
 
 ### 4. Build and Install the library
 ```
@@ -75,10 +78,10 @@ The code will be automatically fetched at configure time and built alongside you
 
 Note that with this method will *not* set user permissions, so you will need to set user permissions manually or run your code with root permissions.
 
-To set user permissions, run `post_install.sh` script. 
+To set user permissions, run `scripts/post_install.sh` script. 
 Assuming you are in `build` directory:
 ```
-sudo bash ../post_install.sh
+sudo bash ../scripts/post_install.sh
 ```
 
 
@@ -405,3 +408,75 @@ to the relevant pins. If the pinmux is not configured, PWM signals will not
 reach the pins! The JetsonGPIO library does not dynamically modify the pinmux
 configuration to achieve this. Read the L4T documentation for details on how to
 configure the pinmux.
+
+
+# Using the library from a docker container
+The following describes how to use the JetsonGPIO library from a docker container. 
+
+## Get the docker image
+You can get the pre-built docker image from [pjueon/jetson-gpio](https://hub.docker.com/repository/docker/pjueon/jetson-gpio/).
+
+## Building docker image (optional)
+You can also build the docker image from the source. `docker/Dockerfile` is the Dockerfile for the library. 
+The following command will build a docker image named `testimg` from it. 
+
+```shell
+sudo docker image build -f docker/Dockerfile -t testimg .
+```
+
+## Running the container
+### Basic options 
+You should map `/sys/devices`, `/sys/class/gpio` into the container to access to the GPIO pins.
+So you need to add these options to `docker container run` command.
+- `-v /sys/devices/:/sys/devices/`
+- `-v /sys/class/gpio:/sys/class/gpio`
+
+### Running the container in privilleged mode
+The library determines the jetson model by checking `/proc/device-tree/compatible` and `/proc/device-tree/chosen` by default.
+These paths only can be mapped into the container in privilleged mode.
+
+The options you need to add are:
+- `--privileged`
+- `-v /proc/device-tree/compatible:/proc/device-tree/compatible`
+- `-v /proc/device-tree/chosen:/proc/device-tree/compatible`
+
+The following example will run `/bin/bash` from the container in privilleged mode. 
+```shell
+sudo docker container run -it --rm \
+--runtime=nvidia --gpus all \
+--privileged \
+-v /proc/device-tree/compatible:/proc/device-tree/compatible \
+-v /proc/device-tree/chosen:/proc/device-tree/chosen \
+-v /sys/devices/:/sys/devices/ \
+-v /sys/class/gpio:/sys/class/gpio \
+pjueon/jetson-gpio /bin/bash
+```
+
+### Running the container in non-privilleged mode
+If you don't want to run the container in privilleged mode, you can directly provide your jetson model name to the library through the environment variable `JETSON_MODEL_NAME`.
+
+The option you need to add is:
+- `-e JETSON_MODEL_NAME=[PUT_YOUR_JETSON_MODEL_NAME_HERE]` (ex> `-e JETSON_MODEL_NAME=JETSON_NANO`)
+
+You can get the proper value for this environment variable by running `samples/jetson_model` in privilleged mode:
+```shell
+sudo docker container run --rm \
+--runtime=nvidia --gpus all \
+--privileged \
+-v /proc/device-tree/compatible:/proc/device-tree/compatible \
+-v /proc/device-tree/chosen:/proc/device-tree/chosen \
+-v /sys/devices/:/sys/devices/ \
+-v /sys/class/gpio:/sys/class/gpio \
+pjueon/jetson-gpio /gpio-cpp/samples/jetson_model
+```
+
+The following example will run `/bin/bash` from the container in non-privilleged mode. 
+
+```shell
+sudo docker container run -it --rm \
+--runtime=nvidia --gpus all \
+-v /sys/devices/:/sys/devices/ \
+-v /sys/class/gpio:/sys/class/gpio \
+-e JETSON_MODEL_NAME=[PUT_YOUR_JETSON_MODEL_NAME_HERE] \
+pjueon/jetson-gpio /bin/bash
+```

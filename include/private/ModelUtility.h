@@ -23,16 +23,21 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #pragma once
-#ifndef EXCEPTION_HANDLING_H
-#define EXCEPTION_HANDLING_H
+#ifndef MODEL_UTILITY_H
+#define MODEL_UTILITY_H
 
-#include <stdexcept>
 #include <string>
 
 namespace GPIO
 {
-    std::string _error_message(const std::exception& e, const std::string& from);
-    std::runtime_error _error(const std::exception& e, const std::string& from);
+    // enum
+    enum class Model;
+
+    std::string model_name(Model model);
+    int model_name_index(const std::string& name);
+    Model index_to_model(int idx);
+    Model name_to_model(const std::string& name);
+
 } // namespace GPIO
 
 #endif

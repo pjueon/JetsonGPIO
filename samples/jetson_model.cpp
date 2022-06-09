@@ -22,17 +22,12 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#pragma once
-#ifndef EXCEPTION_HANDLING_H
-#define EXCEPTION_HANDLING_H
+#include <JetsonGPIO.h>
+#include <iostream>
 
-#include <stdexcept>
-#include <string>
-
-namespace GPIO
+int main()
 {
-    std::string _error_message(const std::exception& e, const std::string& from);
-    std::runtime_error _error(const std::exception& e, const std::string& from);
-} // namespace GPIO
-
-#endif
+    std::string model = GPIO::model;
+    std::cout << model << std::endl;
+    return 0;
+}
