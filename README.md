@@ -463,7 +463,7 @@ sudo docker container run --rm \
 -v /proc/device-tree/chosen:/proc/device-tree/chosen \
 -v /sys/devices/:/sys/devices/ \
 -v /sys/class/gpio:/sys/class/gpio \
-testimg /samples/jetson_model
+testimg /gpio-cpp/samples/jetson_model
 ```
 
 The following example will run `/bin/bash` from the container in non-privilleged mode. 
