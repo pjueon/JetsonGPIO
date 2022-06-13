@@ -13,6 +13,7 @@ set(_unit_test_targets
     "test_dictionary_like"
     "test_lazy_string"
     "test_model_name"
+    "test_format"
     )
 
 

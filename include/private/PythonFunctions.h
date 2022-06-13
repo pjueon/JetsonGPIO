@@ -89,7 +89,8 @@ namespace GPIO
         if (fmt == "" || sizeof...(Args) == 0)
             return fmt;
 
-        int size_s = std::snprintf(nullptr, 0, fmt.c_str(), args...);
+        // add an emptry string at the end to avoid compiler warning: 'format not a string literal and no format arguments'
+        int size_s = std::snprintf(nullptr, 0, fmt.c_str(), args..., "");
         if (size_s <= 0)
             throw std::runtime_error("Error during formatting.");
 
@@ -101,7 +102,7 @@ namespace GPIO
         std::string ret(size, '\0');
 
         // for snprintf, an extra space for the null-terminator MUST be included. (size + 1)
-        std::snprintf(&ret[0], size + 1, fmt.c_str(), args...);
+        std::snprintf(&ret[0], size + 1, fmt.c_str(), args..., "");
         return ret;
     }
 
