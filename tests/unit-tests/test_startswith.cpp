@@ -46,7 +46,7 @@ namespace
 
         TestFunction function(const std::string& name)
         {
-            return { name, [this](){ run(); } };
+            return {name, [this]() { run(); }};
         }
     };
 } // namespace
@@ -54,19 +54,18 @@ namespace
 int main()
 {
     std::vector<TestCase> cases = {
-        { "ABcde xyz987"s, "abc"s,  false },
-        { "jetson nano"s, "jetson"s,  true },
-        { ""s, ""s,  true },
-        { "xyz 012345"s, ""s,  true },
-        { "  009124ab xyz"s, "0"s,  false },
-        { "Jetson GPIO Test 1234"s, "Jetson GPIO Test"s,  true },
-        { "Jetson GPIO Test 1234"s, "Jetson GPIO Test 5678"s,  false },
+        {"ABcde xyz987"s, "abc"s, false},
+        {"jetson nano"s, "jetson"s, true},
+        {""s, ""s, true},
+        {"xyz 012345"s, ""s, true},
+        {"  009124ab xyz"s, "0"s, false},
+        {"Jetson GPIO Test 1234"s, "Jetson GPIO Test"s, true},
+        {"Jetson GPIO Test 1234"s, "Jetson GPIO Test 5678"s, false},
     };
-
 
     TestSuit suit{};
 
-    for(size_t i = 0; i < cases.size(); i++)
+    for (size_t i = 0; i < cases.size(); i++)
     {
         auto name = GPIO::format("case_%02d", i);
         suit.add(cases[i].function(name));
