@@ -14,6 +14,7 @@ set(_unit_test_targets
     "test_lazy_string"
     "test_model_name"
     "test_format"
+    "test_startswith"
     )
 
 
