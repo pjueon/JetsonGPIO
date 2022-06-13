@@ -98,7 +98,7 @@ extern "C"
     int gpio_gpio_function(const char* channel);
 
     /* Function used to check if an event occurred on the specified channel.
-       Param channel must be an integer.
+       Param channel must be a string.
        This function return True or False
        returns -1 on failure*/
     int gpio_event_detected(const char* channel);
@@ -113,7 +113,7 @@ extern "C"
     int gpio_remove_event_callback(const char* channel, void (*callback)());
 
     /* Function used to add threaded event detection for a specified gpio channel.
-       @gpio must be an integer specifying the channel
+       @channel must be a string specifying the channel
        @edge must be a member of Edge
        @callback (optional) may be a callback function to be called when the event is detected (or nullptr)
        @bouncetime (optional) a button-bounce signal ignore time (in milliseconds, default=none)
@@ -125,7 +125,7 @@ extern "C"
 
     /* Function used to perform a blocking wait until the specified edge event is detected within the specified
        timeout period. Returns the channel if an event is detected or 0 if a timeout has occurred.
-       @channel is an integer specifying the channel
+       @channel is a string specifying the channel
        @edge must be a member of GPIOEdge
        @bouncetime in milliseconds (optional)
        @timeout in milliseconds (optional)
