@@ -16,6 +16,7 @@ set(_unit_test_targets
     "test_format"
     "test_startswith"
     "test_lower"
+    "test_none"
     )
 
 

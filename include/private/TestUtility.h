@@ -35,6 +35,7 @@ DEALINGS IN THE SOFTWARE.
 namespace assert
 {
     void is_true(bool b, std::string msg = "");
+    void is_false(bool b, std::string msg = "");
     void expect_exception(const std::function<void(void)>& func, std::string msg = "");
 
     template <class T1, class T2> void are_equal(const T1& expected, const T2& actual, std::string msg = "")
@@ -60,7 +61,7 @@ class TestSuit
 public:
     virtual ~TestSuit() = default;
 
-    void run();
+    int run();
     void reserve(size_t n);
     void add(const TestFunction& test);
 

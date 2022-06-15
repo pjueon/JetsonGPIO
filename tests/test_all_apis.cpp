@@ -758,15 +758,5 @@ private:
 int main()
 {
     APITests t{};
-    try
-    {
-        t.run();
-    }
-    catch (std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-        return -1;
-    }
-
-    return 0;
+    return t.run();
 }
