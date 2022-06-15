@@ -60,7 +60,7 @@ class TestSuit
 public:
     virtual ~TestSuit() = default;
 
-    void run();
+    int run();
     void reserve(size_t n);
     void add(const TestFunction& test);
 
