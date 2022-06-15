@@ -48,6 +48,54 @@ namespace
         constexpr bool convertible = std::is_convertible<GPIO::NoneType, std::string>::value;
         assert::is_true(convertible);
     }
+
+    void is_not_none0()
+    {
+        bool b = GPIO::is_None("-1");
+        assert::is_false(b);
+    }
+
+    void is_not_none1()
+    {
+        bool b = GPIO::is_None("");
+        assert::is_false(b);
+    }
+
+    void is_not_none2()
+    {
+        bool b = GPIO::is_None("none");
+        assert::is_false(b);
+    }
+
+    void is_not_none3()
+    {
+        bool b = GPIO::is_None(" None");
+        assert::is_false(b);
+    }
+
+    void is_not_none4()
+    {
+        bool b = GPIO::is_None("None ");
+        assert::is_false(b);
+    }
+
+    void is_not_none5()
+    {
+        bool b = GPIO::is_None(0);
+        assert::is_false(b);
+    }
+
+    void is_none0()
+    {
+        bool b = GPIO::is_None(-1);
+        assert::is_true(b);
+    }
+
+    void is_none1()
+    {
+        bool b = GPIO::is_None("None");
+        assert::is_true(b);
+    }
 } // namespace
 
 int main()
@@ -60,6 +108,16 @@ int main()
     suit.add(TEST(integer_conversion));
     suit.add(TEST(string_eqaul));
     suit.add(TEST(string_conversion));
+
+    suit.add(TEST(is_not_none0));
+    suit.add(TEST(is_not_none1));
+    suit.add(TEST(is_not_none2));
+    suit.add(TEST(is_not_none3));
+    suit.add(TEST(is_not_none4));
+    suit.add(TEST(is_not_none5));
+
+    suit.add(TEST(is_none0));
+    suit.add(TEST(is_none1));
 
 #undef TEST
 
