@@ -414,13 +414,13 @@ configure the pinmux.
 The following describes how to use the JetsonGPIO library from a docker container. 
 
 ## Preparing the docker image
-### From Docker hub
+### Pulling from Docker hub
 You can get the pre-built image that has JetsonGPIO from [pjueon/jetson-gpio](https://hub.docker.com/r/pjueon/jetson-gpio/).
 ```shell
 docker pull pjueon/jetson-gpio
 ```
 
-### From the source
+### Building from the source
 You can also build the image from the source. `docker/Dockerfile` is the Dockerfile for the library. 
 The following command will build a docker image named `testimg` from it. 
 
@@ -430,19 +430,23 @@ sudo docker image build -f docker/Dockerfile -t testimg .
 
 ## Running the container
 ### Basic options 
-You should map `/sys/devices`, `/sys/class/gpio` into the container to access to the GPIO pins.
-So you need to add these options to `docker container run` command.
-- `-v /sys/devices/:/sys/devices/`
-- `-v /sys/class/gpio:/sys/class/gpio`
+You should map `/sys/devices`, `/sys/class/gpio` into the container to access to the GPIO pins.  
+So you need to add following options to `docker container run` command:
+
+```shell
+-v /sys/devices/:/sys/devices/ \
+-v /sys/class/gpio:/sys/class/gpio
+```
+
+and if you want to use GPU from the container you also need to add following options:  
+
+```shell
+--runtime=nvidia --gpus all
+```
 
 ### Running the container in privilleged mode
 The library determines the jetson model by checking `/proc/device-tree/compatible` and `/proc/device-tree/chosen` by default.
 These paths only can be mapped into the container in privilleged mode.
-
-The options you need to add are:
-- `--privileged`
-- `-v /proc/device-tree/compatible:/proc/device-tree/compatible`
-- `-v /proc/device-tree/chosen:/proc/device-tree/compatible`
 
 The following example will run `/bin/bash` from the container in privilleged mode. 
 ```shell
@@ -457,15 +461,16 @@ pjueon/jetson-gpio /bin/bash
 ```
 
 ### Running the container in non-privilleged mode
-If you don't want to run the container in privilleged mode, you can directly provide your jetson model name to the library through the environment variable `JETSON_MODEL_NAME`.
+If you don't want to run the container in privilleged mode, you can directly provide your jetson model name to the library through the environment variable `JETSON_MODEL_NAME`:
 
-The option you need to add is:
-- `-e JETSON_MODEL_NAME=[PUT_YOUR_JETSON_MODEL_NAME_HERE]` (ex> `-e JETSON_MODEL_NAME=JETSON_NANO`)
+```shell
+# ex> -e JETSON_MODEL_NAME=JETSON_NANO
+-e JETSON_MODEL_NAME=[PUT_YOUR_JETSON_MODEL_NAME_HERE]
+```
 
 You can get the proper value for this environment variable by running `samples/jetson_model` in privilleged mode:
 ```shell
 sudo docker container run --rm \
---runtime=nvidia --gpus all \
 --privileged \
 -v /proc/device-tree/compatible:/proc/device-tree/compatible \
 -v /proc/device-tree/chosen:/proc/device-tree/chosen \
@@ -481,6 +486,6 @@ sudo docker container run -it --rm \
 --runtime=nvidia --gpus all \
 -v /sys/devices/:/sys/devices/ \
 -v /sys/class/gpio:/sys/class/gpio \
--e JETSON_MODEL_NAME=[PUT_YOUR_JETSON_MODEL_NAME_HERE] \
+-e JETSON_MODEL_NAME=[PUT_YOUR_JETSON_MODEL_NAME_HERE] \  
 pjueon/jetson-gpio /bin/bash
 ```
