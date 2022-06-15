@@ -40,6 +40,8 @@ namespace assert
         throw std::runtime_error("assert failed." + msg);
     }
 
+    void is_false(bool b, std::string msg) { is_true(!b, msg); }
+
     void expect_exception(const std::function<void(void)>& func, std::string msg)
     {
         bool exception_occured = false;
