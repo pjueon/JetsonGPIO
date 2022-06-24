@@ -424,13 +424,16 @@ docker pull pjueon/jetson-gpio
 You can use it as a base image for your application.
 
 ### Building from the source
-You can also build the same image on docker hub from the source using `docker/Dockerfile`.
+You can also build the image from the source.
+`docker/Dockerfile` is the docker file that was used for the pre-built image on docker hub. 
+You can modify it for your application.
 
-The following command will build a docker image named `testimg` from it. 
+The following command will build a docker image named `testimg` from `docker/Dockerfile`: 
 
 ```shell
 sudo docker image build -f docker/Dockerfile -t testimg .
 ```
+
 
 ## Running the container
 ### Basic options 
