@@ -426,7 +426,7 @@ You can use it as a base image for your application.
 ### Building from the source
 You can also build the same image on docker hub from the source using `docker/Dockerfile`.
 
-The following command will build a docker image named `testimg` from . 
+The following command will build a docker image named `testimg` from it. 
 
 ```shell
 sudo docker image build -f docker/Dockerfile -t testimg .
