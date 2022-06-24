@@ -415,13 +415,17 @@ The following describes how to use the JetsonGPIO library from a docker containe
 
 ## Preparing the docker image
 ### Pulling from Docker hub
-You can get the pre-built image that has JetsonGPIO from [pjueon/jetson-gpio](https://hub.docker.com/r/pjueon/jetson-gpio/).
+A pre-built image that contains JetsonGPIO is on [pjueon/jetson-gpio](https://hub.docker.com/r/pjueon/jetson-gpio/).
+
 ```shell
 docker pull pjueon/jetson-gpio
 ```
 
+You use it as a base image for your application.
+
 ### Building from the source
-You can also build the image from the source. `docker/Dockerfile` is the Dockerfile for the library. 
+You can also build the image from the source. `docker/Dockerfile` is the Dockerfile for the image on [pjueon/jetson-gpio](https://hub.docker.com/r/pjueon/jetson-gpio/).
+
 The following command will build a docker image named `testimg` from it. 
 
 ```shell
