@@ -118,7 +118,7 @@ To include the JetsonGPIO use:
 #include <JetsonGPIO.h>
 ```
 
-All public APIs are declared in namespace "GPIO". If you want to make your code shorter, you can use:
+All public APIs are declared in namespace `GPIO`. If you want to make your code shorter, you can use:
 ```cpp
 using namespace GPIO; // optional
 ```
@@ -148,7 +148,7 @@ To check which mode has been set, you can call:
 ```cpp
 GPIO::NumberingModes mode = GPIO::getmode();
 ```
-This function returns an instance of enum class GPIO::NumberingModes. The mode must be one of GPIO::BOARD(GPIO::NumberingModes::BOARD), GPIO::BCM(GPIO::NumberingModes::BCM), GPIO::CVM(GPIO::NumberingModes::CVM), GPIO::TEGRA_SOC(GPIO::NumberingModes::TEGRA_SOC) or GPIO::NumberingModes::None.
+This function returns an instance of enum class `GPIO::NumberingModes`. The mode must be one of `GPIO::BOARD`(`GPIO::NumberingModes::BOARD`), `GPIO::BCM`(`GPIO::NumberingModes::BCM`), `GPIO::CVM`(`GPIO::NumberingModes::CVM`), `GPIO::TEGRA_SOC`(`GPIO::NumberingModes::TEGRA_SOC`) or `GPIO::NumberingModes::None`.
 
 #### 3. Warnings
 
@@ -189,7 +189,7 @@ To read the value of a channel, use:
 int value = GPIO::input(channel);
 ```
 
-This will return either GPIO::LOW(== 0) or GPIO::HIGH(== 1).
+This will return either `GPIO::LOW`(== 0) or `GPIO::HIGH`(== 1).
 
 #### 6. Output
 
@@ -199,7 +199,7 @@ To set the value of a pin configured as output, use:
 GPIO::output(channel, state);
 ```
 
-where state can be GPIO::LOW(== 0) or GPIO::HIGH(== 1).
+where state can be `GPIO::LOW`(== 0) or `GPIO::HIGH`(== 1).
 
 
 #### 7. Clean up
