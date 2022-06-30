@@ -255,7 +255,7 @@ This function blocks the calling thread until the provided edge(s) is detected. 
 ```cpp
 GPIO::wait_for_edge(channel, GPIO::RISING);
 ```
-The second parameter specifies the edge to be detected and can be GPIO::RISING, GPIO::FALLING or GPIO::BOTH. If you only want to limit the wait to a specified amount of time, a timeout can be optionally set:
+The second parameter specifies the edge to be detected and can be `GPIO::RISING`, `GPIO::FALLING` or `GPIO::BOTH`. If you only want to limit the wait to a specified amount of time, a timeout can be optionally set:
 
 ```cpp
 // timeout is in milliseconds__
@@ -391,7 +391,7 @@ This feature allows you to check the function of the provided GPIO channel:
 GPIO::Directions direction = GPIO::gpio_function(channel);
 ```
 
-The function returns either GPIO::IN(GPIO::Directions::IN) or GPIO::OUT(GPIO::Directions::OUT) which are the instances of enum class GPIO::Directions.
+The function returns either `GPIO::IN`(`GPIO::Directions::IN`) or `GPIO::OUT`(`GPIO::Directions::OUT`) which are the instances of enum class `GPIO::Directions`.
 
 #### 11. PWM  
 
