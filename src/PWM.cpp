@@ -26,6 +26,7 @@ DEALINGS IN THE SOFTWARE.
 #include <iostream>
 
 #include "JetsonGPIO.h"
+#include "JetsonGPIO/PWM.h"
 #include "private/ExceptionHandling.h"
 #include "private/MainModule.h"
 

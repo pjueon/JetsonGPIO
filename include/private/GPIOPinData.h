@@ -32,7 +32,7 @@ DEALINGS IN THE SOFTWARE.
 #include <string>
 #include <vector>
 
-#include "JetsonGPIO.h"
+#include "JetsonGPIO/PublicEnums.h"
 #include "private/Model.h"
 
 namespace GPIO

@@ -23,34 +23,42 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#include "JetsonGPIO/LazyString.h"
+#pragma once
+#ifndef TYPE_TRAITS_H
+#define TYPE_TRAITS_H
+
+#include <type_traits>
+
+#ifndef CPP14_SUPPORTED
+// define C++14 features
+namespace std
+{
+    template <class T> using decay_t = typename decay<T>::type;
+    template <bool B, class T = void> using enable_if_t = typename enable_if<B, T>::type;
+} // namespace std
+#endif
+
+#ifndef CPP17_SUPPORTED
+// define C++17 features
+namespace std
+{
+    template <class...> using void_t = void;
+}
+#endif
 
 namespace GPIO
 {
-    LazyString::LazyString(const std::function<std::string(void)>& func) : buffer(), is_cached(false), func(func) {}
-
-    LazyString::LazyString(const std::string& str) : buffer(str), is_cached(true), func() {}
-
-    LazyString::LazyString(const char* str) : buffer(str == nullptr ? "" : str), is_cached(true), func() {}
-
-    LazyString::operator const char*() const { return this->operator()().c_str(); }
-
-    LazyString::operator std::string() const { return this->operator()(); }
-
-    const std::string& LazyString::operator()() const
+    template <class T, class = void> struct is_equality_comparable : std::false_type
     {
-        Evaluate();
-        return buffer;
-    }
+    };
 
-    void LazyString::Evaluate() const
+    template <class T>
+    struct is_equality_comparable<T, std::void_t<decltype(std::declval<T>() == std::declval<T>())>>
+    : std::is_convertible<decltype(std::declval<T>() == std::declval<T>()), bool>
     {
-        if (is_cached)
-            return;
+    };
 
-        if (func != nullptr)
-            buffer = func();
-
-        is_cached = true;
-    }
+    template <class T> constexpr bool is_equality_comparable_v = is_equality_comparable<T>::value;
 } // namespace GPIO
+
+#endif

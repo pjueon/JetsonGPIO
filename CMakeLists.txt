@@ -62,6 +62,9 @@ INSTALL(FILES
     ${CMAKE_CURRENT_SOURCE_DIR}/include/JetsonGPIO.h
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
 
+file(GLOB JetsonGPIO_Public_Headers ${CMAKE_CURRENT_SOURCE_DIR}/include/JetsonGPIO/*.h)
+install( FILES ${JetsonGPIO_Public_Headers} DESTINATION include/JetsonGPIO)
+
 # Install the auto-generated configuration header
 install(FILES ${PROJECT_BINARY_DIR}/JetsonGPIOConfig.h
         DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
