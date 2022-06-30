@@ -23,10 +23,11 @@ DEALINGS IN THE SOFTWARE.
 */
 
 #pragma once
-#ifndef GPIO_EVENT
-#define GPIO_EVENT
+#ifndef GPIO_EVENT_H
+#define GPIO_EVENT_H
 
-#include "JetsonGPIO.h"
+#include "JetsonGPIO/Callback.h"
+#include "JetsonGPIO/PublicEnums.h"
 #include <map>
 #include <string>
 
@@ -70,4 +71,4 @@ namespace GPIO
     void _event_cleanup(int gpio, const std::string& gpio_name);
 } // namespace GPIO
 
-#endif /* GPIO_EVENT */
+#endif

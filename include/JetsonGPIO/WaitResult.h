@@ -23,34 +23,31 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#include "JetsonGPIO/LazyString.h"
+#pragma once
+#ifndef WAIT_RESULT_H
+#define WAIT_RESULT_H
+
+#include <string>
 
 namespace GPIO
 {
-    LazyString::LazyString(const std::function<std::string(void)>& func) : buffer(), is_cached(false), func(func) {}
-
-    LazyString::LazyString(const std::string& str) : buffer(str), is_cached(true), func() {}
-
-    LazyString::LazyString(const char* str) : buffer(str == nullptr ? "" : str), is_cached(true), func() {}
-
-    LazyString::operator const char*() const { return this->operator()().c_str(); }
-
-    LazyString::operator std::string() const { return this->operator()(); }
-
-    const std::string& LazyString::operator()() const
+    class WaitResult
     {
-        Evaluate();
-        return buffer;
-    }
+    public:
+        WaitResult(const std::string& channel);
+        WaitResult(const WaitResult&) = default;
+        WaitResult(WaitResult&&) = default;
+        WaitResult& operator=(const WaitResult&) = default;
+        WaitResult& operator=(WaitResult&&) = default;
 
-    void LazyString::Evaluate() const
-    {
-        if (is_cached)
-            return;
+        inline const std::string& channel() const { return _channel; }
+        bool is_event_detected() const;
+        inline operator bool() const { return is_event_detected(); }
 
-        if (func != nullptr)
-            buffer = func();
+    private:
+        std::string _channel;
+    };
 
-        is_cached = true;
-    }
 } // namespace GPIO
+
+#endif

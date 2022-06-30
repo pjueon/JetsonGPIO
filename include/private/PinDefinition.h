@@ -26,7 +26,7 @@ DEALINGS IN THE SOFTWARE.
 #ifndef PIN_DEFINITION_H
 #define PIN_DEFINITION_H
 
-#include "JetsonGPIO.h"
+#include "JetsonGPIO/PublicEnums.h"
 #include "private/DictionaryLike.h"
 #include "private/PythonFunctions.h"
 

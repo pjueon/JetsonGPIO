@@ -36,7 +36,7 @@ DEALINGS IN THE SOFTWARE.
 #include <tuple>
 #include <vector>
 
-#include "JetsonGPIO.h"
+#include "JetsonGPIO/PublicEnums.h"
 #include "private/ExceptionHandling.h"
 #include "private/GPIOPinData.h"
 #include "private/ModelUtility.h"

@@ -23,34 +23,35 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#include "JetsonGPIO/LazyString.h"
+#pragma once
+#ifndef PWM_H
+#define PWM_H
+
+#include <memory>
+#include <string>
 
 namespace GPIO
 {
-    LazyString::LazyString(const std::function<std::string(void)>& func) : buffer(), is_cached(false), func(func) {}
-
-    LazyString::LazyString(const std::string& str) : buffer(str), is_cached(true), func() {}
-
-    LazyString::LazyString(const char* str) : buffer(str == nullptr ? "" : str), is_cached(true), func() {}
-
-    LazyString::operator const char*() const { return this->operator()().c_str(); }
-
-    LazyString::operator std::string() const { return this->operator()(); }
-
-    const std::string& LazyString::operator()() const
+    class PWM
     {
-        Evaluate();
-        return buffer;
-    }
+    public:
+        PWM(const std::string& channel, int frequency_hz);
+        PWM(int channel, int frequency_hz);
+        PWM(PWM&& other);
+        PWM& operator=(PWM&& other);
+        PWM(const PWM&) = delete;            // Can't create duplicate PWM objects
+        PWM& operator=(const PWM&) = delete; // Can't create duplicate PWM objects
+        ~PWM();
+        void start(double duty_cycle_percent);
+        void stop();
+        void ChangeFrequency(int frequency_hz);
+        void ChangeDutyCycle(double duty_cycle_percent);
 
-    void LazyString::Evaluate() const
-    {
-        if (is_cached)
-            return;
+    private:
+        struct Impl;
+        std::unique_ptr<Impl> pImpl;
+    };
 
-        if (func != nullptr)
-            buffer = func();
-
-        is_cached = true;
-    }
 } // namespace GPIO
+
+#endif
