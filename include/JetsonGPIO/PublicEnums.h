@@ -87,4 +87,5 @@ namespace GPIO
 
 } // namespace GPIO
 
+#undef PUBLIC_ENUM_CLASS
 #endif
