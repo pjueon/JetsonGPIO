@@ -48,17 +48,20 @@ namespace std
 
 namespace GPIO
 {
-    template <class T, class = void> struct is_equality_comparable : std::false_type
+    namespace details
     {
-    };
+        template <class T, class = void> struct is_equality_comparable : std::false_type
+        {
+        };
 
-    template <class T>
-    struct is_equality_comparable<T, std::void_t<decltype(std::declval<T>() == std::declval<T>())>>
-    : std::is_convertible<decltype(std::declval<T>() == std::declval<T>()), bool>
-    {
-    };
+        template <class T>
+        struct is_equality_comparable<T, std::void_t<decltype(std::declval<T>() == std::declval<T>())>>
+        : std::is_convertible<decltype(std::declval<T>() == std::declval<T>()), bool>
+        {
+        };
 
-    template <class T> constexpr bool is_equality_comparable_v = is_equality_comparable<T>::value;
+        template <class T> constexpr bool is_equality_comparable_v = is_equality_comparable<T>::value;
+    } // namespace details
 } // namespace GPIO
 
 #endif

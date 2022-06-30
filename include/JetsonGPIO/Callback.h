@@ -67,7 +67,7 @@ namespace GPIO
 
             static_assert(is_no_argument_callback<T> || is_string_argument_callback<T>, "Callback must be callable");
 
-            static_assert(is_equality_comparable_v<const T&>,
+            static_assert(details::is_equality_comparable_v<const T&>,
                           "Callback function MUST be equality comparable. ex> f0 == f1");
 
             return is_string_argument_callback<T> ? CallbackType::Normal : CallbackType::NoArg;
