@@ -216,6 +216,7 @@ individual channels:
 
 ```cpp
 GPIO::cleanup(chan1); // cleanup only chan1
+GPIO::cleanup({chan1, chan2}); // cleanup only chan1 and chan2
 ```
 
 #### 8. Jetson Board Information and library version
