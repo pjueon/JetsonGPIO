@@ -27,6 +27,8 @@ DEALINGS IN THE SOFTWARE.
 #ifndef TYPE_TRAITS_H
 #define TYPE_TRAITS_H
 
+#include <cstdio>
+#include <iterator>
 #include <type_traits>
 
 #ifndef CPP14_SUPPORTED
@@ -50,6 +52,7 @@ namespace GPIO
 {
     namespace details
     {
+        // is_equality_comparable
         template <class T, class = void> struct is_equality_comparable : std::false_type
         {
         };
@@ -61,6 +64,26 @@ namespace GPIO
         };
 
         template <class T> constexpr bool is_equality_comparable_v = is_equality_comparable<T>::value;
+
+        // is_iterable
+        template <class T, typename = void> struct is_iterable : std::false_type
+        {
+        };
+
+        template <class T, size_t N> struct is_iterable<T[N]> : std::true_type
+        {
+        };
+
+        // can call std::begin() and std::end() on T
+        template <class T>
+        struct is_iterable<T,
+                           std::void_t<decltype(std::begin(std::declval<T>())), decltype(std::end(std::declval<T>()))>>
+        : std::true_type
+        {
+        };
+
+        template <class T> constexpr bool is_iterable_v = is_iterable<T>::value;
+
     } // namespace details
 } // namespace GPIO
 
