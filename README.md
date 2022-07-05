@@ -287,7 +287,7 @@ if(GPIO::event_detected(channel))
     do_something();
 ```
 
-As before, you can detect events for GPIO::RISING, GPIO::FALLING or GPIO::BOTH.
+As before, you can detect events for `GPIO::RISING`, `GPIO::FALLING` or `GPIO::BOTH`.
 
 __A callback function run when an edge is detected__
 
