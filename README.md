@@ -148,7 +148,7 @@ To check which mode has been set, you can call:
 ```cpp
 GPIO::NumberingModes mode = GPIO::getmode();
 ```
-This function returns an instance of enum class `GPIO::NumberingModes`. The mode must be one of `GPIO::BOARD`(`GPIO::NumberingModes::BOARD`), `GPIO::BCM`(`GPIO::NumberingModes::BCM`), `GPIO::CVM`(`GPIO::NumberingModes::CVM`), `GPIO::TEGRA_SOC`(`GPIO::NumberingModes::TEGRA_SOC`) or `GPIO::NumberingModes::None`.
+This function returns an instance of enum class `GPIO::NumberingModes`. The mode must be one of `GPIO::BOARD`, `GPIO::BCM`, `GPIO::CVM`, `GPIO::TEGRA_SOC` or `GPIO::NumberingModes::None`.
 
 #### 3. Warnings
 
