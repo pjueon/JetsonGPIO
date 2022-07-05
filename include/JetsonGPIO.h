@@ -27,14 +27,15 @@ DEALINGS IN THE SOFTWARE.
 #ifndef JETSON_GPIO_H
 #define JETSON_GPIO_H
 
+#include <initializer_list>
 #include <string>
 
 #include "JetsonGPIO/Callback.h"
 #include "JetsonGPIO/LazyString.h"
+#include "JetsonGPIO/PWM.h"
 #include "JetsonGPIO/PublicEnums.h"
 #include "JetsonGPIO/TypeTraits.h"
 #include "JetsonGPIO/WaitResult.h"
-#include "JetsonGPIO/PWM.h"
 #include "JetsonGPIOConfig.h"
 
 namespace GPIO
@@ -65,8 +66,11 @@ namespace GPIO
 
     /* Function used to cleanup channels at the end of the program.
        If no channel is provided, all channels are cleaned */
-    void cleanup(const std::string& channel = "None");
+    void cleanup();
+    void cleanup(const std::string& channel);
     void cleanup(int channel);
+    void cleanup(const std::initializer_list<int>& channels);
+    void cleanup(const std::initializer_list<std::string>& channels);
 
     /* Function used to return the current value of the specified channel.
        @returns either HIGH or LOW */

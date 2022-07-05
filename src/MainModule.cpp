@@ -360,6 +360,18 @@ namespace GPIO
 
     const std::string& MainModule::JETSON_INFO() const { return _JETSON_INFO; }
 
+    void MainModule::_warn_if_no_channel_to_cleanup()
+    {
+        // warn if no channel is setup
+        if (global()._gpio_mode == NumberingModes::None && global()._gpio_warnings)
+        {
+            std::cerr << "[WARNING] No channels have been set up yet - nothing to clean up! "
+                         "Try cleaning up at the end of your program instead!"
+                      << std::endl;
+            return;
+        }
+    }
+
     MainModule::MainModule()
     : _pinData(get_data()), // Get GPIO pin data
       _model(model_name(_pinData.model)),

@@ -113,6 +113,8 @@ namespace GPIO
 
         void _cleanup_all();
 
+        void _warn_if_no_channel_to_cleanup();
+
         const std::string& model() const;
 
         const std::string& JETSON_INFO() const;
