@@ -392,7 +392,7 @@ This feature allows you to check the function of the provided GPIO channel:
 GPIO::Directions direction = GPIO::gpio_function(channel);
 ```
 
-The function returns either `GPIO::IN`(`GPIO::Directions::IN`) or `GPIO::OUT`(`GPIO::Directions::OUT`) which are the instances of enum class `GPIO::Directions`.
+The function returns either `GPIO::IN` or `GPIO::OUT` which are the instances of enum class `GPIO::Directions`.
 
 #### 11. PWM  
 
