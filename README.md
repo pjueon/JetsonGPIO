@@ -32,9 +32,9 @@ cmake .. [OPTIONS]
 
 |Option|Default value|Description|
 |------|-------------|-----------|
-|`-DCMAKE_INSTALL_PREFIX=`|`/usr/local`|installation path|
-|`-DBUILD_EXAMPLES=`|ON|build example codes in `samples`|
-|`-DJETSON_GPIO_POST_INSTALL=`|ON|run the post install script after installation to set user permissions.|
+|`-DCMAKE_INSTALL_PREFIX=`|`/usr/local`|Installation path|
+|`-DBUILD_EXAMPLES=`|ON|Build example codes in `samples`|
+|`-DJETSON_GPIO_POST_INSTALL=`|ON|Run the post-install script after installation to set user permissions. If you set this `OFF`, you must run your application as root to use Jetson GPIO.|
 
 ### 4. Build and Install the library
 ```
