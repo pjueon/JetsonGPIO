@@ -134,7 +134,7 @@ namespace GPIO
         }
     }
 
-    void _cleanup(const std::vector<std::string>& channels)
+    void cleanup(const std::vector<std::string>& channels)
     {
         try
         {
@@ -155,15 +155,15 @@ namespace GPIO
         }
     }
 
-    void _cleanup(const std::vector<int>& channels)
+    void cleanup(const std::vector<int>& channels)
     {
         std::vector<std::string> _channels(channels.size());
         std::transform(channels.begin(), channels.end(), _channels.begin(),
                        [](int value) { return std::to_string(value); });
-        _cleanup(_channels);
+        cleanup(_channels);
     }
 
-    void cleanup(const std::string& channel) { _cleanup(std::vector<std::string>{channel}); }
+    void cleanup(const std::string& channel) { cleanup(std::vector<std::string>{channel}); }
 
     void cleanup(int channel)
     {
@@ -171,8 +171,8 @@ namespace GPIO
         cleanup(str_channel);
     }
 
-    void cleanup(const std::initializer_list<int>& channels) { _cleanup(std::vector<int>(channels)); }
-    void cleanup(const std::initializer_list<std::string>& channels) { _cleanup(std::vector<std::string>(channels)); }
+    void cleanup(const std::initializer_list<int>& channels) { cleanup(std::vector<int>(channels)); }
+    void cleanup(const std::initializer_list<std::string>& channels) { cleanup(std::vector<std::string>(channels)); }
 
     int input(const std::string& channel)
     {
