@@ -29,6 +29,7 @@ DEALINGS IN THE SOFTWARE.
 
 #include <initializer_list>
 #include <string>
+#include <vector>
 
 #include "JetsonGPIO/Callback.h"
 #include "JetsonGPIO/LazyString.h"
@@ -69,6 +70,8 @@ namespace GPIO
     void cleanup();
     void cleanup(const std::string& channel);
     void cleanup(int channel);
+    void cleanup(const std::vector<int>& channels);
+    void cleanup(const std::vector<std::string>& channels);
     void cleanup(const std::initializer_list<int>& channels);
     void cleanup(const std::initializer_list<std::string>& channels);
 
