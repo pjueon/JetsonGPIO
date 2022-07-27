@@ -265,7 +265,8 @@ GPIO::WaitResult result = GPIO::wait_for_edge(channel, GPIO::RISING, 10, 500);
 ```
 The function returns a `GPIO::WaitResult` object that contains the channel name for which the edge was detected. 
 
-To check if the event was detected or a timeout occurred, you can use `.is_event_detected()` method of the returned object or just simply cast it to `bool` type:
+To check if the event was detected or a timeout occurred, you can use `.is_event_detected()` method of the returned object or just simply cast it to `bool` type.
+the returned object is implicitly convertible to `bool` and its value is equal to the return value of `.is_event_detected()`:
 ```cpp
 // returns the channel name for which the edge was detected ("None" if a timeout occurred)
 std::string eventDetectedChannel = result.channel();
