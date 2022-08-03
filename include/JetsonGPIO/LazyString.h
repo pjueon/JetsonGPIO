@@ -61,7 +61,7 @@ namespace GPIO
     {
         template <class T>
         constexpr bool is_string =
-            std::is_constructible<LazyString, T>::value && !std::is_same<std::decay_t<T>, nullptr_t>::value;
+            std::is_constructible<LazyString, T>::value && !std::is_same<std::decay_t<T>, std::nullptr_t>::value;
 
         template <class T1, class T2>
         constexpr bool is_lazy_string_comparision = is_string<T1>&& is_string<T2> &&
