@@ -23,42 +23,50 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#include "private/Model.h"
-#include "private/ModelUtility.h"
+#include "private/PythonFunctions.h"
 #include "private/TestUtility.h"
 #include <iostream>
+
+using namespace std::string_literals;
+
+namespace
+{
+    struct LowerTestCase
+    {
+        std::string input;
+        std::string expected;
+
+        void run()
+        {
+            auto actual = GPIO::lower(input);
+            assert::are_equal(expected, actual);
+        }
+
+        TestFunction function(const std::string& name)
+        {
+            return {name, [this]() { run(); }};
+        }
+    };
+} // namespace
 
 int main()
 {
     TestSuit suit{};
 
-#define TEST(NAME)                                                                                                     \
-    {                                                                                                                  \
-        "model to name " #NAME, []() { assert::are_equal(#NAME, GPIO::model_name(GPIO::NAME)); }                       \
-    }
-    suit.add(TEST(CLARA_AGX_XAVIER));
-    suit.add(TEST(JETSON_NX));
-    suit.add(TEST(JETSON_XAVIER));
-    suit.add(TEST(JETSON_TX2));
-    suit.add(TEST(JETSON_TX1));
-    suit.add(TEST(JETSON_NANO));
-    suit.add(TEST(JETSON_TX2_NX));
-    suit.add(TEST(JETSON_ORIN));
-#undef TEST
+    std::vector<LowerTestCase> cases = {
+        {""s, ""s},
+        {"abcd efg 012_xyz 987"s, "abcd efg 012_xyz 987"s},
+        {"aBcd eFG 012_XYZ 987"s, "abcd efg 012_xyz 987"s},
+        {"    "s, "    "s},
+        {"UPPER CASE!!"s, "upper case!!"s},
+        {"This Is a Test..."s, "this is a test..."s},
+    };
 
-#define TEST(NAME)                                                                                                     \
-    {                                                                                                                  \
-        "name to model " #NAME, []() { assert::is_true(GPIO::NAME == GPIO::name_to_model(#NAME)); }                    \
+    for (size_t i = 0; i < cases.size(); i++)
+    {
+        auto name = GPIO::format("case_%02d", i);
+        suit.add(cases[i].function(name));
     }
-    suit.add(TEST(CLARA_AGX_XAVIER));
-    suit.add(TEST(JETSON_NX));
-    suit.add(TEST(JETSON_XAVIER));
-    suit.add(TEST(JETSON_TX2));
-    suit.add(TEST(JETSON_TX1));
-    suit.add(TEST(JETSON_NANO));
-    suit.add(TEST(JETSON_TX2_NX));
-    suit.add(TEST(JETSON_ORIN));
-#undef TEST
 
     return suit.run();
 }

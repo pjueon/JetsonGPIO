@@ -23,34 +23,53 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#include "JetsonGPIO/LazyString.h"
+#include "private/PythonFunctions.h"
+#include "private/TestUtility.h"
+#include <iostream>
+#include <vector>
 
-namespace GPIO
+using namespace std::string_literals;
+
+namespace
 {
-    LazyString::LazyString(const std::function<std::string(void)>& func) : buffer(), is_cached(false), func(func) {}
-
-    LazyString::LazyString(const std::string& str) : buffer(str), is_cached(true), func() {}
-
-    LazyString::LazyString(const char* str) : buffer(str == nullptr ? "" : str), is_cached(true), func() {}
-
-    LazyString::operator const char*() const { return this->operator()().c_str(); }
-
-    LazyString::operator std::string() const { return this->operator()(); }
-
-    const std::string& LazyString::operator()() const
+    struct TestCase
     {
-        Evaluate();
-        return buffer;
+        std::string input;
+        std::string prefix;
+        bool expected;
+
+        void run()
+        {
+            auto actual = GPIO::startswith(input, prefix);
+            assert::are_equal(expected, actual);
+        }
+
+        TestFunction function(const std::string& name)
+        {
+            return {name, [this]() { run(); }};
+        }
+    };
+} // namespace
+
+int main()
+{
+    std::vector<TestCase> cases = {
+        {"ABcde xyz987"s, "abc"s, false},
+        {"jetson nano"s, "jetson"s, true},
+        {""s, ""s, true},
+        {"xyz 012345"s, ""s, true},
+        {"  009124ab xyz"s, "0"s, false},
+        {"Jetson GPIO Test 1234"s, "Jetson GPIO Test"s, true},
+        {"Jetson GPIO Test 1234"s, "Jetson GPIO Test 5678"s, false},
+    };
+
+    TestSuit suit{};
+
+    for (size_t i = 0; i < cases.size(); i++)
+    {
+        auto name = GPIO::format("case_%02d", i);
+        suit.add(cases[i].function(name));
     }
 
-    void LazyString::Evaluate() const
-    {
-        if (is_cached)
-            return;
-
-        if (func != nullptr)
-            buffer = func();
-
-        is_cached = true;
-    }
-} // namespace GPIO
+    return suit.run();
+}

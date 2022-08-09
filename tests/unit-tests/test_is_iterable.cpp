@@ -23,34 +23,61 @@ FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 DEALINGS IN THE SOFTWARE.
 */
 
-#include "JetsonGPIO/LazyString.h"
+#include "private/TestUtility.h"
+#include "JetsonGPIO/TypeTraits.h"
+#include <vector>
+#include <string>
+#include <set>
 
-namespace GPIO
+namespace
 {
-    LazyString::LazyString(const std::function<std::string(void)>& func) : buffer(), is_cached(false), func(func) {}
-
-    LazyString::LazyString(const std::string& str) : buffer(str), is_cached(true), func() {}
-
-    LazyString::LazyString(const char* str) : buffer(str == nullptr ? "" : str), is_cached(true), func() {}
-
-    LazyString::operator const char*() const { return this->operator()().c_str(); }
-
-    LazyString::operator std::string() const { return this->operator()(); }
-
-    const std::string& LazyString::operator()() const
+    struct NotIterable
     {
-        Evaluate();
-        return buffer;
+    };
+
+
+    void Vector()
+    {
+        std::vector<double> data{};
+        assert::is_true(GPIO::details::is_iterable_v<decltype(data)>);
     }
 
-    void LazyString::Evaluate() const
+    void Set()
     {
-        if (is_cached)
-            return;
-
-        if (func != nullptr)
-            buffer = func();
-
-        is_cached = true;
+        std::set<std::string> data{"foo", "bar", "ok"};
+        assert::is_true(GPIO::details::is_iterable_v<decltype(data)>);
     }
-} // namespace GPIO
+
+    void InitializerList()
+    {
+        auto data = {1, 2, 3};
+        assert::is_true(GPIO::details::is_iterable_v<decltype(data)>);
+    }
+
+    void RawArray()
+    {
+        std::string data[] = {"hello", "world", "!"};
+        assert::is_true(GPIO::details::is_iterable_v<decltype(data)>);
+    }
+
+    void NotIterableType()
+    {
+        NotIterable data{};
+        assert::is_false(GPIO::details::is_iterable_v<decltype(data)>);
+    }
+}
+
+int main()
+{
+    TestSuit suit{};
+
+#define TEST(NAME) {#NAME, NAME}
+    suit.add(TEST(Vector));
+    suit.add(TEST(Set));
+    suit.add(TEST(InitializerList));
+    suit.add(TEST(RawArray));
+    suit.add(TEST(NotIterableType));
+#undef TEST
+
+    return 0;
+}

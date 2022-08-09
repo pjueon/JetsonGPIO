@@ -42,8 +42,8 @@ DEALINGS IN THE SOFTWARE.
 #include <mutex>
 #include <thread>
 #include <vector>
+#include <memory>
 
-#include "JetsonGPIO.h"
 
 constexpr size_t MAX_EPOLL_EVENTS = 20;
 

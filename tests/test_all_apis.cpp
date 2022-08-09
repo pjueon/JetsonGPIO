@@ -213,6 +213,43 @@ private:
             throw std::runtime_error("Expected warning did not occur");
     }
 
+    void test_cleanup_multiple_channels()
+    {
+        GPIO::setwarnings(false);
+        Warning w{};
+
+        GPIO::setmode(GPIO::BOARD);
+        GPIO::setup(pin_data.in_a, GPIO::IN);
+        GPIO::setup(pin_data.in_b, GPIO::IN);
+        GPIO::setup(pin_data.out_a, GPIO::OUT);
+
+        GPIO::cleanup({pin_data.in_a, pin_data.in_b});
+
+        if (!w.contents().empty())
+            throw std::runtime_error("Unexpected warning occured");
+
+        GPIO::cleanup();
+    }
+
+    void test_cleanup_multiple_channels_in_vector()
+    {
+        GPIO::setwarnings(false);
+        Warning w{};
+
+        GPIO::setmode(GPIO::BOARD);
+        GPIO::setup(pin_data.in_a, GPIO::IN);
+        GPIO::setup(pin_data.in_b, GPIO::IN);
+        GPIO::setup(pin_data.out_a, GPIO::OUT);
+
+        std::vector<int> channels = {pin_data.in_a, pin_data.in_b};
+        GPIO::cleanup(channels);
+
+        if (!w.contents().empty())
+            throw std::runtime_error("Unexpected warning occured");
+
+        GPIO::cleanup();
+    }
+
     void test_setup_one_board()
     {
         GPIO::setmode(GPIO::BOARD);
@@ -662,6 +699,8 @@ private:
 
         ADD_TEST(test_warnings_off);
         ADD_TEST(test_warnings_on);
+        ADD_TEST(test_cleanup_multiple_channels);
+        ADD_TEST(test_cleanup_multiple_channels_in_vector);
         ADD_TEST(test_setup_one_board);
         ADD_TEST(test_setup_one_bcm);
         ADD_TEST(test_setup_one_cvm);
@@ -758,15 +797,5 @@ private:
 int main()
 {
     APITests t{};
-    try
-    {
-        t.run();
-    }
-    catch (std::exception& e)
-    {
-        std::cerr << e.what() << std::endl;
-        return -1;
-    }
-
-    return 0;
+    return t.run();
 }

@@ -32,9 +32,9 @@ cmake .. [OPTIONS]
 
 |Option|Default value|Description|
 |------|-------------|-----------|
-|`-DCMAKE_INSTALL_PREFIX=`|`/usr/local`|installation path|
-|`-DBUILD_EXAMPLES=`|ON|build example codes in `samples`|
-|`-DJETSON_GPIO_POST_INSTALL=`|ON|run the post install script after installation to set user permissions.|
+|`-DCMAKE_INSTALL_PREFIX=`|`/usr/local`|Installation path|
+|`-DBUILD_EXAMPLES=`|ON|Build example codes in `samples`|
+|`-DJETSON_GPIO_POST_INSTALL=`|ON|Run the post-install script after installation to set user permissions. If you set this `OFF`, you must run your application as root to use Jetson GPIO.|
 
 ### 4. Build and Install the library
 ```
@@ -42,7 +42,7 @@ sudo make install
 ```
 
 # Linking the Library 
-**Note**: To build your code with JetsonGPIO, C++11 or above is required.
+**Note**: To build your code with JetsonGPIO, C++11 or higher is required.
 
 ## Using CMake
 
@@ -118,7 +118,7 @@ To include the JetsonGPIO use:
 #include <JetsonGPIO.h>
 ```
 
-All public APIs are declared in namespace "GPIO". If you want to make your code shorter, you can use:
+All public APIs are declared in namespace `GPIO`. If you want to make your code shorter, you can use:
 ```cpp
 using namespace GPIO; // optional
 ```
@@ -148,7 +148,7 @@ To check which mode has been set, you can call:
 ```cpp
 GPIO::NumberingModes mode = GPIO::getmode();
 ```
-This function returns an instance of enum class GPIO::NumberingModes. The mode must be one of GPIO::BOARD(GPIO::NumberingModes::BOARD), GPIO::BCM(GPIO::NumberingModes::BCM), GPIO::CVM(GPIO::NumberingModes::CVM), GPIO::TEGRA_SOC(GPIO::NumberingModes::TEGRA_SOC) or GPIO::NumberingModes::None.
+This function returns an instance of enum class `GPIO::NumberingModes`. The mode must be one of `GPIO::BOARD`, `GPIO::BCM`, `GPIO::CVM`, `GPIO::TEGRA_SOC` or `GPIO::NumberingModes::None`.
 
 #### 3. Warnings
 
@@ -189,7 +189,7 @@ To read the value of a channel, use:
 int value = GPIO::input(channel);
 ```
 
-This will return either GPIO::LOW(== 0) or GPIO::HIGH(== 1).
+This will return either `GPIO::LOW`(== 0) or `GPIO::HIGH`(== 1).
 
 #### 6. Output
 
@@ -199,7 +199,7 @@ To set the value of a pin configured as output, use:
 GPIO::output(channel, state);
 ```
 
-where state can be GPIO::LOW(== 0) or GPIO::HIGH(== 1).
+where state can be `GPIO::LOW`(== 0) or `GPIO::HIGH`(== 1).
 
 
 #### 7. Clean up
@@ -216,6 +216,7 @@ individual channels:
 
 ```cpp
 GPIO::cleanup(chan1); // cleanup only chan1
+GPIO::cleanup({chan1, chan2}); // cleanup only chan1 and chan2
 ```
 
 #### 8. Jetson Board Information and library version
@@ -255,7 +256,7 @@ This function blocks the calling thread until the provided edge(s) is detected. 
 ```cpp
 GPIO::wait_for_edge(channel, GPIO::RISING);
 ```
-The second parameter specifies the edge to be detected and can be GPIO::RISING, GPIO::FALLING or GPIO::BOTH. If you only want to limit the wait to a specified amount of time, a timeout can be optionally set:
+The second parameter specifies the edge to be detected and can be `GPIO::RISING`, `GPIO::FALLING` or `GPIO::BOTH`. If you only want to limit the wait to a specified amount of time, a timeout can be optionally set:
 
 ```cpp
 // timeout is in milliseconds__
@@ -264,7 +265,8 @@ GPIO::WaitResult result = GPIO::wait_for_edge(channel, GPIO::RISING, 10, 500);
 ```
 The function returns a `GPIO::WaitResult` object that contains the channel name for which the edge was detected. 
 
-To check if the event was detected or a timeout occurred, you can use `.is_event_detected()` method of the returned object or just simply cast it to `bool` type:
+To check if the event was detected or a timeout occurred, you can use `.is_event_detected()` method of the returned object or just simply cast it to `bool` type.
+the returned object is implicitly convertible to `bool` and its value is equal to the return value of `.is_event_detected()`:
 ```cpp
 // returns the channel name for which the edge was detected ("None" if a timeout occurred)
 std::string eventDetectedChannel = result.channel();
@@ -286,7 +288,7 @@ if(GPIO::event_detected(channel))
     do_something();
 ```
 
-As before, you can detect events for GPIO::RISING, GPIO::FALLING or GPIO::BOTH.
+As before, you can detect events for `GPIO::RISING`, `GPIO::FALLING` or `GPIO::BOTH`.
 
 __A callback function run when an edge is detected__
 
@@ -391,7 +393,7 @@ This feature allows you to check the function of the provided GPIO channel:
 GPIO::Directions direction = GPIO::gpio_function(channel);
 ```
 
-The function returns either GPIO::IN(GPIO::Directions::IN) or GPIO::OUT(GPIO::Directions::OUT) which are the instances of enum class GPIO::Directions.
+The function returns either `GPIO::IN` or `GPIO::OUT` which are the instances of enum class `GPIO::Directions`.
 
 #### 11. PWM  
 
@@ -413,32 +415,47 @@ configure the pinmux.
 # Using the library from a docker container
 The following describes how to use the JetsonGPIO library from a docker container. 
 
-## Get the docker image
-You can get the pre-built docker image from [pjueon/jetson-gpio](https://hub.docker.com/repository/docker/pjueon/jetson-gpio/).
+## Preparing the docker image
+### Pulling from Docker hub
+A pre-built image that contains JetsonGPIO is available on docker hub([pjueon/jetson-gpio](https://hub.docker.com/r/pjueon/jetson-gpio/)).
 
-## Building docker image (optional)
-You can also build the docker image from the source. `docker/Dockerfile` is the Dockerfile for the library. 
-The following command will build a docker image named `testimg` from it. 
+```shell
+docker pull pjueon/jetson-gpio
+```
+
+You can use it as a base image for your application.
+
+### Building from the source
+You can also build the image from the source.
+`docker/Dockerfile` is the docker file that was used for the pre-built image on docker hub. 
+You can modify it for your application.
+
+The following command will build a docker image named `testimg` from `docker/Dockerfile`: 
 
 ```shell
 sudo docker image build -f docker/Dockerfile -t testimg .
 ```
 
+
 ## Running the container
 ### Basic options 
-You should map `/sys/devices`, `/sys/class/gpio` into the container to access to the GPIO pins.
-So you need to add these options to `docker container run` command.
-- `-v /sys/devices/:/sys/devices/`
-- `-v /sys/class/gpio:/sys/class/gpio`
+You should map `/sys/devices`, `/sys/class/gpio` into the container to access to the GPIO pins.  
+So you need to add following options to `docker container run` command:
+
+```shell
+-v /sys/devices/:/sys/devices/ \
+-v /sys/class/gpio:/sys/class/gpio
+```
+
+and if you want to use GPU from the container you also need to add following options:  
+
+```shell
+--runtime=nvidia --gpus all
+```
 
 ### Running the container in privilleged mode
 The library determines the jetson model by checking `/proc/device-tree/compatible` and `/proc/device-tree/chosen` by default.
 These paths only can be mapped into the container in privilleged mode.
-
-The options you need to add are:
-- `--privileged`
-- `-v /proc/device-tree/compatible:/proc/device-tree/compatible`
-- `-v /proc/device-tree/chosen:/proc/device-tree/compatible`
 
 The following example will run `/bin/bash` from the container in privilleged mode. 
 ```shell
@@ -453,15 +470,16 @@ pjueon/jetson-gpio /bin/bash
 ```
 
 ### Running the container in non-privilleged mode
-If you don't want to run the container in privilleged mode, you can directly provide your jetson model name to the library through the environment variable `JETSON_MODEL_NAME`.
+If you don't want to run the container in privilleged mode, you can directly provide your jetson model name to the library through the environment variable `JETSON_MODEL_NAME`:
 
-The option you need to add is:
-- `-e JETSON_MODEL_NAME=[PUT_YOUR_JETSON_MODEL_NAME_HERE]` (ex> `-e JETSON_MODEL_NAME=JETSON_NANO`)
+```shell
+# ex> -e JETSON_MODEL_NAME=JETSON_NANO
+-e JETSON_MODEL_NAME=[PUT_YOUR_JETSON_MODEL_NAME_HERE]
+```
 
 You can get the proper value for this environment variable by running `samples/jetson_model` in privilleged mode:
 ```shell
 sudo docker container run --rm \
---runtime=nvidia --gpus all \
 --privileged \
 -v /proc/device-tree/compatible:/proc/device-tree/compatible \
 -v /proc/device-tree/chosen:/proc/device-tree/chosen \
@@ -477,6 +495,6 @@ sudo docker container run -it --rm \
 --runtime=nvidia --gpus all \
 -v /sys/devices/:/sys/devices/ \
 -v /sys/class/gpio:/sys/class/gpio \
--e JETSON_MODEL_NAME=[PUT_YOUR_JETSON_MODEL_NAME_HERE] \
+-e JETSON_MODEL_NAME=[PUT_YOUR_JETSON_MODEL_NAME_HERE] \  
 pjueon/jetson-gpio /bin/bash
 ```

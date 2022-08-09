@@ -120,30 +120,33 @@ namespace GPIO
 
     void setup(int channel, Directions direction, int initial) { setup(std::to_string(channel), direction, initial); }
 
-    void cleanup(const std::string& channel)
+    // clean all channels if no channel param provided
+    void cleanup()
     {
         try
         {
-            // warn if no channel is setup
-            if (global()._gpio_mode == NumberingModes::None && global()._gpio_warnings)
-            {
-                std::cerr << "[WARNING] No channels have been set up yet - nothing to clean up! "
-                             "Try cleaning up at the end of your program instead!"
-                          << std::endl;
-                return;
-            }
+            global()._warn_if_no_channel_to_cleanup();
+            global()._cleanup_all();
+        }
+        catch (std::exception& e)
+        {
+            throw _error(e, "cleanup()");
+        }
+    }
 
-            // clean all channels if no channel param provided
-            if (is_None(channel))
-            {
-                global()._cleanup_all();
-                return;
-            }
+    void cleanup(const std::vector<std::string>& channels)
+    {
+        try
+        {
+            global()._warn_if_no_channel_to_cleanup();
 
-            ChannelInfo ch_info = global()._channel_to_info(channel);
-            if (is_in(ch_info.channel, global()._channel_configuration))
+            auto ch_infos = global()._channels_to_infos(channels);
+            for (auto&& ch_info : ch_infos)
             {
-                global()._cleanup_one(ch_info);
+                if (is_in(ch_info.channel, global()._channel_configuration))
+                {
+                    global()._cleanup_one(ch_info);
+                }
             }
         }
         catch (std::exception& e)
@@ -152,11 +155,24 @@ namespace GPIO
         }
     }
 
+    void cleanup(const std::vector<int>& channels)
+    {
+        std::vector<std::string> _channels(channels.size());
+        std::transform(channels.begin(), channels.end(), _channels.begin(),
+                       [](int value) { return std::to_string(value); });
+        cleanup(_channels);
+    }
+
+    void cleanup(const std::string& channel) { cleanup(std::vector<std::string>{channel}); }
+
     void cleanup(int channel)
     {
         std::string str_channel = std::to_string(channel);
         cleanup(str_channel);
     }
+
+    void cleanup(const std::initializer_list<int>& channels) { cleanup(std::vector<int>(channels)); }
+    void cleanup(const std::initializer_list<std::string>& channels) { cleanup(std::vector<std::string>(channels)); }
 
     int input(const std::string& channel)
     {

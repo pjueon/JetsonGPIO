@@ -40,6 +40,8 @@ namespace assert
         throw std::runtime_error("assert failed." + msg);
     }
 
+    void is_false(bool b, std::string msg) { is_true(!b, msg); }
+
     void expect_exception(const std::function<void(void)>& func, std::string msg)
     {
         bool exception_occured = false;
@@ -63,7 +65,7 @@ void TestFunction::execute() const
         func();
 }
 
-void TestSuit::run()
+int TestSuit::run()
 {
     setup();
     std::cout << "Number of test cases: " << tests.size() << std::endl;
@@ -76,15 +78,17 @@ void TestSuit::run()
         {
             test.func();
         }
-        catch (...)
+        catch (std::exception& e)
         {
             on_failed();
-            std::cout << "test failed." << std::endl;
-            throw;
+            std::cerr << "test failed." << std::endl;
+            std::cerr << e.what() << std::endl;
+            return -1;
         }
     }
 
     std::cout << "All tests passed." << std::endl;
+    return 0;
 }
 
 void TestSuit::reserve(size_t n) { tests.reserve(n); }
