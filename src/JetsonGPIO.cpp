@@ -65,8 +65,11 @@ namespace GPIO
             if (global()._gpio_mode != NumberingModes::None && mode != global()._gpio_mode)
                 throw std::runtime_error("A different mode has already been set!");
 
-            global()._channel_data = global()._channel_data_by_mode.at(mode);
-            global()._gpio_mode = mode;
+            if (global()._gpio_mode == NumberingModes::None)
+            {
+                global()._channel_data = global()._channel_data_by_mode.at(mode);
+                global()._gpio_mode = mode;
+            }
         }
         catch (std::exception& e)
         {
