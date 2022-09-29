@@ -61,11 +61,20 @@ namespace GPIO
             // check if mode is valid
             if (mode == NumberingModes::None)
                 throw std::runtime_error("Pin numbering mode must be BOARD, BCM, TEGRA_SOC or CVM");
-            // check if a different mode has been set
-            if (global()._gpio_mode != NumberingModes::None && mode != global()._gpio_mode)
-                throw std::runtime_error("A different mode has already been set!");
 
-            if (global()._gpio_mode == NumberingModes::None)
+            // check if a different mode has been set
+            bool already_set = global()._gpio_mode != NumberingModes::None;
+            bool same_mode = mode == global()._gpio_mode;
+
+            if (already_set && !same_mode)
+            {
+                throw std::runtime_error("A different mode has already been set!");
+            }
+            else if (already_set && same_mode)
+            {
+                return; // do nothing
+            }
+            else // not set yet
             {
                 global()._channel_data = global()._channel_data_by_mode.at(mode);
                 global()._gpio_mode = mode;
