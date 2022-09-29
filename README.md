@@ -334,6 +334,11 @@ public:
         return name == other.name;
     }
 
+    bool operator!=(const MyCallback& other) const 
+    {
+        return !(*this == other);
+    }
+    
 private:
     std::string name;
 };
