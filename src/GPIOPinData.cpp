@@ -61,6 +61,8 @@ namespace GPIO
         /* These vectors contain all the relevant GPIO data for each Jetson Platform.
         The values are use to generate dictionaries that map the corresponding pin
         mode numbers to the Linux GPIO pin number and GPIO chip directory */
+        const vector<PinDefinition> JETSON_ORIN_NX_PIN_DEFS;
+        const vector<string> compats_jetson_orins_nx;
         const vector<PinDefinition> JETSON_ORIN_PIN_DEFS;
         const vector<string> compats_jetson_orins;
         const vector<PinDefinition> CLARA_AGX_XAVIER_PIN_DEFS;
@@ -95,6 +97,37 @@ namespace GPIO
     // clang-format off
     EntirePinData::EntirePinData()
         : 
+        JETSON_ORIN_NX_PIN_DEFS
+        {
+            { "{164: 144}"s, "{164: PAC.06}"s, "2200000.gpio", "7",  "4",  "GPIO09",     "GP167",            None,          None },
+            { "{164: 112}"s, "{164:  PR.04}"s, "2200000.gpio", "11", "17", "UART1_RTS",  "GP72_UART1_RTS_N", None,          None },
+            { "{164:  50}"s, "{164:  PH.07}"s, "2200000.gpio", "12", "18", "I2S0_SCLK",  "GP122",            None,          None },
+            { "{164: 122}"s, "{164:  PY.00}"s, "2200000.gpio", "13", "27", "SPI1_SCK",   "GP36_SPI3_CLK",    None,          None },
+            { "{164:  85}"s, "{164:  PN.01}"s, "2200000.gpio", "15", "22", "GPIO12",     "GP88_PWM1",        "3280000.pwm",    0 },
+            { "{164: 126}"s, "{164:  PY.04}"s, "2200000.gpio", "16", "23", "SPI1_CS1",   "GP40_SPI3_CS1_N",  None,          None },
+            { "{164: 125}"s, "{164:  PY.03}"s, "2200000.gpio", "18", "24", "SPI1_CS0",   "GP39_SPI3_CS0_N",  None,          None },
+            { "{164: 135}"s, "{164:  PZ.05}"s, "2200000.gpio", "19", "10", "SPI0_MOSI",  "GP49_SPI1_MOSI",   None,          None },
+            { "{164: 134}"s, "{164:  PZ.04}"s, "2200000.gpio", "21", "9",  "SPI0_MISO",  "GP48_SPI1_MISO",   None,          None },
+            { "{164: 123}"s, "{164:  PY.01}"s, "2200000.gpio", "22", "25", "SPI1_MISO",  "GP37_SPI3_MISO",   None,          None },
+            { "{164: 133}"s, "{164:  PZ.03}"s, "2200000.gpio", "23", "11", "SPI0_SCK",   "GP47_SPI1_CLK",    None,          None },
+            { "{164: 136}"s, "{164:  PZ.06}"s, "2200000.gpio", "24", "8",  "SPI0_CS0",   "GP50_SPI1_CS0_N",  None,          None },
+            { "{164: 137}"s, "{164:  PZ.07}"s, "2200000.gpio", "26", "7",  "SPI0_CS1",   "GP51_SPI1_CS1_N",  None,          None },
+            { "{164: 105}"s, "{164:  PQ.05}"s, "2200000.gpio", "29", "5",  "GPIO01",     "GP65",             None,          None },
+            { "{164: 106}"s, "{164:  PQ.06}"s, "2200000.gpio", "31", "6",  "GPIO11",     "GP66",             None,          None },
+            { "{164:  41}"s, "{164:  PG.06}"s, "2200000.gpio", "32", "12", "GPIO07",     "GP113_PWM7",       None,          None },
+            { "{164:  43}"s, "{164:  PH.00}"s, "2200000.gpio", "33", "13", "GPIO13",     "GP115",            "32c0000.pwm",    0 },
+            { "{164:  53}"s, "{164:  PI.02}"s, "2200000.gpio", "35", "19", "I2S0_FS",    "GP125",            None,          None },
+            { "{164: 113}"s, "{164:  PR.05}"s, "2200000.gpio", "36", "16", "UART1_CTS",  "GP73_UART1_CTS_N", None,          None },
+            { "{164: 124}"s, "{164:  PY.02}"s, "2200000.gpio", "37", "26", "SPI1_MOSI",  "GP38_SPI3_MOSI",   None,          None },
+            { "{164:  52}"s, "{164:  PI.01}"s, "2200000.gpio", "38", "20", "I2S0_SDIN",  "GP124",            None,          None },
+            { "{164:  51}"s, "{164:  PI.00}"s, "2200000.gpio", "40", "21", "I2S0_SDOUT", "GP123",            None,          None }           
+
+        },
+        compats_jetson_orins_nx
+        {
+            "nvidia,p3509-0000+p3767-0000",
+        },
+
         JETSON_ORIN_PIN_DEFS
         {
             { "{164: 106}"s, "{164:  PQ.06}"s, "2200000.gpio", "7",  "4",  "MCLK05",     "GP66",             None,         None },
@@ -371,6 +404,7 @@ namespace GPIO
 
         PIN_DEFS_MAP
         {
+            { JETSON_ORIN_NX, JETSON_ORIN_NX_PIN_DEFS },
             { JETSON_ORIN, JETSON_ORIN_PIN_DEFS },
             { CLARA_AGX_XAVIER, CLARA_AGX_XAVIER_PIN_DEFS },
             { JETSON_NX, JETSON_NX_PIN_DEFS },
@@ -382,6 +416,7 @@ namespace GPIO
         },
         JETSON_INFO_MAP
         {
+            { JETSON_ORIN_NX, {1, "32768M, 65536M",  "Unknown", "JETSON_ORIN_NX", "NVIDIA", "A78AE"} },
             { JETSON_ORIN, {1, "32768M, 65536M",  "Unknown", "JETSON_ORIN", "NVIDIA", "A78AE"} },
             { CLARA_AGX_XAVIER, {1, "16384M",  "Unknown", "CLARA_AGX_XAVIER", "NVIDIA", "ARM Carmel"} },
             { JETSON_NX, {1, "16384M, 8192M", "Unknown", "Jetson NX", "NVIDIA", "ARM Carmel"} },
@@ -541,8 +576,13 @@ namespace GPIO
             }
             else if (matches(_DATA.compats_jetson_orins))
             {
-                warn_if_not_carrier_board({"3737"s, "0000"s});
+                warn_if_not_carrier_board({"3737"s});
                 return JETSON_ORIN;
+            }
+            else if (matches(_DATA.compats_jetson_orins_nx))
+            {
+                warn_if_not_carrier_board({"3509"s});
+                return JETSON_ORIN_NX;
             }
         }
 
