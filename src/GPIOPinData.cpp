@@ -382,7 +382,7 @@ namespace GPIO
         },
         JETSON_INFO_MAP
         {
-            { JETSON_ORIN, {1, "32768M",  "Unknown", "JETSON_ORIN", "NVIDIA", "A78AE"} },
+            { JETSON_ORIN, {1, "32768M, 65536M",  "Unknown", "JETSON_ORIN", "NVIDIA", "A78AE"} },
             { CLARA_AGX_XAVIER, {1, "16384M",  "Unknown", "CLARA_AGX_XAVIER", "NVIDIA", "ARM Carmel"} },
             { JETSON_NX, {1, "16384M, 8192M", "Unknown", "Jetson NX", "NVIDIA", "ARM Carmel"} },
             { JETSON_XAVIER, {1, "65536M, 32768M, 16384M, 8192M", "Unknown", "Jetson Xavier", "NVIDIA", "ARM Carmel"} },
