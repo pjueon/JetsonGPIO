@@ -125,7 +125,7 @@ private:
             Set BOARD pin 18 as mux function PWM:
             busybox devmem 0x02434040 32 0x401
             Board mode pins */
-            return {18, 19, 11, 13, {}, "GPIO40", "GP66", {15, 18}};
+            return {18, 19, 11, 13, {}, "MCLK05", "GP66", {15, 18}};
 
         if (model == "JETSON_XAVIER")
             /* Pre-test configuration, if boot-time pinmux doesn't set up PWM pins:
