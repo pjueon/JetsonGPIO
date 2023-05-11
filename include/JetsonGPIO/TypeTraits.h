@@ -31,6 +31,14 @@ DEALINGS IN THE SOFTWARE.
 #include <iterator>
 #include <type_traits>
 
+#if (__cplusplus >= 201402L) && !defined(CPP14_SUPPORTED)
+#define CPP14_SUPPORTED
+#endif
+
+#if (__cplusplus >= 201703L) && !defined(CPP17_SUPPORTED)
+#define CPP17_SUPPORTED
+#endif
+
 #ifndef CPP14_SUPPORTED
 // define C++14 features
 namespace std
