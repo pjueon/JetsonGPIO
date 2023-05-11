@@ -118,6 +118,15 @@ class APITests : public TestSuit
 private:
     static TestPinData get_test_pin_data(const std::string& model)
     {
+        if (model == "JETSON_ORIN_NX")
+            /* Pre-test configuration, if boot-time pinmux doesn't set up PWM pins:
+            Set BOARD pin 15 as mux function PWM:
+            busybox devmem 0x02440020 32 0x400
+            Set BOARD pin 33 as mux function PWM:
+            busybox devmem 0x02434040 32 0x401
+            Board mode pins */
+            return {33, 19, 11, 13, {}, "GPIO09", "GP167", {15, 33}};
+
         if (model == "JETSON_ORIN")
             /* Pre-test configuration, if boot-time pinmux doesn't set up PWM pins:
             Set BOARD pin 15 as mux function PWM:
@@ -125,7 +134,7 @@ private:
             Set BOARD pin 18 as mux function PWM:
             busybox devmem 0x02434040 32 0x401
             Board mode pins */
-            return {18, 19, 11, 13, {}, "GPIO40", "GP66", {15, 18}};
+            return {18, 19, 11, 13, {}, "MCLK05", "GP66", {15, 18}};
 
         if (model == "JETSON_XAVIER")
             /* Pre-test configuration, if boot-time pinmux doesn't set up PWM pins:
