@@ -31,6 +31,10 @@ DEALINGS IN THE SOFTWARE.
 #include <iterator>
 #include <type_traits>
 
+#if (__cplusplus >= 201103L) && !defined(CPP11_SUPPORTED)
+#define CPP11_SUPPORTED
+#endif
+
 #if (__cplusplus >= 201402L) && !defined(CPP14_SUPPORTED)
 #define CPP14_SUPPORTED
 #endif
@@ -38,6 +42,11 @@ DEALINGS IN THE SOFTWARE.
 #if (__cplusplus >= 201703L) && !defined(CPP17_SUPPORTED)
 #define CPP17_SUPPORTED
 #endif
+
+#ifndef CPP11_SUPPORTED
+#error "JetsonGPIO requires C++11 or higher"
+#endif
+
 
 #ifndef CPP14_SUPPORTED
 // define C++14 features
