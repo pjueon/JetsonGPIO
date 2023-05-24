@@ -61,6 +61,7 @@ namespace GPIO
         /* These vectors contain all the relevant GPIO data for each Jetson Platform.
         The values are use to generate dictionaries that map the corresponding pin
         mode numbers to the Linux GPIO pin number and GPIO chip directory */
+        const vector<string> compats_jetson_orins_nano;
         const vector<PinDefinition> JETSON_ORIN_NX_PIN_DEFS;
         const vector<string> compats_jetson_orins_nx;
         const vector<PinDefinition> JETSON_ORIN_PIN_DEFS;
@@ -366,10 +367,22 @@ namespace GPIO
 
     EntirePinData::EntirePinData()
         : 
+        compats_jetson_orins_nano
+        {
+            "nvidia,p3509-0000+p3767-0003",
+            "nvidia,p3768-0000+p3767-0003",
+            "nvidia,p3509-0000+p3767-0004",
+            "nvidia,p3768-0000+p3767-0004",
+            "nvidia,p3509-0000+p3767-0005",
+            "nvidia,p3768-0000+p3767-0005"
+        },
         JETSON_ORIN_NX_PIN_DEFS{ _JETSON_ORIN_NX_PIN_DEFS() },
         compats_jetson_orins_nx
         {
             "nvidia,p3509-0000+p3767-0000",
+            "nvidia,p3768-0000+p3767-0000",
+            "nvidia,p3509-0000+p3767-0001",
+            "nvidia,p3768-0000+p3767-0001"
         },
 
         JETSON_ORIN_PIN_DEFS{ _JETSON_ORIN_PIN_DEFS() },
@@ -439,6 +452,7 @@ namespace GPIO
 
         PIN_DEFS_MAP
         {
+            { JETSON_ORIN_NANO, JETSON_ORIN_NX_PIN_DEFS },
             { JETSON_ORIN_NX, JETSON_ORIN_NX_PIN_DEFS },
             { JETSON_ORIN, JETSON_ORIN_PIN_DEFS },
             { CLARA_AGX_XAVIER, CLARA_AGX_XAVIER_PIN_DEFS },
@@ -451,6 +465,7 @@ namespace GPIO
         },
         JETSON_INFO_MAP
         {
+            { JETSON_ORIN_NANO, {1, "32768M, 65536M", "Unknown", "JETSON_ORIN_NANO", "NVIDIA", "A78AE"} },
             { JETSON_ORIN_NX, {1, "32768M, 65536M",  "Unknown", "JETSON_ORIN_NX", "NVIDIA", "A78AE"} },
             { JETSON_ORIN, {1, "32768M, 65536M",  "Unknown", "JETSON_ORIN", "NVIDIA", "A78AE"} },
             { CLARA_AGX_XAVIER, {1, "16384M",  "Unknown", "CLARA_AGX_XAVIER", "NVIDIA", "ARM Carmel"} },
@@ -616,8 +631,13 @@ namespace GPIO
             }
             else if (matches(_DATA.compats_jetson_orins_nx))
             {
-                warn_if_not_carrier_board({"3509"s});
+                warn_if_not_carrier_board({"3509"s, "3768"s});
                 return JETSON_ORIN_NX;
+            }
+            else if (matches(_DATA.compats_jetson_orins_nano))
+            {
+                warn_if_not_carrier_board({"3509"s, "3768"s});
+                return JETSON_ORIN_NANO;
             }
         }
 
