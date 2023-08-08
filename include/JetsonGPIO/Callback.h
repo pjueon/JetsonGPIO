@@ -99,7 +99,7 @@ namespace GPIO
             NoArgCallback(const NoArgCallback&) = default;
             NoArgCallback(NoArgCallback&&) = default;
 
-            template <class T, class = std::enable_if_t<!std::is_same<std::decay_t<T>, nullptr_t>::value &&
+            template <class T, class = std::enable_if_t<!std::is_same<std::decay_t<T>, std::nullptr_t>::value &&
                                                         std::is_constructible<func_t, T&&>::value>>
             NoArgCallback(T&& function)
             : function(std::forward<T>(function)), comparer(comparer_impl::Compare<std::decay_t<T>>)
