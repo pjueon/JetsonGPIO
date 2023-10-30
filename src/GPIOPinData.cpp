@@ -388,7 +388,10 @@ namespace GPIO
         compats_jetson_orins
         {
             "nvidia,p3737-0000+p3701-0000",
+            "nvidia,p3737-0000+p3701-0001",
             "nvidia,p3737-0000+p3701-0004",
+            "nvidia,p3737-0000+p3701-0005",
+            "nvidia,p3737-0000+p3701-0008",
         },
 
         CLARA_AGX_XAVIER_PIN_DEFS{ _CLARA_AGX_XAVIER_PIN_DEFS() },
