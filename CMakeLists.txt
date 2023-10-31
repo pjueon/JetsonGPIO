@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.2)
 enable_testing()
 
 project(JetsonGPIO
-        VERSION 1.2.4
+        VERSION 1.2.5
         LANGUAGES C CXX)
 
 include(GNUInstallDirs)
