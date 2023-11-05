@@ -64,6 +64,12 @@ namespace GPIO
        @initial must be HIGH, LOW or -1 and is only valid when direction is OUT  */
     void setup(const std::string& channel, Directions direction, int initial = -1);
     void setup(int channel, Directions direction, int initial = -1);
+    void setup(const std::vector<std::string>& channels, Directions direction, int initial = -1);
+    void setup(const std::vector<int>& channels, Directions direction, int initial = -1);
+    void setup(const std::initializer_list<int>& channels, Directions direction, int initial = -1);
+    void setup(const std::vector<std::string>& channels, Directions direction, const std::vector<int>& initials);
+    void setup(const std::vector<int>& channels, Directions direction, const std::vector<int>& initials); 
+    void setup(const std::initializer_list<int>& channels, Directions direction, const std::vector<int>& initials); 
 
     /* Function used to cleanup channels at the end of the program.
        If no channel is provided, all channels are cleaned */
