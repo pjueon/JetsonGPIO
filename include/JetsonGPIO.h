@@ -79,7 +79,6 @@ namespace GPIO
     void cleanup(const std::vector<int>& channels);
     void cleanup(const std::vector<std::string>& channels);
     void cleanup(const std::initializer_list<int>& channels);
-    void cleanup(const std::initializer_list<std::string>& channels);
 
     /* Function used to return the current value of the specified channel.
        @returns either HIGH or LOW */

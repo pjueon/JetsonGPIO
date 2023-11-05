@@ -225,7 +225,6 @@ namespace GPIO
     }
 
     void cleanup(const std::initializer_list<int>& channels) { cleanup(std::vector<int>(channels)); }
-    void cleanup(const std::initializer_list<std::string>& channels) { cleanup(std::vector<std::string>(channels)); }
 
     int input(const std::string& channel)
     {
