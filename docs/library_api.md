@@ -74,6 +74,18 @@ It is also possible to specify an initial value for the output channel:
 GPIO::setup(channel, GPIO::OUT, GPIO::HIGH);
 ```
 
+Setting up multiple channels is also supported. 
+```cpp
+// setup multiple channels as input
+GPIO::setup({chan1, chan2}, GPIO::IN);
+
+// setup multiple output channels. The initial value(GPIO::HIGH) is optional. 
+GPIO::setup({chan3, chan4, chan5}, GPIO::OUT, GPIO::HIGH);
+
+// setup multiple output channels with multiple initial values. The number of channels and number of values must be equal. 
+GPIO::setup({chan6, chan7}, GPIO::OUT, {GPIO::HIGH, GPIO::LOW});
+```
+
 
 #### 5. Input
 
