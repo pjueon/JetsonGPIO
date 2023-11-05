@@ -25,6 +25,7 @@ DEALINGS IN THE SOFTWARE.
 #include <vector>
 #include <string>
 #include <set>
+#include <list>
 
 namespace
 {
@@ -35,32 +36,38 @@ namespace
 
     void Vector()
     {
-        std::vector<double> data{};
-        assert::is_true(GPIO::details::is_iterable_v<decltype(data)>);
+        using T = std::vector<double>;
+        assert::is_true(GPIO::details::is_iterable_v<T>);
     }
 
     void Set()
     {
-        std::set<std::string> data{"foo", "bar", "ok"};
-        assert::is_true(GPIO::details::is_iterable_v<decltype(data)>);
+        using T = std::set<float>;
+        assert::is_true(GPIO::details::is_iterable_v<T>);
     }
 
     void InitializerList()
     {
-        auto data = {1, 2, 3};
-        assert::is_true(GPIO::details::is_iterable_v<decltype(data)>);
+        using T = std::initializer_list<std::string>;
+        assert::is_true(GPIO::details::is_iterable_v<T>);
     }
 
     void RawArray()
     {
-        std::string data[] = {"hello", "world", "!"};
-        assert::is_true(GPIO::details::is_iterable_v<decltype(data)>);
+        using T = std::string[10];
+        assert::is_true(GPIO::details::is_iterable_v<T>);
     }
+
+    void List()
+    {
+        using T = std::list<int>;
+        assert::is_true(GPIO::details::is_iterable_v<T>);
+    }    
 
     void NotIterableType()
     {
-        NotIterable data{};
-        assert::is_false(GPIO::details::is_iterable_v<decltype(data)>);
+        using T = NotIterable;
+        assert::is_false(GPIO::details::is_iterable_v<T>);
     }
 }
 
@@ -73,8 +80,9 @@ int main()
     suit.add(TEST(Set));
     suit.add(TEST(InitializerList));
     suit.add(TEST(RawArray));
+    suit.add(TEST(List));
     suit.add(TEST(NotIterableType));
 #undef TEST
 
-    return 0;
+    return suit.run();
 }
