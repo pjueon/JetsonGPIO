@@ -346,7 +346,7 @@ private:
         GPIO::cleanup();
     }
 
-    void test_setup_all()
+    void test_setup_all0()
     {
         GPIO::setmode(GPIO::BOARD);
         for (auto pin : all_board_pins)
@@ -357,6 +357,47 @@ private:
         }
         GPIO::cleanup();
     }
+
+    void test_setup_all1()
+    {
+        GPIO::setmode(GPIO::BOARD);
+        std::vector<int> pins{};
+        pins.reserve(all_board_pins.size());
+
+        for (auto pin : all_board_pins)
+        {
+            if (is_in(pin, pin_data.unimplemented_pins))
+                continue;
+
+            pins.emplace_back(pin);
+        }
+
+        GPIO::setup(pins, GPIO::IN);
+        GPIO::cleanup();
+    }
+
+    void test_setup_multiple_outputs0()
+    {
+        GPIO::setmode(GPIO::BOARD);
+        GPIO::setup({pin_data.out_a, pin_data.out_b}, GPIO::OUT);
+        GPIO::cleanup();
+    }
+
+    void test_setup_multiple_outputs1()
+    {
+        GPIO::setmode(GPIO::BOARD);
+        GPIO::setup({pin_data.out_a, pin_data.out_b}, GPIO::OUT, {GPIO::HIGH, GPIO::LOW});
+        GPIO::cleanup();
+    }
+
+
+    void test_setup_multiple_outputs2()
+    {
+        GPIO::setmode(GPIO::BOARD);
+        GPIO::setup({std::to_string(pin_data.out_a), std::to_string(pin_data.out_b)}, GPIO::OUT, {GPIO::LOW, GPIO::HIGH});
+        GPIO::cleanup();
+    }
+
 
     void test_cleanup_one()
     {
@@ -727,7 +768,11 @@ private:
         ADD_TEST(test_setup_one_out_high);
         ADD_TEST(test_setup_one_out_low);
         ADD_TEST(test_setup_one_in);
-        ADD_TEST(test_setup_all);
+        ADD_TEST(test_setup_all0);
+        ADD_TEST(test_setup_all1);
+        ADD_TEST(test_setup_multiple_outputs0);
+        ADD_TEST(test_setup_multiple_outputs1);
+        ADD_TEST(test_setup_multiple_outputs2);
         ADD_TEST(test_cleanup_one);
         ADD_TEST(test_cleanup_all);
         ADD_TEST(test_input);

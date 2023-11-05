@@ -132,6 +132,47 @@ namespace GPIO
 
     void setup(int channel, Directions direction, int initial) { setup(std::to_string(channel), direction, initial); }
 
+    void setup(const std::vector<std::string>& channels, Directions direction, int initial)
+    {
+        for (const auto& channel : channels)
+            setup(channel, direction, initial);
+    }
+
+    void setup(const std::vector<int>& channels, Directions direction, int initial)
+    {
+        for (const auto& channel : channels)
+            setup(channel, direction, initial);
+    }    
+
+    void setup(const std::initializer_list<int>& channels, Directions direction, int initial)
+    {
+        setup(std::vector<int>(channels), direction, initial);
+    }
+
+    void setup(const std::vector<std::string>& channels, Directions direction, const std::vector<int>& initials)
+    {
+        if (direction == Directions::OUT && channels.size() != initials.size())
+            throw std::runtime_error(format("Number of values (%d) != number of channels (%d)", initials.size(), channels.size()));
+
+        for (std::size_t i = 0; i < channels.size(); i++)
+            setup(channels[i], direction, initials[i]);    
+    }
+
+    void setup(const std::vector<int>& channels, Directions direction, const std::vector<int>& initials)
+    {
+        std::vector<std::string> _channels(channels.size());
+        std::transform(channels.begin(), channels.end(), _channels.begin(),
+                       [](int value) { return std::to_string(value); });
+
+        setup(_channels, direction, initials);
+    }
+
+    void setup(const std::initializer_list<int>& channels, Directions direction, const std::vector<int>& initials)
+    {
+        setup(std::vector<int>(channels), direction, initials);
+    }
+
+
     // clean all channels if no channel param provided
     void cleanup()
     {

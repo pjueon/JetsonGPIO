@@ -80,7 +80,7 @@ namespace GPIO
         template <class T> constexpr bool is_equality_comparable_v = is_equality_comparable<T>::value;
 
         // is_iterable
-        template <class T, typename = void> struct is_iterable : std::false_type
+        template <class T, class = void> struct is_iterable : std::false_type
         {
         };
 
@@ -97,6 +97,18 @@ namespace GPIO
         };
 
         template <class T> constexpr bool is_iterable_v = is_iterable<T>::value;
+
+
+        template<class T, class = void> struct value_type;
+        
+        template<class T, std::size_t N> struct value_type<T[N]> { using type = T; };
+        
+        template<class T> struct value_type<T, std::void_t<typename T::value_type>>
+        {
+            using type = typename T::value_type;
+        };
+
+        template<class T> using value_type_t = typename value_type<T>::type;
 
     } // namespace details
 } // namespace GPIO
