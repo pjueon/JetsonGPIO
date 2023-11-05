@@ -18,6 +18,7 @@ set(_unit_test_targets
     "test_lower"
     "test_none"
     "test_is_iterable"
+    "test_value_type"
     )
 
 
