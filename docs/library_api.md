@@ -319,5 +319,5 @@ any PWM channels.
 The system pinmux must be configured to connect the hardware PWM controlller(s)
 to the relevant pins. If the pinmux is not configured, PWM signals will not
 reach the pins! The JetsonGPIO library does not dynamically modify the pinmux
-configuration to achieve this. Read the L4T documentation for details on how to
+configuration to achieve this. Read the [L4T documentation](https://docs.nvidia.com/jetson/archives/r35.4.1/DeveloperGuide/text/HR/ConfiguringTheJetsonExpansionHeaders.html) for details on how to
 configure the pinmux.
