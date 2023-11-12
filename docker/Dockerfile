@@ -20,7 +20,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-FROM nvcr.io/nvidia/l4t-base:r32.4.3 AS base
+FROM nvcr.io/nvidia/l4t-base:r32.7.1 AS base
 
 RUN apt-get update 
 RUN apt-get install git build-essential cmake -y
