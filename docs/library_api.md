@@ -105,8 +105,15 @@ To set the value of a pin configured as output, use:
 GPIO::output(channel, state);
 ```
 
-where state can be `GPIO::LOW`(== 0) or `GPIO::HIGH`(== 1).
-
+where state can be `GPIO::LOW`(== 0) or `GPIO::HIGH`(== 1).  
+  
+You can also output to multiple channels:
+```cpp
+std::vector<int> channels = { 18, 12, 13 };
+GPIO::output(channels, GPIO::HIGH); // or GPIO::LOW
+// set the first channel to LOW and rest to HIGH
+GPIO::output(channels, {GPIO::LOW, GPIO::HIGH, GPIO::HIGH});
+```
 
 #### 7. Clean up
 
