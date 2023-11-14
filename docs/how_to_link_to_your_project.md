@@ -44,11 +44,12 @@ sudo bash ../scripts/post_install.sh
 
 
 ## Without CMake
-- The library name is `JetsonGPIO`.
-- The library header files are installed in `/usr/local/include` by default.
-- The library has dependency on `pthread` (the library uses `std::thread`)
-
-The following example shows how to compile your code with the library: 
-```
+The following example shows how to compile your code with `JetsonGPIO`: 
+```shell
+# you can use any other compiler instead of g++  
 g++ -o your_program_name [your_source_codes...] -lJetsonGPIO -lpthread
 ```
+> [!NOTE]
+> - All the header files are installed in `/usr/local/include` by default.
+> - `JetsonGPIO` has dependency on `pthread` due to the use of `std::thread`. Therefore, `pthread` should be linked to your code as well.
+ 
