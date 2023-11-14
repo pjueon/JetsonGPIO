@@ -89,6 +89,12 @@ namespace GPIO
        @value must be either HIGH or LOW */
     void output(const std::string& channel, int value);
     void output(int channel, int value);
+    void output(const std::vector<std::string>& channels, int value);
+    void output(const std::initializer_list<int>& channels, int value);
+    void output(const std::vector<int>& channels, int value);
+    void output(const std::vector<std::string>& channels, const std::vector<int>& values);
+    void output(const std::initializer_list<int>& channels, const std::vector<int>& values);
+    void output(const std::vector<int>& channels, const std::vector<int>& values);
 
     /* Function used to check the currently set function of the channel specified. */
     Directions gpio_function(const std::string& channel);

@@ -270,6 +270,42 @@ namespace GPIO
 
     void output(int channel, int value) { output(std::to_string(channel), value); }
 
+    void output(const std::vector<std::string>& channels, int value)
+    {
+        output(channels, std::vector<int>(channels.size(), value));
+    }
+
+    void output(const std::initializer_list<int>& channels, int value)
+    {
+        output(std::vector<int>(channels), std::vector<int>(channels.size(), value));
+    }
+
+    void output(const std::vector<int>& channels, int value)
+    {
+        output(channels, std::vector<int>(channels.size(), value));
+    }
+
+    void output(const std::vector<std::string>& channels, const std::vector<int>& values)
+    {
+        if (channels.size() != values.size())
+            throw std::runtime_error(format("Number of values (%d) != number of channels (%d)", values.size(), channels.size()));
+
+        for (std::size_t i = 0; i < channels.size(); i++)
+            output(channels[i], values[i]);
+    }
+
+    void output(const std::initializer_list<int>& channels, const std::vector<int>& values)
+    {
+        output(std::vector<int>(channels), values);
+    }
+
+    void output(const std::vector<int>& channels, const std::vector<int>& values)
+    {
+        std::vector<std::string> _channels(channels.size());
+        std::transform(channels.begin(), channels.end(), _channels.begin(), [](int x){ return std::to_string(x); });
+        output(_channels, values);
+    }
+
     Directions gpio_function(const std::string& channel)
     {
         try

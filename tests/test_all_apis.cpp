@@ -435,6 +435,26 @@ private:
         GPIO::cleanup();
     }
 
+    void test_multiple_outputs0()
+    {
+        GPIO::setmode(GPIO::BOARD);
+        std::vector<int> channels = {pin_data.out_a, pin_data.out_b};
+        GPIO::setup(channels, GPIO::OUT);
+        GPIO::output(channels, GPIO::HIGH);
+        GPIO::output(channels, GPIO::LOW);
+        GPIO::cleanup();
+    }
+
+    void test_multiple_outputs1()
+    {
+        GPIO::setmode(GPIO::BOARD);
+        std::vector<int> channels = {pin_data.out_a, pin_data.out_b};
+        GPIO::setup(channels, GPIO::OUT);
+        GPIO::output(channels, {GPIO::HIGH, GPIO::LOW});
+        GPIO::output(channels, {GPIO::LOW, GPIO::HIGH});
+        GPIO::cleanup();
+    }
+
     void test_out_in_init_high()
     {
         GPIO::setmode(GPIO::BOARD);
@@ -777,6 +797,8 @@ private:
         ADD_TEST(test_cleanup_all);
         ADD_TEST(test_input);
         ADD_TEST(test_output_one);
+        ADD_TEST(test_multiple_outputs0);
+        ADD_TEST(test_multiple_outputs1);
         ADD_TEST(test_out_in_init_high);
         ADD_TEST(test_out_in_init_low);
         ADD_TEST(test_gpio_function_unexported);
