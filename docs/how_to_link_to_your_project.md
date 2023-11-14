@@ -1,6 +1,7 @@
 
 # How to link `JetsonGPIO` to your project
-**Note**: To build your code with `JetsonGPIO`, C++11 or higher is required.
+> [!IMPORTANT]
+> To build your code with `JetsonGPIO`, C++11 or higher is required.
 
 ## With CMake
 
@@ -34,10 +35,9 @@ target_link_libraries(mytarget JetsonGPIO::JetsonGPIO)
 
 The code will be automatically fetched at configure time and built alongside your project.
 
-Note that with this method will *not* set user permissions, so you will need to set user permissions manually or run your code with root permissions.
-
-To set user permissions, run `scripts/post_install.sh` script. 
-Assuming you are in `build` directory:
+> [!IMPORTANT] 
+> This method does not automatically set user permissions, so you will need to set them manually or run your code with root permissions. 
+> To set user permissions, execute the `scripts/post_install.sh` script. Assuming you are in `build` directory:
 ```
 sudo bash ../scripts/post_install.sh
 ```

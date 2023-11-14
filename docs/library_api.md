@@ -222,10 +222,10 @@ GPIO::add_event_detect(channel, GPIO::RISING, callback_fn);
 Any object that satisfies the following requirements can be used as a callback function. 
 
 - Callable with a `const std::string&` type argument (for the channel name) **OR** without any argument. The return type must be `void`.
-  - *Note*: If the callback object is **not only** callable with a `const std::string&` type argument **but also** callable without any argument,
-  the method with a `const std::string&` type argument will be used as a callback function. 
+> [!NOTE]
+> If the callback object is **not only** callable with a `const std::string&` type argument **but also** callable without any argument, the method with a `const std::string&` type argument will be used as a callback function. 
 - Copy-constructible 
-- Equality-comparable with same type (ex> func0 == func1)  
+- Equality-comparable with same type (ex> `func0 == func1`)  
 
 Here is a user-defined type callback example:
 
@@ -316,16 +316,13 @@ The function returns either `GPIO::IN` or `GPIO::OUT` which are the instances of
 
 #### 11. PWM  
 
-See `samples/simple_pwm.cpp` for details on how to use PWM channels.
+> [!IMPORTANT]
+> The system pinmux must be configured to connect the hardware PWM controlller(s) to the relevant pins. If the pinmux is not configured, PWM signals will not reach the pins! The JetsonGPIO library does not dynamically modify the pinmux configuration to achieve this. Read the [L4T documentation](https://docs.nvidia.com/jetson/archives/r35.4.1/DeveloperGuide/text/HR/ConfiguringTheJetsonExpansionHeaders.html) for details on how to configure the pinmux.
 
 The JetsonGPIO library supports PWM only on pins with attached hardware PWM
 controllers. Unlike the RPi.GPIO library, the JetsonGPIO library does not
 implement Software emulated PWM. Jetson Nano supports 2 PWM channels, and
 Jetson AGX Xavier supports 3 PWM channels. Jetson TX1 and TX2 do not support
-any PWM channels.
+any PWM channels.  
 
-The system pinmux must be configured to connect the hardware PWM controlller(s)
-to the relevant pins. If the pinmux is not configured, PWM signals will not
-reach the pins! The JetsonGPIO library does not dynamically modify the pinmux
-configuration to achieve this. Read the [L4T documentation](https://docs.nvidia.com/jetson/archives/r35.4.1/DeveloperGuide/text/HR/ConfiguringTheJetsonExpansionHeaders.html) for details on how to
-configure the pinmux.
+See `samples/simple_pwm.cpp` for details on how to use PWM channels.
