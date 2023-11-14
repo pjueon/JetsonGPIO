@@ -1,7 +1,7 @@
 # JetsonGPIO (C++)
-`JetsonGPIO` is an unofficial C++ version of the [NVIDIA's `Jetson.GPIO` Python library](https://github.com/NVIDIA/jetson-gpio).
+`JetsonGPIO` is an unofficial C++ adaptation of the NVIDIA's Python library, [`Jetson.GPIO`](https://github.com/NVIDIA/jetson-gpio).
 
-NVIDIA Jetson series development boards contain a 40 pin GPIO header, similar to the 40 pin header in the Raspberry Pi. These GPIOs can be controlled for digital input and output using this library. `JetsonGPIO` provides C++ APIs that are almost same as the `Jetson.GPIO` Python library.
+NVIDIA Jetson series development boards contain a 40 pin GPIO header, similar to the 40 pin header in the Raspberry Pi. These GPIOs can be controlled for digital input and output using this library. `JetsonGPIO` provides C++ APIs that are almost same as the [`Jetson.GPIO`](https://github.com/NVIDIA/jetson-gpio).
   
 # Documentation
 - [Package Components](docs/package_components.md)
