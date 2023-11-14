@@ -80,7 +80,8 @@ Setting up multiple channels is also supported.
 GPIO::setup({chan1, chan2}, GPIO::IN);
 
 // setup multiple output channels. The initial value(GPIO::HIGH) is optional. 
-GPIO::setup({chan3, chan4, chan5}, GPIO::OUT, GPIO::HIGH);
+std::vector<int> channels = {chan3, chan4, chan5};  // or std::vector<std::string>
+GPIO::setup(channels, GPIO::OUT, GPIO::HIGH);
 
 // setup multiple output channels with multiple initial values. The number of channels and number of values must be equal. 
 GPIO::setup({chan6, chan7}, GPIO::OUT, {GPIO::HIGH, GPIO::LOW});
@@ -109,7 +110,7 @@ where state can be `GPIO::LOW`(== 0) or `GPIO::HIGH`(== 1).
   
 You can also output to multiple channels:
 ```cpp
-std::vector<int> channels = { 18, 12, 13 };
+std::vector<int> channels = { 18, 12, 13 };   // or std::vector<std::string>
 GPIO::output(channels, GPIO::HIGH); // or GPIO::LOW
 // set the first channel to LOW and rest to HIGH
 GPIO::output(channels, {GPIO::LOW, GPIO::HIGH, GPIO::HIGH});
