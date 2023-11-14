@@ -20,7 +20,7 @@ cmake .. [OPTIONS]
 |------|-------------|-----------|
 |`-D CMAKE_INSTALL_PREFIX=`|`/usr/local`|Installation path|
 |`-D BUILD_EXAMPLES=`|ON|Build example codes in `samples`|
-|`-D JETSON_GPIO_POST_INSTALL=`|ON|Run the post-install script after installation to set user permissions. If you set this `OFF`, you must run your application as root to use Jetson GPIO.|
+|`-D JETSON_GPIO_POST_INSTALL=`|ON|Run the post-install script after installation to set user permissions. If you set this `OFF`, you must run your application as root to use `JetsonGPIO`.|
 
 ### 4. Build and Install the library
 ```
