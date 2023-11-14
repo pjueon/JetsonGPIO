@@ -36,7 +36,7 @@ target_link_libraries(mytarget JetsonGPIO::JetsonGPIO)
 The code will be automatically fetched at configure time and built alongside your project.
 
 > [!IMPORTANT] 
-> This method does not automatically set user permissions, so you will need to set them manually or run your code with root permissions. 
+> This method does *not* automatically set user permissions, so you will need to set them manually or run your code with root permissions. 
 > To set user permissions, execute the `scripts/post_install.sh` script. Assuming you are in `build` directory:
 ```
 sudo bash ../scripts/post_install.sh

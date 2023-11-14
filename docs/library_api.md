@@ -315,14 +315,11 @@ GPIO::Directions direction = GPIO::gpio_function(channel);
 The function returns either `GPIO::IN` or `GPIO::OUT` which are the instances of enum class `GPIO::Directions`.
 
 #### 11. PWM  
+> [!NOTE]
+> `JetsonGPIO` supports PWM *only* on pins with attached hardware PWM controllers. Unlike `RPi.GPIO`, `JetsonGPIO` does *not* implement software emulated PWM. 
 
 > [!IMPORTANT]
-> The system pinmux must be configured to connect the hardware PWM controlller(s) to the relevant pins. If the pinmux is not configured, PWM signals will not reach the pins! The JetsonGPIO library does not dynamically modify the pinmux configuration to achieve this. Read the [L4T documentation](https://docs.nvidia.com/jetson/archives/r35.4.1/DeveloperGuide/text/HR/ConfiguringTheJetsonExpansionHeaders.html) for details on how to configure the pinmux.
+> The system pinmux must be configured to connect the hardware PWM controlller(s) to the relevant pins. If the pinmux is not configured, PWM signals will not reach the pins! `JetsonGPIO` does *not* dynamically modify the pinmux configuration to achieve this. Read the [L4T documentation](https://docs.nvidia.com/jetson/archives/r35.4.1/DeveloperGuide/text/HR/ConfiguringTheJetsonExpansionHeaders.html) for details on how to configure the pinmux.
 
-The JetsonGPIO library supports PWM only on pins with attached hardware PWM
-controllers. Unlike the RPi.GPIO library, the JetsonGPIO library does not
-implement Software emulated PWM. Jetson Nano supports 2 PWM channels, and
-Jetson AGX Xavier supports 3 PWM channels. Jetson TX1 and TX2 do not support
-any PWM channels.  
 
 See `samples/simple_pwm.cpp` for details on how to use PWM channels.
