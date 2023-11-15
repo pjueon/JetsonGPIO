@@ -37,12 +37,8 @@ WORKDIR /source/JetsonGPIO
 RUN mkdir build
 
 WORKDIR /source/JetsonGPIO/build
-RUN cmake ../ -DBUILD_EXAMPLES=ON -DJETSON_GPIO_POST_INSTALL=OFF
-RUN make install
-
-# collect install files to ./install
-COPY scripts/collect_install_files.py .
-RUN python3 ./collect_install_files.py
+RUN cmake .. -DCMAKE_INSTALL_PREFIX=./install -DBUILD_EXAMPLES=ON -DJETSON_GPIO_POST_INSTALL=OFF
+RUN cmake --build . --target install
 
 # app
 FROM base AS app 
