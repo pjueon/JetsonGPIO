@@ -9,3 +9,4 @@ NVIDIA Jetson series development boards contain a 40 pin GPIO header, similar to
 - [How to link `JetsonGPIO` to your project](docs/how_to_link_to_your_project.md)
 - [Complete library API](docs/library_api.md)
 - [Using `JetsonGPIO` from a docker container](docs/using_from_docker_container.md)
+- [Lisence](LISENCE.txt)
