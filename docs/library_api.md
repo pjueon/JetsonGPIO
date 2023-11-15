@@ -222,7 +222,7 @@ Any object that satisfies the following requirements can be used as a callback f
 
 - Callable with a `const std::string&` type argument (for the channel name) **OR** without any argument. The return type must be `void`.
 > [!NOTE]
-> If the callback object is **not only** callable with a `const std::string&` type argument **but also** callable without any argument, the method with a `const std::string&` type argument will be used as a callback function. 
+> If the callback object is *not only* callable with a `const std::string&` type argument *but also* callable without any argument, the method with a `const std::string&` type argument will be used as a callback function. 
 - Copy-constructible 
 - Equality-comparable with same type (ex> `func0 == func1`)  
 
@@ -282,7 +282,8 @@ GPIO::add_event_callback(channel, callback_one);
 GPIO::add_event_callback(channel, callback_two);
 ```
 
-The two callbacks in this case are run sequentially, not concurrently since there is only one event thread running all callback functions.
+> [!NOTE]
+> The two callbacks in this case are run sequentially, not concurrently since there is only one event thread running all callback functions.
 
 In order to prevent multiple calls to the callback functions by collapsing multiple events in to a single one, a debounce time can be optionally set:
 
