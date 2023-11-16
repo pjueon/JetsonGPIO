@@ -65,6 +65,9 @@
 !.vscode/extensions.json
 *.code-workspace
 
+### CLion ###
+.idea/
+
 ### VisualStudioCode Patch ###
 # Ignore all local history of files
 .history
@@ -76,3 +79,4 @@ CMakeLists.txt.user
 # End of https://www.toptal.com/developers/gitignore/api/linux,visualstudiocode,c++
 
 build/
+cmake-build-debug/
