@@ -1,10 +1,10 @@
 
-# Using the library from a docker container
-The following describes how to use the JetsonGPIO library from a docker container. 
+# Using *JetsonGPIO* from a docker container
+The following describes how to use *JetsonGPIO* from a docker container. 
 
 ## Preparing the docker image
 ### Pulling from Docker hub
-A pre-built image that contains JetsonGPIO is available on docker hub([pjueon/jetson-gpio](https://hub.docker.com/r/pjueon/jetson-gpio/)).
+A pre-built image that contains *JetsonGPIO* is available on docker hub([pjueon/jetson-gpio](https://hub.docker.com/r/pjueon/jetson-gpio/)).
 
 ```shell
 docker pull pjueon/jetson-gpio
@@ -62,6 +62,9 @@ If you don't want to run the container in privilleged mode, you can directly pro
 # ex> -e JETSON_MODEL_NAME=JETSON_NANO
 -e JETSON_MODEL_NAME=[PUT_YOUR_JETSON_MODEL_NAME_HERE]
 ```
+> [!WARNING]
+> If the name of the input Jetson model does not match the actual model, the behavior is undefined.
+
 
 You can get the proper value for this environment variable by running `samples/jetson_model` in privilleged mode:
 ```shell

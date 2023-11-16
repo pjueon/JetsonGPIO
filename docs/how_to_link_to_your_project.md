@@ -1,7 +1,7 @@
 
-# How to link `JetsonGPIO` to your project
+# How to link *JetsonGPIO* to your project
 > [!IMPORTANT]
-> To build your code with `JetsonGPIO`, C++11 or higher is required.
+> To build your code with *JetsonGPIO*, C++11 or higher is required.
 
 ## With CMake
 
@@ -44,12 +44,12 @@ sudo bash ../scripts/post_install.sh
 
 
 ## Without CMake
-The following example shows how to compile your code with `JetsonGPIO`: 
+The following example shows how to compile your code with *JetsonGPIO*: 
 ```shell
 # you can use any other compiler instead of g++  
 g++ -o your_program_name [your_source_codes...] -lJetsonGPIO -lpthread
 ```
 > [!NOTE]
 > - All the header files are installed in `/usr/local/include` by default.
-> - `JetsonGPIO` has dependency on `pthread` due to the use of `std::thread`. Therefore, `pthread` should be linked to your code as well.
+> - *JetsonGPIO* has dependency on `pthread` due to the use of `std::thread`. Therefore, `pthread` should be linked to your code as well.
  

@@ -1,13 +1,13 @@
 
 # Complete library API
 
-`JetsonGPIO`(C++) provides almost same APIs as the `Jetson.GPIO`(Python).
+*JetsonGPIO* (C++) provides almost same APIs as those of *Jetson.GPIO* (Python).
 The following discusses the use of each API:
 
 
 #### 1. Include the library
 
-To include `JetsonGPIO` use:
+To include *JetsonGPIO* use:
 ```cpp
 #include <JetsonGPIO.h>
 ```
@@ -19,8 +19,8 @@ using namespace GPIO; // optional
 
 #### 2. Pin numbering
 
-`JetsonGPIO` provides four ways of numbering the I/O pins. The first
-two correspond to the modes provided by the `RPi.GPIO`, which is a Python GPIO library for Raspberry Pi, i.e BOARD and BCM
+*JetsonGPIO* provides four ways of numbering the I/O pins. The first
+two correspond to the modes provided by the *RPi.GPIO*, which is a Python GPIO library for Raspberry Pi, i.e BOARD and BCM
 which refer to the pin number of the 40 pin GPIO header and the Broadcom SoC
 GPIO numbers respectively. The remaining two modes, CVM and TEGRA_SOC use
 strings instead of numbers which correspond to signal names on the CVM/CVB
@@ -47,7 +47,7 @@ This function returns an instance of enum class `GPIO::NumberingModes`. The mode
 #### 3. Warnings
 
 It is possible that the GPIO you are trying to use is already being used
-external to the current application. In such a condition, `JetsonGPIO` will warn you if the GPIO being used is configured to anything but the
+external to the current application. In such a condition, *JetsonGPIO* will warn you if the GPIO being used is configured to anything but the
 default direction (input). It will also warn you if you try cleaning up before
 setting up the mode and channels. To disable warnings, call:
 ```cpp
@@ -160,7 +160,7 @@ This provides a string with the X.Y.Z version format.
 
 #### 9. Interrupts
 
-Aside from busy-polling, `JetsonGPIO` provides three additional ways of monitoring an input event:
+Aside from busy-polling, *JetsonGPIO* provides three additional ways of monitoring an input event:
 
 __The wait_for_edge() function__
 
@@ -316,10 +316,10 @@ The function returns either `GPIO::IN` or `GPIO::OUT` which are the instances of
 
 #### 11. PWM  
 > [!NOTE]
-> `JetsonGPIO` supports PWM *only* on pins with attached hardware PWM controllers. Unlike `RPi.GPIO`, `JetsonGPIO` does *not* implement software emulated PWM. 
+> *JetsonGPIO* supports PWM *only* on pins with attached hardware PWM controllers. Unlike *RPi.GPIO*, *JetsonGPIO* does *not* implement software emulated PWM. 
 
 > [!IMPORTANT]
-> The system pinmux must be configured to connect the hardware PWM controlller(s) to the relevant pins. If the pinmux is not configured, PWM signals will not reach the pins! `JetsonGPIO` does *not* dynamically modify the pinmux configuration to achieve this. Read the [L4T documentation](https://docs.nvidia.com/jetson/archives/r35.4.1/DeveloperGuide/text/HR/ConfiguringTheJetsonExpansionHeaders.html) for details on how to configure the pinmux.
+> The system pinmux must be configured to connect the hardware PWM controlller(s) to the relevant pins. If the pinmux is not configured, PWM signals will not reach the pins! *JetsonGPIO* does *not* dynamically modify the pinmux configuration to achieve this. Read the [L4T documentation](https://docs.nvidia.com/jetson/archives/r35.4.1/DeveloperGuide/text/HR/ConfiguringTheJetsonExpansionHeaders.html) for details on how to configure the pinmux.
 
 
 See `samples/simple_pwm.cpp` for details on how to use PWM channels.
