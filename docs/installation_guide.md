@@ -1,4 +1,14 @@
 # Installation Guide
+This document describes how to build and install the *JetsonGPIO* from the source code.
+
+### 0. Prerequisites
+To build *JetsonGPIO* from the source code, the following prerequisites are needed:
+
+- `git` (for cloning the source code from GitHub)
+- `CMake` (3.2 or higher)
+- A C++ compiler that supports C++11 (ex> `g++`, `clang`, etc)
+- Build automation tools (ex> `GNU Make`, `Ninja`, etc)
+
 ### 1. Clone the repository.
 ```
 git clone https://github.com/pjueon/JetsonGPIO
@@ -27,7 +37,7 @@ cmake .. [OPTIONS]
 sudo cmake --build . --target install
 ```
 
-# Compiling the Samples
+## Compiling the Samples
 You can add cmake option `-D BUILD_EXAMPLES=ON` to build example codes in `samples`.
 Assuming you are in `build` directory:
 ```
