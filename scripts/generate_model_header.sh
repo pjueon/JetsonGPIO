@@ -20,38 +20,40 @@ cat << EOF > $HEADER_FILE
 
 #include <string>
 
-namespace GPIO {
-  enum class Model {
+namespace GPIO 
+{
+    enum class Model 
+    {
 EOF
 
 # Add enum class items using a for loop
 for MODEL in $JETSON_MODELS; do
-  echo "    $MODEL," >> $HEADER_FILE
+  echo "        $MODEL," >> $HEADER_FILE
 done
 
 # Add remaining part
 cat << EOF >> $HEADER_FILE
-  };
+    };
 
-  // names
-  constexpr const char* MODEL_NAMES[] = {
+    // names
+    constexpr const char* MODEL_NAMES[] = {
 EOF
 
 # Add enum names using a for loop
 for MODEL in $JETSON_MODELS; do
-  echo "    \"$MODEL\"," >> $HEADER_FILE
+  echo "        \"$MODEL\"," >> $HEADER_FILE
 done
 
 # Add remaining part
 cat << EOF >> $HEADER_FILE
-  };
+    };
 
-  // alias
+    // alias
 EOF
 
 # Add enum alias generation commands
 for MODEL in $JETSON_MODELS; do
-  echo "  constexpr Model $MODEL = Model::$MODEL;" >> $HEADER_FILE
+  echo "    constexpr Model $MODEL = Model::$MODEL;" >> $HEADER_FILE
 done
 
 # Add remaining part
