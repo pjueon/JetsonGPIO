@@ -8,7 +8,7 @@ add_custom_command(
     COMMAND chmod +x ${CMAKE_CURRENT_SOURCE_DIR}/scripts/generate_model_header.sh
     COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/scripts/generate_model_header.sh ${MODEL_HEADER_FILE} ${JETSON_MODELS}
     COMMAND ${CMAKE_COMMAND} -E echo "Model.h file has been created."
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt ${CMAKE_CURRENT_SOURCE_DIR}/scripts/generate_model_header.sh
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/cmake/GenerateModelHeader.cmake ${CMAKE_CURRENT_SOURCE_DIR}/scripts/generate_model_header.sh
     COMMENT "Generating Model.h"
 )
 
