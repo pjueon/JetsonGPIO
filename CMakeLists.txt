@@ -51,6 +51,10 @@ target_include_directories(JetsonGPIO PUBLIC
 
 add_library(JetsonGPIO::JetsonGPIO ALIAS JetsonGPIO)
 
+# Generate Model.h file
+include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/GenerateModelHeader.cmake)
+
+
 # Install Library
 install(TARGETS JetsonGPIO
         EXPORT JetsonGPIOTargets
