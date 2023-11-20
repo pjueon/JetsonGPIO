@@ -94,9 +94,8 @@ install(FILES
         ${CMAKE_CURRENT_BINARY_DIR}/JetsonGPIOConfigVersion.cmake
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/JetsonGPIO)
 
-# Install the README and LICENSE files
+# Install the LICENSE file
 install(FILES
-        ${CMAKE_CURRENT_LIST_DIR}/README.md
         ${CMAKE_CURRENT_LIST_DIR}/LICENSE.txt
         DESTINATION ${CMAKE_INSTALL_DATADIR}/JetsonGPIO)
 
