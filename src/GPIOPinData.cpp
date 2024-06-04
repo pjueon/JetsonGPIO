@@ -674,7 +674,7 @@ namespace GPIO
             map<string, string> gpio_chip_ngpio{};
             map<string, string> pwm_dirs{};
 
-            vector<string> sysfs_prefixes = {"/sys/devices/", "/sys/devices/platform/"};
+            vector<string> sysfs_prefixes = {"/sys/devices/", "/sys/devices/platform/", "/sys/bus/platform/devices/"};
 
             // Get the gpiochip offsets
             set<string> gpio_chip_names{};
