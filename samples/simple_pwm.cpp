@@ -1,7 +1,6 @@
 /*
-Copyright (c) 2012-2017 Ben Croston ben@croston.org.
-Copyright (c) 2019, NVIDIA CORPORATION.
-Copyright (c) 2019 Jueon Park(pjueon) bluegbg@gmail.com.
+Copyright (c) 2019-2023, NVIDIA CORPORATION.
+Copyright (c) 2019-2023, Jueon Park(pjueon) <bluegbgb@gmail.com>.
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -37,7 +36,8 @@ DEALINGS IN THE SOFTWARE.
 using namespace std;
 const map<string, int> output_pins{
     {"JETSON_XAVIER", 18},    {"JETSON_NANO", 33},   {"JETSON_NX", 33},
-    {"CLARA_AGX_XAVIER", 18}, {"JETSON_TX2_NX", 32}, {"JETSON_ORIN", 18},
+    {"CLARA_AGX_XAVIER", 18}, {"JETSON_TX2_NX", 32}, {"JETSON_ORIN", 18}, 
+    {"JETSON_ORIN_NX", 33}, {"JETSON_ORIN_NANO", 33}, 
 };
 
 int get_output_pin()

@@ -20,7 +20,7 @@
 # FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER
 # DEALINGS IN THE SOFTWARE.
 
-FROM nvcr.io/nvidia/l4t-base:r32.4.3 AS base
+FROM nvcr.io/nvidia/l4t-base:r32.7.1 AS base
 
 RUN apt-get update 
 RUN apt-get install git build-essential cmake -y
@@ -37,12 +37,8 @@ WORKDIR /source/JetsonGPIO
 RUN mkdir build
 
 WORKDIR /source/JetsonGPIO/build
-RUN cmake ../ -DBUILD_EXAMPLES=ON -DJETSON_GPIO_POST_INSTALL=OFF
-RUN make install
-
-# collect install files to ./install
-COPY scripts/collect_install_files.py .
-RUN python3 ./collect_install_files.py
+RUN cmake .. -DCMAKE_INSTALL_PREFIX=./install -DBUILD_EXAMPLES=ON -DJETSON_GPIO_POST_INSTALL=OFF
+RUN cmake --build . --target install
 
 # app
 FROM base AS app 

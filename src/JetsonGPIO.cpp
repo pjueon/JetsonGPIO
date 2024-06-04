@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2012-2017 Ben Croston ben@croston.org.
-Copyright (c) 2019, NVIDIA CORPORATION.
-Copyright (c) 2019 Jueon Park(pjueon) bluegbg@gmail.com.
-Copyright (c) 2021 Adam Rasburn blackforestcheesecake@protonmail.ch
+Copyright (c) 2012-2017 Ben Croston <ben@croston.org>.
+Copyright (c) 2019-2023, NVIDIA CORPORATION.
+Copyright (c) 2019-2023, Jueon Park(pjueon) <bluegbgb@gmail.com>.
+Copyright (c) 2021-2023, Adam Rasburn <blackforestcheesecake@protonmail.ch>.
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -61,11 +61,20 @@ namespace GPIO
             // check if mode is valid
             if (mode == NumberingModes::None)
                 throw std::runtime_error("Pin numbering mode must be BOARD, BCM, TEGRA_SOC or CVM");
-            // check if a different mode has been set
-            if (global()._gpio_mode != NumberingModes::None && mode != global()._gpio_mode)
-                throw std::runtime_error("A different mode has already been set!");
 
-            if (global()._gpio_mode == NumberingModes::None)
+            // check if a different mode has been set
+            bool already_set = global()._gpio_mode != NumberingModes::None;
+            bool same_mode = mode == global()._gpio_mode;
+
+            if (already_set && !same_mode)
+            {
+                throw std::runtime_error("A different mode has already been set!");
+            }
+            else if (already_set && same_mode)
+            {
+                return; // do nothing
+            }
+            else // not set yet
             {
                 global()._channel_data = global()._channel_data_by_mode.at(mode);
                 global()._gpio_mode = mode;
@@ -123,6 +132,47 @@ namespace GPIO
 
     void setup(int channel, Directions direction, int initial) { setup(std::to_string(channel), direction, initial); }
 
+    void setup(const std::vector<std::string>& channels, Directions direction, int initial)
+    {
+        for (const auto& channel : channels)
+            setup(channel, direction, initial);
+    }
+
+    void setup(const std::vector<int>& channels, Directions direction, int initial)
+    {
+        for (const auto& channel : channels)
+            setup(channel, direction, initial);
+    }    
+
+    void setup(const std::initializer_list<int>& channels, Directions direction, int initial)
+    {
+        setup(std::vector<int>(channels), direction, initial);
+    }
+
+    void setup(const std::vector<std::string>& channels, Directions direction, const std::vector<int>& initials)
+    {
+        if (direction == Directions::OUT && channels.size() != initials.size())
+            throw std::runtime_error(format("Number of values (%d) != number of channels (%d)", initials.size(), channels.size()));
+
+        for (std::size_t i = 0; i < channels.size(); i++)
+            setup(channels[i], direction, initials[i]);    
+    }
+
+    void setup(const std::vector<int>& channels, Directions direction, const std::vector<int>& initials)
+    {
+        std::vector<std::string> _channels(channels.size());
+        std::transform(channels.begin(), channels.end(), _channels.begin(),
+                       [](int value) { return std::to_string(value); });
+
+        setup(_channels, direction, initials);
+    }
+
+    void setup(const std::initializer_list<int>& channels, Directions direction, const std::vector<int>& initials)
+    {
+        setup(std::vector<int>(channels), direction, initials);
+    }
+
+
     // clean all channels if no channel param provided
     void cleanup()
     {
@@ -175,7 +225,6 @@ namespace GPIO
     }
 
     void cleanup(const std::initializer_list<int>& channels) { cleanup(std::vector<int>(channels)); }
-    void cleanup(const std::initializer_list<std::string>& channels) { cleanup(std::vector<std::string>(channels)); }
 
     int input(const std::string& channel)
     {
@@ -220,6 +269,42 @@ namespace GPIO
     }
 
     void output(int channel, int value) { output(std::to_string(channel), value); }
+
+    void output(const std::vector<std::string>& channels, int value)
+    {
+        output(channels, std::vector<int>(channels.size(), value));
+    }
+
+    void output(const std::initializer_list<int>& channels, int value)
+    {
+        output(std::vector<int>(channels), std::vector<int>(channels.size(), value));
+    }
+
+    void output(const std::vector<int>& channels, int value)
+    {
+        output(channels, std::vector<int>(channels.size(), value));
+    }
+
+    void output(const std::vector<std::string>& channels, const std::vector<int>& values)
+    {
+        if (channels.size() != values.size())
+            throw std::runtime_error(format("Number of values (%d) != number of channels (%d)", values.size(), channels.size()));
+
+        for (std::size_t i = 0; i < channels.size(); i++)
+            output(channels[i], values[i]);
+    }
+
+    void output(const std::initializer_list<int>& channels, const std::vector<int>& values)
+    {
+        output(std::vector<int>(channels), values);
+    }
+
+    void output(const std::vector<int>& channels, const std::vector<int>& values)
+    {
+        std::vector<std::string> _channels(channels.size());
+        std::transform(channels.begin(), channels.end(), _channels.begin(), [](int x){ return std::to_string(x); });
+        output(_channels, values);
+    }
 
     Directions gpio_function(const std::string& channel)
     {

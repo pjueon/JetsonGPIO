@@ -26,48 +26,53 @@ DEALINGS IN THE SOFTWARE.
 #include <string>
 #include <set>
 #include <list>
+#include <type_traits>
 
 namespace
 {
-    struct NotIterable
-    {
-    };
-
-
     void Vector()
     {
         using T = std::vector<double>;
-        assert::is_true(GPIO::details::is_iterable_v<T>);
+        using expected = double;
+        using actual = GPIO::details::value_type_t<T>;
+
+        assert::is_true(std::is_same<expected, actual>::value);
     }
 
     void Set()
     {
-        using T = std::set<float>;
-        assert::is_true(GPIO::details::is_iterable_v<T>);
+        using T = std::set<std::string>;
+        using expected = std::string;
+        using actual = GPIO::details::value_type_t<T>;
+
+        assert::is_true(std::is_same<expected, actual>::value);
     }
 
     void InitializerList()
     {
-        using T = std::initializer_list<std::string>;
-        assert::is_true(GPIO::details::is_iterable_v<T>);
+        using T = std::initializer_list<unsigned int>;
+        using expected = unsigned int;
+        using actual = GPIO::details::value_type_t<T>;
+
+        assert::is_true(std::is_same<expected, actual>::value);
     }
 
     void RawArray()
     {
-        using T = std::string[10];
-        assert::is_true(GPIO::details::is_iterable_v<T>);
+        using T = int[3];
+        using expected = int;
+        using actual = GPIO::details::value_type_t<T>;
+
+        assert::is_true(std::is_same<expected, actual>::value);
     }
 
     void List()
     {
-        using T = std::list<int>;
-        assert::is_true(GPIO::details::is_iterable_v<T>);
-    }    
+        using T = std::set<float>;
+        using expected = float;
+        using actual = GPIO::details::value_type_t<T>;
 
-    void NotIterableType()
-    {
-        using T = NotIterable;
-        assert::is_false(GPIO::details::is_iterable_v<T>);
+        assert::is_true(std::is_same<expected, actual>::value);
     }
 }
 
@@ -81,7 +86,6 @@ int main()
     suit.add(TEST(InitializerList));
     suit.add(TEST(RawArray));
     suit.add(TEST(List));
-    suit.add(TEST(NotIterableType));
 #undef TEST
 
     return suit.run();

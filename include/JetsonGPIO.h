@@ -1,8 +1,8 @@
 /*
-Copyright (c) 2012-2017 Ben Croston ben@croston.org.
-Copyright (c) 2019, NVIDIA CORPORATION.
-Copyright (c) 2019 Jueon Park(pjueon) bluegbg@gmail.com.
-Copyright (c) 2021 Adam Rasburn blackforestcheesecake@protonmail.ch
+Copyright (c) 2012-2017 Ben Croston <ben@croston.org>.
+Copyright (c) 2019-2023, NVIDIA CORPORATION.
+Copyright (c) 2019-2023, Jueon Park(pjueon) <bluegbgb@gmail.com>.
+Copyright (c) 2021-2023, Adam Rasburn <blackforestcheesecake@protonmail.ch>.
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -64,6 +64,12 @@ namespace GPIO
        @initial must be HIGH, LOW or -1 and is only valid when direction is OUT  */
     void setup(const std::string& channel, Directions direction, int initial = -1);
     void setup(int channel, Directions direction, int initial = -1);
+    void setup(const std::vector<std::string>& channels, Directions direction, int initial = -1);
+    void setup(const std::vector<int>& channels, Directions direction, int initial = -1);
+    void setup(const std::initializer_list<int>& channels, Directions direction, int initial = -1);
+    void setup(const std::vector<std::string>& channels, Directions direction, const std::vector<int>& initials);
+    void setup(const std::vector<int>& channels, Directions direction, const std::vector<int>& initials); 
+    void setup(const std::initializer_list<int>& channels, Directions direction, const std::vector<int>& initials); 
 
     /* Function used to cleanup channels at the end of the program.
        If no channel is provided, all channels are cleaned */
@@ -73,7 +79,6 @@ namespace GPIO
     void cleanup(const std::vector<int>& channels);
     void cleanup(const std::vector<std::string>& channels);
     void cleanup(const std::initializer_list<int>& channels);
-    void cleanup(const std::initializer_list<std::string>& channels);
 
     /* Function used to return the current value of the specified channel.
        @returns either HIGH or LOW */
@@ -84,6 +89,12 @@ namespace GPIO
        @value must be either HIGH or LOW */
     void output(const std::string& channel, int value);
     void output(int channel, int value);
+    void output(const std::vector<std::string>& channels, int value);
+    void output(const std::initializer_list<int>& channels, int value);
+    void output(const std::vector<int>& channels, int value);
+    void output(const std::vector<std::string>& channels, const std::vector<int>& values);
+    void output(const std::initializer_list<int>& channels, const std::vector<int>& values);
+    void output(const std::vector<int>& channels, const std::vector<int>& values);
 
     /* Function used to check the currently set function of the channel specified. */
     Directions gpio_function(const std::string& channel);

@@ -1,8 +1,5 @@
 /*
-Copyright (c) 2012-2017 Ben Croston ben@croston.org.
-Copyright (c) 2019, NVIDIA CORPORATION.
-Copyright (c) 2019 Jueon Park(pjueon) bluegbg@gmail.com.
-Copyright (c) 2021 Adam Rasburn blackforestcheesecake@protonmail.ch
+Copyright (c) 2019-2023, Jueon Park(pjueon) <bluegbgb@gmail.com>.
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -30,6 +27,23 @@ DEALINGS IN THE SOFTWARE.
 #include <cstdio>
 #include <iterator>
 #include <type_traits>
+
+#if (__cplusplus >= 201103L) && !defined(CPP11_SUPPORTED)
+#define CPP11_SUPPORTED
+#endif
+
+#if (__cplusplus >= 201402L) && !defined(CPP14_SUPPORTED)
+#define CPP14_SUPPORTED
+#endif
+
+#if (__cplusplus >= 201703L) && !defined(CPP17_SUPPORTED)
+#define CPP17_SUPPORTED
+#endif
+
+#ifndef CPP11_SUPPORTED
+#error "JetsonGPIO requires C++11 or higher"
+#endif
+
 
 #ifndef CPP14_SUPPORTED
 // define C++14 features
@@ -66,7 +80,7 @@ namespace GPIO
         template <class T> constexpr bool is_equality_comparable_v = is_equality_comparable<T>::value;
 
         // is_iterable
-        template <class T, typename = void> struct is_iterable : std::false_type
+        template <class T, class = void> struct is_iterable : std::false_type
         {
         };
 
@@ -83,6 +97,18 @@ namespace GPIO
         };
 
         template <class T> constexpr bool is_iterable_v = is_iterable<T>::value;
+
+
+        template<class T, class = void> struct value_type;
+        
+        template<class T, std::size_t N> struct value_type<T[N]> { using type = T; };
+        
+        template<class T> struct value_type<T, std::void_t<typename T::value_type>>
+        {
+            using type = typename T::value_type;
+        };
+
+        template<class T> using value_type_t = typename value_type<T>::type;
 
     } // namespace details
 } // namespace GPIO

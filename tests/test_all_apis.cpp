@@ -1,8 +1,6 @@
 /*
-Copyright (c) 2012-2017 Ben Croston ben@croston.org.
-Copyright (c) 2019, NVIDIA CORPORATION.
-Copyright (c) 2019 Jueon Park(pjueon) bluegbg@gmail.com.
-Copyright (c) 2021 Adam Rasburn blackforestcheesecake@protonmail.ch
+Copyright (c) 2019-2023, NVIDIA CORPORATION.
+Copyright (c) 2019-2023, Jueon Park(pjueon) <bluegbgb@gmail.com>.
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -118,6 +116,25 @@ class APITests : public TestSuit
 private:
     static TestPinData get_test_pin_data(const std::string& model)
     {
+        if (model == "JETSON_ORIN_NANO")
+            /* Pre-test configuration, if boot-time pinmux doesn't set up PWM pins:
+            Set BOARD pin 15 as mux function PWM:
+            busybox devmem 0x02440020 32 0x400
+            Set BOARD pin 33 as mux function PWM:
+            busybox devmem 0x02434040 32 0x401
+            Board mode pins
+            */
+            return {33, 19, 11, 13, {}, "GPIO09", "GP167", {15, 33}};
+
+        if (model == "JETSON_ORIN_NX")
+            /* Pre-test configuration, if boot-time pinmux doesn't set up PWM pins:
+            Set BOARD pin 15 as mux function PWM:
+            busybox devmem 0x02440020 32 0x400
+            Set BOARD pin 33 as mux function PWM:
+            busybox devmem 0x02434040 32 0x401
+            Board mode pins */
+            return {33, 19, 11, 13, {}, "GPIO09", "GP167", {15, 33}};
+
         if (model == "JETSON_ORIN")
             /* Pre-test configuration, if boot-time pinmux doesn't set up PWM pins:
             Set BOARD pin 15 as mux function PWM:
@@ -125,7 +142,7 @@ private:
             Set BOARD pin 18 as mux function PWM:
             busybox devmem 0x02434040 32 0x401
             Board mode pins */
-            return {18, 19, 11, 13, {}, "GPIO40", "GP66", {15, 18}};
+            return {18, 19, 11, 13, {}, "MCLK05", "GP66", {15, 18}};
 
         if (model == "JETSON_XAVIER")
             /* Pre-test configuration, if boot-time pinmux doesn't set up PWM pins:
@@ -329,7 +346,7 @@ private:
         GPIO::cleanup();
     }
 
-    void test_setup_all()
+    void test_setup_all0()
     {
         GPIO::setmode(GPIO::BOARD);
         for (auto pin : all_board_pins)
@@ -340,6 +357,47 @@ private:
         }
         GPIO::cleanup();
     }
+
+    void test_setup_all1()
+    {
+        GPIO::setmode(GPIO::BOARD);
+        std::vector<int> pins{};
+        pins.reserve(all_board_pins.size());
+
+        for (auto pin : all_board_pins)
+        {
+            if (is_in(pin, pin_data.unimplemented_pins))
+                continue;
+
+            pins.emplace_back(pin);
+        }
+
+        GPIO::setup(pins, GPIO::IN);
+        GPIO::cleanup();
+    }
+
+    void test_setup_multiple_outputs0()
+    {
+        GPIO::setmode(GPIO::BOARD);
+        GPIO::setup({pin_data.out_a, pin_data.out_b}, GPIO::OUT);
+        GPIO::cleanup();
+    }
+
+    void test_setup_multiple_outputs1()
+    {
+        GPIO::setmode(GPIO::BOARD);
+        GPIO::setup({pin_data.out_a, pin_data.out_b}, GPIO::OUT, {GPIO::HIGH, GPIO::LOW});
+        GPIO::cleanup();
+    }
+
+
+    void test_setup_multiple_outputs2()
+    {
+        GPIO::setmode(GPIO::BOARD);
+        GPIO::setup({std::to_string(pin_data.out_a), std::to_string(pin_data.out_b)}, GPIO::OUT, {GPIO::LOW, GPIO::HIGH});
+        GPIO::cleanup();
+    }
+
 
     void test_cleanup_one()
     {
@@ -374,6 +432,26 @@ private:
         GPIO::setup(pin_data.out_a, GPIO::OUT);
         GPIO::output(pin_data.out_a, GPIO::HIGH);
         GPIO::output(pin_data.out_a, GPIO::LOW);
+        GPIO::cleanup();
+    }
+
+    void test_multiple_outputs0()
+    {
+        GPIO::setmode(GPIO::BOARD);
+        std::vector<int> channels = {pin_data.out_a, pin_data.out_b};
+        GPIO::setup(channels, GPIO::OUT);
+        GPIO::output(channels, GPIO::HIGH);
+        GPIO::output(channels, GPIO::LOW);
+        GPIO::cleanup();
+    }
+
+    void test_multiple_outputs1()
+    {
+        GPIO::setmode(GPIO::BOARD);
+        std::vector<int> channels = {pin_data.out_a, pin_data.out_b};
+        GPIO::setup(channels, GPIO::OUT);
+        GPIO::output(channels, {GPIO::HIGH, GPIO::LOW});
+        GPIO::output(channels, {GPIO::LOW, GPIO::HIGH});
         GPIO::cleanup();
     }
 
@@ -710,11 +788,17 @@ private:
         ADD_TEST(test_setup_one_out_high);
         ADD_TEST(test_setup_one_out_low);
         ADD_TEST(test_setup_one_in);
-        ADD_TEST(test_setup_all);
+        ADD_TEST(test_setup_all0);
+        ADD_TEST(test_setup_all1);
+        ADD_TEST(test_setup_multiple_outputs0);
+        ADD_TEST(test_setup_multiple_outputs1);
+        ADD_TEST(test_setup_multiple_outputs2);
         ADD_TEST(test_cleanup_one);
         ADD_TEST(test_cleanup_all);
         ADD_TEST(test_input);
         ADD_TEST(test_output_one);
+        ADD_TEST(test_multiple_outputs0);
+        ADD_TEST(test_multiple_outputs1);
         ADD_TEST(test_out_in_init_high);
         ADD_TEST(test_out_in_init_low);
         ADD_TEST(test_gpio_function_unexported);

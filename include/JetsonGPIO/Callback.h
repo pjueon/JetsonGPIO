@@ -1,8 +1,5 @@
 /*
-Copyright (c) 2012-2017 Ben Croston ben@croston.org.
-Copyright (c) 2019, NVIDIA CORPORATION.
-Copyright (c) 2019 Jueon Park(pjueon) bluegbg@gmail.com.
-Copyright (c) 2021 Adam Rasburn blackforestcheesecake@protonmail.ch
+Copyright (c) 2019-2023, Jueon Park(pjueon) <bluegbgb@gmail.com>.
 
 Permission is hereby granted, free of charge, to any person obtaining a
 copy of this software and associated documentation files (the "Software"),
@@ -99,7 +96,7 @@ namespace GPIO
             NoArgCallback(const NoArgCallback&) = default;
             NoArgCallback(NoArgCallback&&) = default;
 
-            template <class T, class = std::enable_if_t<!std::is_same<std::decay_t<T>, nullptr_t>::value &&
+            template <class T, class = std::enable_if_t<!std::is_same<std::decay_t<T>, std::nullptr_t>::value &&
                                                         std::is_constructible<func_t, T&&>::value>>
             NoArgCallback(T&& function)
             : function(std::forward<T>(function)), comparer(comparer_impl::Compare<std::decay_t<T>>)
