@@ -21,6 +21,7 @@ add_definitions(-Wall -O2 -fPIC -g)
 # Sources
 set(JetsonGPIO_LIB_SRCS
     ${CMAKE_CURRENT_SOURCE_DIR}/src/JetsonGPIO.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/JetsonGPIO_C_Wrapper.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/MainModule.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/PWM.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/src/PythonFunctions.cpp
